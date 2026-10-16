@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/ui-core",
+        "outDir": "./",
+        "paths": {}
+    },
+    "include": [
+        "../../src/ui-core/**/*.ts",
+        "../../references.d.ts",
+        "../../tools/references.d.ts",
+        "../../src/references.d.ts"
+    ],
+    "exclude": [
+        "../../src/ui-core/angular/**"
+    ]
+}

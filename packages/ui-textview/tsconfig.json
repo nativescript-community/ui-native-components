@@ -1,0 +1,24 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/ui-textview",
+        "outDir": "./",
+        "paths": {
+            "@nativescript-community/ui-core": [
+                "packages/ui-core/index"
+            ],
+            "@nativescript-community/ui-core/*": [
+                "packages/ui-core/*"
+            ]
+        }
+    },
+    "include": [
+        "../../src/ui-textview/**/*.ts",
+        "../../references.d.ts",
+        "../../tools/references.d.ts",
+        "../../src/references.d.ts"
+    ],
+    "exclude": [
+        "../../src/ui-textview/angular/**"
+    ]
+}

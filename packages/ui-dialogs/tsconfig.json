@@ -1,0 +1,30 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/ui-dialogs",
+        "outDir": "./",
+        "paths": {
+            "@nativescript-community/ui-core": [
+                "packages/ui-core/index"
+            ],
+            "@nativescript-community/ui-core/*": [
+                "packages/ui-core/*"
+            ],
+            "@nativescript-community/ui-textfield": [
+                "packages/ui-textfield/textfield"
+            ],
+            "@nativescript-community/ui-textfield/*": [
+                "packages/ui-textfield/*"
+            ]
+        }
+    },
+    "include": [
+        "../../src/ui-dialogs/**/*.ts",
+        "../../references.d.ts",
+        "../../tools/references.d.ts",
+        "../../src/references.d.ts"
+    ],
+    "exclude": [
+        "../../src/ui-dialogs/angular/**"
+    ]
+}

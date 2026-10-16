@@ -1,0 +1,46 @@
+{
+    "name": "@nativescript-community/ui-button",
+    "version": "7.3.4",
+    "description": "Button augmented with variant, role, icon src and loading. Material on Android, native UIButton on iOS.",
+    "main": "./button",
+    "sideEffects": false,
+    "typings": "./button.d.ts",
+    "scripts": {
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-button' --parents --cwd=../../src/ui-button && tsc  --build",
+        "build": "npm run tsc && npm run readme",
+        "build.watch": "npm run tsc -- -w",
+        "build.all": "npm run build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.2.0",
+            "ios": "6.2.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-material-components/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/ui-material-components",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-button"
+    },
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/text": "^1.5.2",
+        "@nativescript-community/ui-core": "^7.3.4"
+    }
+}

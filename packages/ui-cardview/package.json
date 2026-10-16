@@ -1,0 +1,45 @@
+{
+    "name": "@nativescript-community/ui-cardview",
+    "version": "7.3.4",
+    "description": "CardView augmented with Material ripple/elevation/shape. Android only (Material), plain core ContentView on iOS.",
+    "main": "./cardview",
+    "sideEffects": false,
+    "typings": "./cardview.d.ts",
+    "scripts": {
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-cardview' --parents --cwd=../../src/ui-cardview && tsc  --build",
+        "build": "npm run tsc && npm run readme",
+        "build.watch": "npm run tsc -- -w",
+        "build.all": "npm run build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.2.0",
+            "ios": "6.2.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-material-components/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/ui-material-components",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-cardview"
+    },
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/ui-core": "^7.3.4"
+    }
+}

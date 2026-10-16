@@ -1,0 +1,7 @@
+{
+    "uses": [
+        "com.google.android.material.card:MaterialCardView",
+        "android.graphics.drawable:Drawable",
+        "android.view:ViewOutlineProvider"
+    ]
+}
