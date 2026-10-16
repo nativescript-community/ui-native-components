@@ -1,4 +1,4 @@
-import type { FormattedString, TextBase } from '@nativescript/core';
+import { FormattedString, Label, TextBase } from '@nativescript/core';
 
 let textLib: any;
 let textLibChecked = false;
@@ -18,10 +18,12 @@ export function getTextLib(): { createNativeAttributedString?: (...args: any[]) 
     return textLib;
 }
 
-export function createNativeFormattedTextCommon(formatted: FormattedString, owner: TextBase, density?: number) {
+export function createNativeFormattedTextCommon(formatted: FormattedString, owner?: TextBase, density?: number) {
     if (!formatted) {
         return null;
     }
+    // the owner gives the default font and color of the spans
+    owner = owner || new Label();
     const lib = getTextLib();
     if (lib?.createNativeAttributedString) {
         // fontSizeRatio is iOS only, density Android only

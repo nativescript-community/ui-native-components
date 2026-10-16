@@ -5,7 +5,7 @@
  * @module @nativescript-community/ui-textfield
  */
 
-import { Color, TextField as NTextField } from '@nativescript/core';
+import { Color, FormattedString, TextField as NTextField } from '@nativescript/core';
 import { VerticalTextAlignment } from '@nativescript-community/text';
 
 export type TextFieldProperties = Partial<Pick<TextField, keyof TextField>>;
@@ -36,6 +36,11 @@ export class TextField extends NTextField {
     buttonColor: Color;
     digits: string;
     verticalTextAlignment: VerticalTextAlignment;
+    /**
+     * Rich text (spans) of the hint, it wins over `hint`. `@nativescript-community/text` is used when installed (optional).
+     * Android: the floating label only draws plain text, the spans show with `floating="false"`.
+     */
+    formattedHint: FormattedString;
 
     focus();
     blur();

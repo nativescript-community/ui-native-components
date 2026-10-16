@@ -1,5 +1,5 @@
-import { Application, Utils } from '@nativescript/core';
-import { SearchBarCommon, SearchBarVariant, variantProperty } from './searchbar-common';
+import { Background, Color, Utils, backgroundColorProperty, backgroundInternalProperty } from '@nativescript/core';
+import { SearchBarCommon, SearchBarVariant, formattedHintProperty, formattedTextProperty, variantProperty } from './searchbar-common';
 export * from './searchbar-common';
 
 const HEIGHT_DP = 56;
@@ -53,6 +53,9 @@ export class SearchBar extends SearchBarCommon {
         this.applyVariant(this.variant);
     }
 
+    private mUserColor: Color;
+    private mUserBackground: Background;
+
     private applyVariant(variant: SearchBarVariant) {
         const searchView = this.nativeViewProtected as androidx.appcompat.widget.SearchView;
         if (!searchView) {
@@ -61,15 +64,49 @@ export class SearchBar extends SearchBarCommon {
         const context = searchView.getContext();
         const R = (com.google.android.material as any).R;
         const outlined = variant === 'outline' || variant === 'minimal';
+        const user = this.mUserBackground;
         const background = new android.graphics.drawable.GradientDrawable();
-        background.setCornerRadius(Utils.layout.toDevicePixels(HEIGHT_DP / 2));
-        if (outlined) {
+        // background-color, border and border-radius of the view replace the ones of the variant
+        const radius = user?.borderTopLeftRadius ? Utils.layout.toDevicePixels(user.borderTopLeftRadius) : Utils.layout.toDevicePixels(HEIGHT_DP / 2);
+        background.setCornerRadius(radius);
+        if (this.mUserColor) {
+            background.setColor(this.mUserColor.android);
+        } else if (outlined) {
             background.setColor(android.graphics.Color.TRANSPARENT);
-            background.setStroke(Utils.layout.toDevicePixels(1), themeColor(context, R.attr.colorOutline, android.graphics.Color.GRAY));
         } else {
             background.setColor(themeColor(context, R.attr.colorSurfaceContainerHigh, android.graphics.Color.LTGRAY));
         }
+        if (user?.borderTopWidth) {
+            background.setStroke(Utils.layout.toDevicePixels(user.borderTopWidth), user.borderTopColor ? user.borderTopColor.android : android.graphics.Color.GRAY);
+        } else if (outlined) {
+            background.setStroke(Utils.layout.toDevicePixels(1), themeColor(context, R.attr.colorOutline, android.graphics.Color.GRAY));
+        }
         searchView.setBackground(background);
+    }
+
+    private get editText(): android.widget.EditText {
+        const searchView = this.nativeViewProtected as androidx.appcompat.widget.SearchView;
+        return searchView.findViewById(id(searchView.getContext(), 'search_src_text')) as android.widget.EditText;
+    }
+
+    [formattedHintProperty.setNative](value) {
+        // a hint can be a spannable: the plain hint of the core SearchBar is restored without spans
+        this.editText?.setHint(value ? this.createNativeRichText(value) : this.hint || '');
+    }
+
+    [formattedTextProperty.setNative](value) {
+        if (value) {
+            this.editText?.setText(this.createNativeRichText(value));
+        }
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.mUserColor = value instanceof Color ? value : value ? new Color(value as any) : null;
+        this.applyVariant(this.variant);
+    }
+    [backgroundInternalProperty.setNative](value: Background) {
+        this.mUserBackground = value;
+        this.applyVariant(this.variant);
     }
 
     [variantProperty.setNative](value: SearchBarVariant) {

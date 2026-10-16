@@ -1,4 +1,5 @@
-import { Color, Screen, backgroundColorProperty, colorProperty } from '@nativescript/core';
+import { Background, Color, Screen, backgroundColorProperty, backgroundInternalProperty, colorProperty } from '@nativescript/core';
+import { applyBorderBackground } from '@nativescript-community/ui-core/border-background';
 import { ProgressBase, busyProperty, indeterminateProperty, progressBackgroundColorProperty, progressColorProperty } from './progress-common';
 
 /**
@@ -50,6 +51,9 @@ export class Progress extends ProgressBase {
     [colorProperty.setNative](value: Color | UIColor) {
         this.mProgressColor = value instanceof Color ? value.ios : value;
         this.updateBarColors();
+    }
+    [backgroundInternalProperty.setNative](value: Background) {
+        applyBorderBackground(this, value);
     }
     [backgroundColorProperty.setNative](value: Color | UIColor) {
         this.mTrackColor = value instanceof Color ? value.ios : value;

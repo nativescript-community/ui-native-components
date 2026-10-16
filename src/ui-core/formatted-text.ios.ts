@@ -1,7 +1,7 @@
 import { FormattedString, ImageSource, TextBase } from '@nativescript/core';
 import { createNativeFormattedTextCommon } from './formatted-text-common';
 
-export function createNativeFormattedText(formatted: FormattedString, owner: TextBase): NSAttributedString {
+export function createNativeFormattedText(formatted: FormattedString, owner?: TextBase): NSAttributedString {
     return createNativeFormattedTextCommon(formatted, owner);
 }
 

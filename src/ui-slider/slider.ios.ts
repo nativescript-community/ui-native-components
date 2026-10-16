@@ -1,4 +1,6 @@
-import { Color, colorProperty } from '@nativescript/core';
+import { Background, Color, backgroundInternalProperty, colorProperty } from '@nativescript/core';
+import { applyBorderBackground } from '@nativescript-community/ui-core/border-background';
+
 import { valueProperty } from '@nativescript/core/ui/slider/slider-common';
 import { SliderBase } from './slider-common';
 import { stepSizeProperty, thumbColorProperty, trackBackgroundColorProperty, trackFillColorProperty } from './cssproperties';
@@ -78,6 +80,9 @@ export class Slider extends SliderBase {
         if (!this.thumbColor) {
             this.nativeViewProtected.thumbTintColor = color ? color.ios : null;
         }
+    }
+    [backgroundInternalProperty.setNative](value: Background) {
+        applyBorderBackground(this, value);
     }
     [thumbColorProperty.setNative](color: Color) {
         this.nativeViewProtected.thumbTintColor = color ? color.ios : null;

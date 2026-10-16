@@ -1,6 +1,9 @@
-import { Color, Font, colorProperty, fontInternalProperty } from '@nativescript/core';
+import { Color, Font, Utils, colorProperty, fontInternalProperty, paddingBottomProperty, paddingLeftProperty, paddingRightProperty, paddingTopProperty } from '@nativescript/core';
 import { CheckBoxBase, checkedColorProperty, checkedProperty, indeterminateProperty, textProperty } from './checkbox-common';
 export * from './checkbox-common';
+
+// the effective paddings are in device pixels
+const dip = (value: number) => Utils.layout.toDeviceIndependentPixels(value);
 
 @NativeClass
 class TapHandler extends NSObject {
@@ -65,7 +68,11 @@ export class CheckBox extends CheckBoxBase {
         const symbol = this.indeterminate ? 'minus.square.fill' : this.checked ? 'checkmark.square.fill' : 'square';
         configuration.image = UIImage.systemImageNamed(symbol);
         configuration.imagePadding = 10;
-        configuration.contentInsets = { top: 6, leading: 0, bottom: 6, trailing: 0 } as any;
+        // the css padding, else a small vertical inset
+        const hasPadding = this.effectivePaddingTop || this.effectivePaddingRight || this.effectivePaddingBottom || this.effectivePaddingLeft;
+        configuration.contentInsets = (hasPadding
+            ? { top: dip(this.effectivePaddingTop), leading: dip(this.effectivePaddingLeft), bottom: dip(this.effectivePaddingBottom), trailing: dip(this.effectivePaddingRight) }
+            : { top: 6, leading: 0, bottom: 6, trailing: 0 }) as any;
         const selected = this.checked || this.indeterminate;
         const accent = this.checkedColor?.ios;
         // the box is tinted by the foreground color, the label keeps its own color
@@ -100,6 +107,18 @@ export class CheckBox extends CheckBoxBase {
     }
     [fontInternalProperty.setNative](value: Font) {
         this.mFont = value?.getUIFont?.(UIFont.systemFontOfSize(17));
+        this.updateConfiguration();
+    }
+    [paddingTopProperty.setNative](value) {
+        this.updateConfiguration();
+    }
+    [paddingRightProperty.setNative](value) {
+        this.updateConfiguration();
+    }
+    [paddingBottomProperty.setNative](value) {
+        this.updateConfiguration();
+    }
+    [paddingLeftProperty.setNative](value) {
         this.updateConfiguration();
     }
     [checkedColorProperty.setNative](value: Color) {

@@ -37,7 +37,7 @@ import {
 import { accessibilityIdentifierProperty } from '@nativescript/core/accessibility/accessibility-properties';
 import { testIDProperty } from '@nativescript/core/ui/core/view/view-common';
 import { secureProperty } from '@nativescript/core/ui/text-field';
-import { TextFieldBase } from './textfield.common';
+import { TextFieldBase, formattedHintProperty } from './textfield.common';
 
 let FrameLayoutLayoutParams: typeof android.widget.FrameLayout.LayoutParams;
 export class TextField extends TextFieldBase {
@@ -118,6 +118,16 @@ export class TextField extends TextFieldBase {
                 this.layoutView.setHint(text);
             } else {
                 this.nativeTextViewProtected.setHint(text);
+            }
+        } catch (error) {}
+    }
+    [formattedHintProperty.setNative](value) {
+        const hint = value ? this.createNativeRichText(value) : this.hint;
+        try {
+            if (this.floating) {
+                this.layoutView.setHint(hint);
+            } else {
+                this.nativeTextViewProtected.setHint(hint);
             }
         } catch (error) {}
     }

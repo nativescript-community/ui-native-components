@@ -3,6 +3,8 @@ import { ProgressBase, busyProperty, indeterminateProperty, progressBackgroundCo
 import { getRippleColor } from '@nativescript-community/ui-core';
 import { inflateLayout } from '@nativescript-community/ui-core/android/utils';
 
+import { applyBorderBackground } from '@nativescript-community/ui-core/border-background';
+
 export class Progress extends ProgressBase {
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
@@ -50,7 +52,7 @@ export class Progress extends ProgressBase {
         this.nativeViewProtected.setTrackColor(color.android);
     }
     [backgroundInternalProperty.setNative](value) {
-        //
+        applyBorderBackground(this, value);
     }
 
     [trackCornerRadiusProperty.setNative](value) {

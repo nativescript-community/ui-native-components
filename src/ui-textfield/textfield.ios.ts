@@ -1,6 +1,6 @@
 import { digitsProperty } from '@nativescript-community/ui-core/textbase/cssproperties';
 import { TextField as NTextField } from '@nativescript/core';
-import { TextFieldBase } from './textfield.common';
+import { TextFieldBase, formattedHintProperty } from './textfield.common';
 
 /**
  * iOS: native UITextField (core TextField).
@@ -33,6 +33,15 @@ export class TextField extends TextFieldBase {
         }
         // not part of the public typings of core TextField
         return (NTextField.prototype as any).textFieldShouldChangeCharactersInRangeReplacementString.call(this, textField, range, replacementString);
+    }
+
+    [formattedHintProperty.setNative](value) {
+        // without spans the plain hint (and placeholderColor) of the core TextField is restored
+        if (value) {
+            this.nativeViewProtected.attributedPlaceholder = this.createNativeRichText(value);
+        } else {
+            this.hint = this.hint;
+        }
     }
 
     [digitsProperty.setNative](value: string) {

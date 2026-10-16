@@ -31,6 +31,7 @@ import SegmentedBar from './SegmentedBar.svelte';
 import Menus from './Menus.svelte';
 import RefreshLayout from './RefreshLayout.svelte';
 import SearchBars from './SearchBars.svelte';
+import Styling from './Styling.svelte';
 import Snackbar from './Snackbar.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
@@ -73,5 +74,6 @@ export const demos = [
     { name: 'Tabs', path: 'Tabs', component: Tabs },
     { name: 'Bottom navigation', path: 'BottomNavigation', component: BottomNavigation },
     { name: 'Bottom navigation bar', path: 'BottomNavigationBar', component: BottomNavigationBar },
+    { name: 'Styling audit', path: 'Styling', component: Styling },
     { name: 'Snackbar', path: 'Snackbar', component: Snackbar }
 ];

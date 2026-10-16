@@ -1,5 +1,19 @@
 <script lang="ts">
-    import { Frame } from '@nativescript/core';
+    import { Color, FormattedString, Frame, Span } from '@nativescript/core';
+    function spans(...parts: { text: string; color?: string; bold?: boolean; size?: number }[]) {
+        const formatted = new FormattedString();
+        parts.forEach((part) => {
+            const span = new Span();
+            span.text = part.text;
+            if (part.color) span.color = new Color(part.color);
+            if (part.bold) span.fontWeight = 'bold';
+            if (part.size) span.fontSize = part.size;
+            formatted.spans.push(span);
+        });
+        return formatted;
+    }
+    const hintSpans = spans({ text: 'Your ', color: '#757575' }, { text: 'name', bold: true, color: '#d32f2f' }, { text: ' here', size: 12, color: '#757575' });
+    const contentSpans = spans({ text: 'Rich ', bold: true }, { text: 'content', color: '#6750a4' });
     let text = '';
     let error = '';
     $: error = text.length > 0 && text.length < 3 ? 'at least 3 characters' : '';
@@ -30,6 +44,10 @@
             <label class="title" text="digits, secure" />
             <uitextfield variant="outline" hint="only 0-9" digits="0123456789" keyboardType="number" />
             <uitextfield variant="outline" hint="password" secure="true" />
+
+            <label class="title" text="rich text: hint spans (floating=false on Android) and content spans" textWrap="true" />
+            <uitextfield variant="outline" floating="false" formattedHint={hintSpans} />
+            <uitextfield variant="outline" floating="false" hint="plain" formattedText={contentSpans} />
 
             <label class="title" text="multiline" />
             <uitextview variant="outline" hint="Message" helper="multi line" counterMaxLength="100" maxLength="100" text={multiline} on:textChange={(e) => (multiline = e.value)} height="120" />

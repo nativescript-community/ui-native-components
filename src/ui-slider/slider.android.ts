@@ -1,6 +1,7 @@
 import { cssProperty, rippleColorAlphaProperty, rippleColorProperty, themer } from '@nativescript-community/ui-core';
 import { getColorStateList, getEnabledColorStateList, state } from '@nativescript-community/ui-core/android/utils';
 import { CoercibleProperty, Color, Property, View, backgroundColorProperty, backgroundInternalProperty, colorProperty } from '@nativescript/core';
+import { applyBorderBackground } from '@nativescript-community/ui-core/border-background';
 import { stepSizeProperty, thumbColorProperty, trackBackgroundColorProperty, trackFillColorProperty } from './cssproperties';
 import { getRippleColor } from '@nativescript-community/ui-core/index.android';
 
@@ -186,7 +187,7 @@ export class Slider extends View {
     }
 
     [backgroundInternalProperty.setNative](value) {
-        //
+        applyBorderBackground(this, value);
     }
 
     [rippleColorProperty.setNative](color: Color) {
