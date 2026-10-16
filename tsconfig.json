@@ -79,6 +79,18 @@
             ],
             "@nativescript-community/ui-bottomnavigationbar/*": [
                 "src/ui-bottomnavigationbar/*"
+            ],
+            "@nativescript-community/ui-core-tabs": [
+                "src/ui-core-tabs/tab-navigation-base/index"
+            ],
+            "@nativescript-community/ui-core-tabs/*": [
+                "src/ui-core-tabs/*"
+            ],
+            "@nativescript-community/ui-bottom-navigation": [
+                "src/ui-bottom-navigation/index"
+            ],
+            "@nativescript-community/ui-bottom-navigation/*": [
+                "src/ui-bottom-navigation/*"
             ]
         }
     }

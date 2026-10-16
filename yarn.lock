@@ -1703,18 +1703,17 @@ __metadata:
   dependencies:
     "@mdi/font": "npm:6.5.95"
     "@nativescript-community/ui-activityindicator": "npm:*"
+    "@nativescript-community/ui-bottom-navigation": "npm:*"
     "@nativescript-community/ui-bottomnavigationbar": "npm:*"
     "@nativescript-community/ui-bottomsheet": "npm:*"
     "@nativescript-community/ui-button": "npm:*"
-    "@nativescript-community/ui-cardview": "npm:*"
     "@nativescript-community/ui-core": "npm:*"
+    "@nativescript-community/ui-core-tabs": "npm:*"
     "@nativescript-community/ui-dialogs": "npm:*"
     "@nativescript-community/ui-floatingactionbutton": "npm:*"
     "@nativescript-community/ui-progress": "npm:*"
-    "@nativescript-community/ui-ripple": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
-    "@nativescript-community/ui-speeddial": "npm:*"
     "@nativescript-community/ui-switch": "npm:*"
     "@nativescript-community/ui-textfield": "npm:*"
     "@nativescript-community/ui-textview": "npm:*"
@@ -1747,6 +1746,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nativescript-community/ui-bottom-navigation@npm:*, @nativescript-community/ui-bottom-navigation@workspace:packages/ui-bottom-navigation":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-bottom-navigation@workspace:packages/ui-bottom-navigation"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+    "@nativescript-community/ui-core-tabs": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
 "@nativescript-community/ui-bottomnavigationbar@npm:*, @nativescript-community/ui-bottomnavigationbar@workspace:packages/ui-bottomnavigationbar":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-bottomnavigationbar@workspace:packages/ui-bottomnavigationbar"
@@ -1763,7 +1771,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@npm:^7.3.4, @nativescript-community/ui-button@workspace:packages/ui-button":
+"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@workspace:packages/ui-button":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-button@workspace:packages/ui-button"
   dependencies:
@@ -1772,9 +1780,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-cardview@npm:*, @nativescript-community/ui-cardview@workspace:packages/ui-cardview":
+"@nativescript-community/ui-core-tabs@npm:*, @nativescript-community/ui-core-tabs@npm:^7.3.4, @nativescript-community/ui-core-tabs@workspace:packages/ui-core-tabs":
   version: 0.0.0-use.local
-  resolution: "@nativescript-community/ui-cardview@workspace:packages/ui-cardview"
+  resolution: "@nativescript-community/ui-core-tabs@workspace:packages/ui-core-tabs"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
@@ -1822,14 +1830,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-ripple@npm:*, @nativescript-community/ui-ripple@workspace:packages/ui-ripple":
-  version: 0.0.0-use.local
-  resolution: "@nativescript-community/ui-ripple@workspace:packages/ui-ripple"
-  dependencies:
-    "@nativescript-community/ui-core": "npm:^7.3.4"
-  languageName: unknown
-  linkType: soft
-
 "@nativescript-community/ui-slider@npm:*, @nativescript-community/ui-slider@workspace:packages/ui-slider":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-slider@workspace:packages/ui-slider"
@@ -1842,15 +1842,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-snackbar@workspace:packages/ui-snackbar"
   dependencies:
-    "@nativescript-community/ui-core": "npm:^7.3.4"
-  languageName: unknown
-  linkType: soft
-
-"@nativescript-community/ui-speeddial@npm:*, @nativescript-community/ui-speeddial@workspace:packages/ui-speeddial":
-  version: 0.0.0-use.local
-  resolution: "@nativescript-community/ui-speeddial@workspace:packages/ui-speeddial"
-  dependencies:
-    "@nativescript-community/ui-button": "npm:^7.3.4"
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft

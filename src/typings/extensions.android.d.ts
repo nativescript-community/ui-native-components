@@ -74,6 +74,22 @@ declare namespace com {
                     getItemCount(): number;
                 }
 
+                export class NavigationBar extends com.google.android.material.bottomnavigation.BottomNavigationView {
+                    constructor(context: globalAndroid.content.Context);
+
+                    onTap(position: number): boolean;
+                    onSelectedPositionChange(position: number, prevPosition: number): void;
+                    setSelectedPosition(position: number): void;
+                    getSelectedPosition(): number;
+                    setItems(items: Array<TabItemSpec>): void;
+                    updateItemAt(position: number, itemSpec: TabItemSpec): void;
+                    setItemColors(selectedColor: number, unselectedColor: number): void;
+
+                    getTextViewForItemAt(index: number): globalAndroid.widget.TextView;
+                    getViewForItemAt(index: number): globalAndroid.view.View;
+                    getItemCount(): number;
+                }
+
                 export class TabViewPager extends androidx.viewpager2.widget.ViewPager2 {
                     constructor(context: globalAndroid.content.Context);
                     constructor(context: globalAndroid.content.Context, attrs: globalAndroid.util.AttributeSet);

@@ -22,10 +22,12 @@
     "dependencies": {
         "@mdi/font": "6.5.95",
         "@nativescript-community/ui-activityindicator": "*",
+        "@nativescript-community/ui-bottom-navigation": "*",
         "@nativescript-community/ui-bottomnavigationbar": "*",
         "@nativescript-community/ui-bottomsheet": "*",
         "@nativescript-community/ui-button": "*",
         "@nativescript-community/ui-core": "*",
+        "@nativescript-community/ui-core-tabs": "*",
         "@nativescript-community/ui-dialogs": "*",
         "@nativescript-community/ui-floatingactionbutton": "*",
         "@nativescript-community/ui-progress": "*",
