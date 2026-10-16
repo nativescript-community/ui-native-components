@@ -1,15 +1,15 @@
 import { Trace, Utils } from '@nativescript/core';
-import { PullToRefreshBase, bottomEnabledProperty, bottomRefreshingProperty, indicatorColorProperty, indicatorFillColorProperty, refreshingProperty, topEnabledProperty } from './pulltorefresh-common';
+import { RefreshLayoutBase, bottomEnabledProperty, bottomRefreshingProperty, indicatorColorProperty, indicatorFillColorProperty, refreshingProperty, topEnabledProperty } from './refreshlayout-common';
 
-export * from './pulltorefresh-common';
+export * from './refreshlayout-common';
 
 const TRIGGER = 70;
 const FOOTER_HEIGHT = 56;
 
 @NativeClass
 class RefreshHandler extends NSObject {
-    _owner: WeakRef<PullToRefresh>;
-    static initWithOwner(owner: PullToRefresh) {
+    _owner: WeakRef<RefreshLayout>;
+    static initWithOwner(owner: RefreshLayout) {
         const handler = RefreshHandler.new() as RefreshHandler;
         handler._owner = new WeakRef(owner);
         return handler;
@@ -27,8 +27,8 @@ class RefreshHandler extends NSObject {
  */
 @NativeClass
 class PanHandler extends NSObject {
-    _owner: WeakRef<PullToRefresh>;
-    static initWithOwner(owner: PullToRefresh) {
+    _owner: WeakRef<RefreshLayout>;
+    static initWithOwner(owner: RefreshLayout) {
         const handler = PanHandler.new() as PanHandler;
         handler._owner = new WeakRef(owner);
         return handler;
@@ -65,7 +65,7 @@ function findScrollView(view: UIView): UIScrollView {
  * iOS: the scroll view has two edges: the start of its content (UIRefreshControl) and the end (a spinner under the last item, pulled by the user).
  * The visual top/bottom are mapped to them: with a reversed content (CollectionView `reverseLayout` rotates the scroll view) the top is the end.
  */
-export class PullToRefresh extends PullToRefreshBase {
+export class RefreshLayout extends RefreshLayoutBase {
     private mRefreshControl: UIRefreshControl;
     private mHandler: RefreshHandler;
     private mPanHandler: PanHandler;
@@ -93,8 +93,8 @@ export class PullToRefresh extends PullToRefreshBase {
         try {
             this.setup();
         } catch (error) {
-            Trace.write(`PullToRefresh error: ${(error as any)?.stack || error}`, Trace.categories.Error, Trace.messageType.error);
-            console.log('PullToRefresh error ' + ((error as any)?.stack || error));
+            Trace.write(`RefreshLayout error: ${(error as any)?.stack || error}`, Trace.categories.Error, Trace.messageType.error);
+            console.log('RefreshLayout error ' + ((error as any)?.stack || error));
         }
     }
 
@@ -246,7 +246,7 @@ export class PullToRefresh extends PullToRefreshBase {
         try {
             this.onPan(state);
         } catch (error) {
-            console.log('PullToRefresh error ' + ((error as any)?.stack || error));
+            console.log('RefreshLayout error ' + ((error as any)?.stack || error));
         }
     }
 

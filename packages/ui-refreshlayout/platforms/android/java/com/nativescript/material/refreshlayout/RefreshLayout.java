@@ -1,4 +1,4 @@
-package com.nativescript.material.pulltorefresh;
+package com.nativescript.material.refreshlayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,10 +19,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * SwipeRefreshLayout (pull from the top) which also supports a pull from the bottom.
- * A horizontal drag is not intercepted, so a horizontal carousel can be inside (same as the CarouselFriendlySwipeRefreshLayout of the former ui-pulltorefresh).
+ * A horizontal drag is not intercepted, so a horizontal carousel can be inside (same as the CarouselFriendlySwipeRefreshLayout of the former ui-refreshlayout).
  * Both follow the nested scrolling of the child (RecyclerView/CollectionView, NestedScrollView...): the top is the visual top, whatever the layout direction of the child.
  */
-public class PullToRefreshLayout extends SwipeRefreshLayout {
+public class RefreshLayout extends SwipeRefreshLayout {
     private static final float DRAG_RATE = 0.5f;
     private static final int SPINNER_SIZE_DP = 40;
     private static final int TRIGGER_DP = 80;
@@ -44,7 +44,7 @@ public class PullToRefreshLayout extends SwipeRefreshLayout {
     private final float mTouchSlop;
     private float mPreviousX;
 
-    public PullToRefreshLayout(Context context) {
+    public RefreshLayout(Context context) {
         super(context);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         float density = context.getResources().getDisplayMetrics().density;

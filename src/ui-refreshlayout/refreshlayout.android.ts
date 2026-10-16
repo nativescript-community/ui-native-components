@@ -1,14 +1,14 @@
-import { PullToRefreshBase, bottomEnabledProperty, bottomRefreshingProperty, indicatorColorProperty, indicatorFillColorProperty, refreshingProperty, topEnabledProperty } from './pulltorefresh-common';
+import { RefreshLayoutBase, bottomEnabledProperty, bottomRefreshingProperty, indicatorColorProperty, indicatorFillColorProperty, refreshingProperty, topEnabledProperty } from './refreshlayout-common';
 
-export * from './pulltorefresh-common';
+export * from './refreshlayout-common';
 
-type NativeLayout = com.nativescript.material.pulltorefresh.PullToRefreshLayout & { refreshListener?: any; bottomListener?: any };
+type NativeLayout = com.nativescript.material.refreshlayout.RefreshLayout & { refreshListener?: any; bottomListener?: any };
 
-export class PullToRefresh extends PullToRefreshBase {
+export class RefreshLayout extends RefreshLayoutBase {
     nativeViewProtected: NativeLayout;
 
     public createNativeView() {
-        return new com.nativescript.material.pulltorefresh.PullToRefreshLayout(this._context);
+        return new com.nativescript.material.refreshlayout.RefreshLayout(this._context);
     }
 
     public initNativeView() {

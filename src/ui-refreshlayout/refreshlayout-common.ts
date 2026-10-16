@@ -3,10 +3,10 @@ import { CSSType, Color, ContentView, CssProperty, Property, Style, booleanConve
 /**
  * A layout with the pull to refresh pattern for its content (a CollectionView, ListView, ScrollView, WebView...).
  * The edges are visual: `top` is the top of the screen, also for a CollectionView with `reverseLayout` (chat).
- * Same API as `@nativescript-community/ui-pulltorefresh`: `refreshing`, the `refresh` event, `indicatorColor`, `indicatorFillColor`.
+ * Same API as `@nativescript-community/ui-refreshlayout`: `refreshing`, the `refresh` event, `indicatorColor`, `indicatorFillColor`.
  */
-@CSSType('PullToRefresh')
-export abstract class PullToRefreshBase extends ContentView {
+@CSSType('RefreshLayout')
+export abstract class RefreshLayoutBase extends ContentView {
     public static refreshEvent = 'refresh';
     public static bottomRefreshEvent = 'bottomRefresh';
 
@@ -48,18 +48,18 @@ export abstract class PullToRefreshBase extends ContentView {
     }
 
     protected notifyRefresh(bottom: boolean) {
-        this.notify({ eventName: bottom ? PullToRefreshBase.bottomRefreshEvent : PullToRefreshBase.refreshEvent, object: this });
+        this.notify({ eventName: bottom ? RefreshLayoutBase.bottomRefreshEvent : RefreshLayoutBase.refreshEvent, object: this });
     }
 }
 
-export const refreshingProperty = new Property<PullToRefreshBase, boolean>({ name: 'refreshing', defaultValue: false, valueConverter: booleanConverter });
-refreshingProperty.register(PullToRefreshBase);
-export const bottomRefreshingProperty = new Property<PullToRefreshBase, boolean>({ name: 'bottomRefreshing', defaultValue: false, valueConverter: booleanConverter });
-bottomRefreshingProperty.register(PullToRefreshBase);
-export const topEnabledProperty = new Property<PullToRefreshBase, boolean>({ name: 'topEnabled', defaultValue: true, valueConverter: booleanConverter });
-topEnabledProperty.register(PullToRefreshBase);
-export const bottomEnabledProperty = new Property<PullToRefreshBase, boolean>({ name: 'bottomEnabled', defaultValue: false, valueConverter: booleanConverter });
-bottomEnabledProperty.register(PullToRefreshBase);
+export const refreshingProperty = new Property<RefreshLayoutBase, boolean>({ name: 'refreshing', defaultValue: false, valueConverter: booleanConverter });
+refreshingProperty.register(RefreshLayoutBase);
+export const bottomRefreshingProperty = new Property<RefreshLayoutBase, boolean>({ name: 'bottomRefreshing', defaultValue: false, valueConverter: booleanConverter });
+bottomRefreshingProperty.register(RefreshLayoutBase);
+export const topEnabledProperty = new Property<RefreshLayoutBase, boolean>({ name: 'topEnabled', defaultValue: true, valueConverter: booleanConverter });
+topEnabledProperty.register(RefreshLayoutBase);
+export const bottomEnabledProperty = new Property<RefreshLayoutBase, boolean>({ name: 'bottomEnabled', defaultValue: false, valueConverter: booleanConverter });
+bottomEnabledProperty.register(RefreshLayoutBase);
 
 export const indicatorColorProperty = new CssProperty<Style, Color>({
     name: 'indicatorColor',

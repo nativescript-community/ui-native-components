@@ -1,4 +1,4 @@
-# @nativescript-community/ui-pulltorefresh
+# @nativescript-community/ui-refreshlayout
 
 Pull to refresh for any scrollable view (CollectionView, ListView, ScrollView, WebView...), from the **top and the bottom**.
 
@@ -6,7 +6,7 @@ Pull to refresh for any scrollable view (CollectionView, ListView, ScrollView, W
 - iOS: `UIRefreshControl` for the start of the scrolling, a spinner pulled at the end of the scrolling for the other edge.
 - The edges are **visual**: with a CollectionView `reverseLayout` (chat), `top` stays the top of the screen (older messages).
 
-Same API as the former `@nativescript-community/ui-pulltorefresh` (`refreshing`, the `refresh` event, `indicatorColor`, `indicatorFillColor`, `refreshControl`), plus:
+Same API as the former `@nativescript-community/ui-refreshlayout` (`refreshing`, the `refresh` event, `indicatorColor`, `indicatorFillColor`, `refreshControl`), plus:
 
 | | |
 |---|---|
@@ -15,9 +15,9 @@ Same API as the former `@nativescript-community/ui-pulltorefresh` (`refreshing`,
 | `bottomRefreshing` | the bottom refresh is running, set it to `false` when the work is done |
 
 ```svelte
-<uipulltorefresh bottomEnabled="true" refreshing={top} bottomRefreshing={bottom}
+<uirefreshlayout bottomEnabled="true" refreshing={top} bottomRefreshing={bottom}
     on:refresh={() => { top = true; loadOlder().then(() => (top = false)); }}
     on:bottomRefresh={() => { bottom = true; loadNewer().then(() => (bottom = false)); }}>
     <collectionview items={items} reverseLayout="true" />
-</uipulltorefresh>
+</uirefreshlayout>
 ```

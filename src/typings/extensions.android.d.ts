@@ -130,8 +130,8 @@ declare namespace com {
                     color: number;
                 }
             }
-            export namespace pulltorefresh {
-                export class PullToRefreshLayout extends androidx.swiperefreshlayout.widget.SwipeRefreshLayout {
+            export namespace refreshlayout {
+                export class RefreshLayout extends androidx.swiperefreshlayout.widget.SwipeRefreshLayout {
                     constructor(context: globalAndroid.content.Context);
                     setTopEnabled(enabled: boolean): void;
                     setBottomEnabled(enabled: boolean): void;

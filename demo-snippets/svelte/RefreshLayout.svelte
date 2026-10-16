@@ -51,13 +51,13 @@
         </stackLayout>
         <label row="1" text={`${log} (${items.length} items)`} padding="8" />
         {#key chat}
-            <uipulltorefresh row="2" topEnabled="true" bottomEnabled="true" refreshing={topRefreshing} bottomRefreshing={bottomRefreshing} on:refresh={onTopRefresh} on:bottomRefresh={onBottomRefresh}>
+            <uirefreshlayout row="2" topEnabled="true" bottomEnabled="true" refreshing={topRefreshing} bottomRefreshing={bottomRefreshing} on:refresh={onTopRefresh} on:bottomRefresh={onBottomRefresh}>
                 <collectionview {items} reverseLayout={chat} rowHeight="56">
                     <Template let:item>
                         <label text={item.text} padding="0 16" verticalAlignment="center" backgroundColor={chat ? '#e8def8' : 'transparent'} margin="4 16" borderRadius="12" />
                     </Template>
                 </collectionview>
-            </uipulltorefresh>
+            </uirefreshlayout>
         {/key}
     </gridLayout>
 </page>

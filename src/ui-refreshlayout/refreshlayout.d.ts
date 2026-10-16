@@ -2,12 +2,12 @@
  * Pull to refresh for a scrollable view (CollectionView, ListView, ScrollView, WebView...), from the top and the bottom.
  * Android uses SwipeRefreshLayout (+ a nested scrolling pull for the bottom). iOS uses UIRefreshControl (+ a pull at the end of the scrolling for the other edge).
  * The edges are visual: a CollectionView with `reverseLayout` (chat) is supported, `top` stays the top of the screen.
- * @module @nativescript-community/ui-pulltorefresh
+ * @module @nativescript-community/ui-refreshlayout
  */
 
 import { Color, ContentView } from '@nativescript/core';
 
-export class PullToRefresh extends ContentView {
+export class RefreshLayout extends ContentView {
     /** event of the pull from the top */
     public static refreshEvent: string;
     /** event of the pull from the bottom */

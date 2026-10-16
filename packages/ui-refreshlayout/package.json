@@ -1,12 +1,12 @@
 {
-    "name": "@nativescript-community/ui-pulltorefresh",
+    "name": "@nativescript-community/ui-refreshlayout",
     "version": "7.3.4",
     "description": "Pull to refresh at the top and the bottom of a scrollable view: SwipeRefreshLayout on Android, UIRefreshControl on iOS. Made for CollectionView and chat UX.",
-    "main": "./pulltorefresh",
+    "main": "./refreshlayout",
     "sideEffects": false,
-    "typings": "./pulltorefresh.d.ts",
+    "typings": "./refreshlayout.d.ts",
     "scripts": {
-        "tsc": "cpy '**/*.d.ts' '../../packages/ui-pulltorefresh' --parents --cwd=../../src/ui-pulltorefresh && tsc  --build",
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-refreshlayout' --parents --cwd=../../src/ui-refreshlayout && tsc  --build",
         "build": "npm run tsc && npm run readme",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
@@ -36,7 +36,7 @@
     "homepage": "https://github.com/nativescript-community/ui-material-components",
     "repository": {
         "type": "git",
-        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-pulltorefresh"
+        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-refreshlayout"
     },
     "readmeFilename": "README.md",
     "dependencies": {

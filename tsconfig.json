@@ -116,11 +116,11 @@
             "@nativescript-community/ui-datetimepicker/*": [
                 "src/ui-datetimepicker/*"
             ],
-            "@nativescript-community/ui-pulltorefresh": [
-                "src/ui-pulltorefresh/pulltorefresh"
+            "@nativescript-community/ui-refreshlayout": [
+                "src/ui-refreshlayout/refreshlayout"
             ],
-            "@nativescript-community/ui-pulltorefresh/*": [
-                "src/ui-pulltorefresh/*"
+            "@nativescript-community/ui-refreshlayout/*": [
+                "src/ui-refreshlayout/*"
             ]
         }
     }

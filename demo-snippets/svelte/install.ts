@@ -8,7 +8,7 @@ import ButtonPlugin from '@nativescript-community/ui-button/svelte';
 import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
 import FloatingActionButtonPlugin from '@nativescript-community/ui-floatingactionbutton/svelte';
 import ProgressPlugin from '@nativescript-community/ui-progress/svelte';
-import PullToRefreshPlugin from '@nativescript-community/ui-pulltorefresh/svelte';
+import RefreshLayoutPlugin from '@nativescript-community/ui-refreshlayout/svelte';
 import SegmentedBarPlugin from '@nativescript-community/ui-segmentedbar/svelte';
 import SliderPlugin from '@nativescript-community/ui-slider/svelte';
 import SwitchPlugin from '@nativescript-community/ui-switch/svelte';
@@ -26,7 +26,7 @@ import Dialogs from './Dialogs.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
 import SegmentedBar from './SegmentedBar.svelte';
 import Menus from './Menus.svelte';
-import PullToRefresh from './PullToRefresh.svelte';
+import RefreshLayout from './RefreshLayout.svelte';
 import Snackbar from './Snackbar.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
@@ -42,7 +42,7 @@ export function installPlugin() {
     CollectionViewPlugin.register();
     FloatingActionButtonPlugin.register();
     ProgressPlugin.register();
-    PullToRefreshPlugin.register();
+    RefreshLayoutPlugin.register();
     SegmentedBarPlugin.register();
     SliderPlugin.register();
     SwitchPlugin.register();
@@ -59,7 +59,7 @@ export const demos = [
     { name: 'Segmented bar', path: 'SegmentedBar', component: SegmentedBar },
     { name: 'Menus', path: 'Menus', component: Menus },
     { name: 'Date and time pickers', path: 'DateTimePickers', component: DateTimePickers },
-    { name: 'Pull to refresh', path: 'PullToRefresh', component: PullToRefresh },
+    { name: 'Pull to refresh', path: 'RefreshLayout', component: RefreshLayout },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
     { name: 'Tabs', path: 'Tabs', component: Tabs },

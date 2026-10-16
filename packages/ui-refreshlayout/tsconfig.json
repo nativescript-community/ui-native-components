@@ -1,7 +1,7 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "rootDir": "../../src/ui-pulltorefresh",
+        "rootDir": "../../src/ui-refreshlayout",
         "outDir": "./",
         "paths": {
             "@nativescript-community/ui-core": [
@@ -13,12 +13,12 @@
         }
     },
     "include": [
-        "../../src/ui-pulltorefresh/**/*.ts",
+        "../../src/ui-refreshlayout/**/*.ts",
         "../../references.d.ts",
         "../../tools/references.d.ts",
         "../../src/references.d.ts"
     ],
     "exclude": [
-        "../../src/ui-pulltorefresh/angular/**"
+        "../../src/ui-refreshlayout/angular/**"
     ]
 }
