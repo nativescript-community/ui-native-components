@@ -31,6 +31,7 @@
         "@nativescript-community/ui-dialogs": "*",
         "@nativescript-community/ui-floatingactionbutton": "*",
         "@nativescript-community/ui-progress": "*",
+        "@nativescript-community/ui-segmentedbar": "*",
         "@nativescript-community/ui-slider": "*",
         "@nativescript-community/ui-snackbar": "*",
         "@nativescript-community/ui-switch": "*",

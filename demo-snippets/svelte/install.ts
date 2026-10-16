@@ -7,6 +7,7 @@ import BottomNavigationBarPlugin from '@nativescript-community/ui-bottomnavigati
 import ButtonPlugin from '@nativescript-community/ui-button/svelte';
 import FloatingActionButtonPlugin from '@nativescript-community/ui-floatingactionbutton/svelte';
 import ProgressPlugin from '@nativescript-community/ui-progress/svelte';
+import SegmentedBarPlugin from '@nativescript-community/ui-segmentedbar/svelte';
 import SliderPlugin from '@nativescript-community/ui-slider/svelte';
 import SwitchPlugin from '@nativescript-community/ui-switch/svelte';
 import TabsPlugin from '@nativescript-community/ui-tabs/svelte';
@@ -20,6 +21,7 @@ import Buttons from './Buttons.svelte';
 import Controls from './Controls.svelte';
 import Dialogs from './Dialogs.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
+import SegmentedBar from './SegmentedBar.svelte';
 import Snackbar from './Snackbar.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
@@ -34,6 +36,7 @@ export function installPlugin() {
     ButtonPlugin.register();
     FloatingActionButtonPlugin.register();
     ProgressPlugin.register();
+    SegmentedBarPlugin.register();
     SliderPlugin.register();
     SwitchPlugin.register();
     TabsPlugin.register();
@@ -46,6 +49,7 @@ export const demos = [
     { name: 'Floating action buttons', path: 'FloatingActionButtons', component: FloatingActionButtons },
     { name: 'Text fields', path: 'TextFields', component: TextFields },
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },
+    { name: 'Segmented bar', path: 'SegmentedBar', component: SegmentedBar },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
     { name: 'Tabs', path: 'Tabs', component: Tabs },

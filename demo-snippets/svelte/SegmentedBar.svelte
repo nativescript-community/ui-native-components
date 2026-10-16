@@ -1,0 +1,27 @@
+<script lang="ts">
+    import { Frame } from '@nativescript/core';
+    let index = 0;
+    let iconIndex = 1;
+    const titles = ['Day', 'Week', 'Month'];
+</script>
+
+<page>
+    <actionBar title="Segmented bar">
+        <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
+    </actionBar>
+    <stackLayout class="demo">
+        <label class="title" text={`titles: ${titles[index]}`} />
+        <uisegmentedbar selectedIndex={index} on:selectedIndexChange={(e) => (index = e.value)}>
+            {#each titles as title}
+                <uisegmentedbaritem {title} />
+            {/each}
+        </uisegmentedbar>
+
+        <label class="title" text={`icons: ${iconIndex}`} />
+        <uisegmentedbar selectedIndex={iconIndex} on:selectedIndexChange={(e) => (iconIndex = e.value)}>
+            <uisegmentedbaritem src={__IOS__ ? 'sys://list.bullet' : 'res://ic_add'} />
+            <uisegmentedbaritem src={__IOS__ ? 'sys://square.grid.2x2' : 'res://ic_star'} />
+            <uisegmentedbaritem src={__IOS__ ? 'sys://map' : 'res://ic_add'} />
+        </uisegmentedbar>
+    </stackLayout>
+</page>

@@ -1712,6 +1712,7 @@ __metadata:
     "@nativescript-community/ui-dialogs": "npm:*"
     "@nativescript-community/ui-floatingactionbutton": "npm:*"
     "@nativescript-community/ui-progress": "npm:*"
+    "@nativescript-community/ui-segmentedbar": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
     "@nativescript-community/ui-switch": "npm:*"
@@ -1772,7 +1773,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@workspace:packages/ui-button":
+"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@npm:^7.3.4, @nativescript-community/ui-button@workspace:packages/ui-button":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-button@workspace:packages/ui-button"
   dependencies:
@@ -1827,6 +1828,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-progress@workspace:packages/ui-progress"
   dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-segmentedbar@npm:*, @nativescript-community/ui-segmentedbar@workspace:packages/ui-segmentedbar":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-segmentedbar@workspace:packages/ui-segmentedbar"
+  dependencies:
+    "@nativescript-community/ui-button": "npm:^7.3.4"
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft

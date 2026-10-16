@@ -97,6 +97,12 @@
             ],
             "@nativescript-community/ui-tabs/*": [
                 "src/ui-tabs/*"
+            ],
+            "@nativescript-community/ui-segmentedbar": [
+                "src/ui-segmentedbar/segmentedbar"
+            ],
+            "@nativescript-community/ui-segmentedbar/*": [
+                "src/ui-segmentedbar/*"
             ]
         }
     }
