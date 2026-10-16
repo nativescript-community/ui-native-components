@@ -1,0 +1,57 @@
+{
+    "name": "@nativescript-community/ui-native-components",
+    "description": "NativeScript augmented components: Material on Android, native UIKit on iOS",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "lerna run build",
+        "build.watch": "lerna run build.watch",
+        "build.all": "lerna run build.all",
+        "clean": "rimraf -g 'packages/**/*.d.ts' 'packages/**/*.tsbuildinfo' 'packages/**/*.js' 'packages/**/*.mjs' 'packages/**/*.js.map' 'packages/**/*.mjs.map' 'packages/**/*.metada'",
+        "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'node_modules'",
+        "commitmsg": "commitlint -e $GIT_PARAMS",
+        "postinstall": "npm run setup",
+        "publish": "npm run setup && npm run clean && npm run build.all && npm run readme && npm run doc && lerna publish",
+        "readme": "lerna run readme && node ./tools/readme.js",
+        "setup": "ts-patch install",
+        "sync": "node ./tools/sync.mjs",
+        "update": "node ./tools/update.js",
+        "doc": "node tools/builddoc.mjs",
+        "demo.svelte.android": "cd ./demo-svelte && ns run android --no-hmr --env.watchNodeModules",
+        "demo.svelte.ios": "cd ./demo-svelte && ns run ios --no-hmr --env.watchNodeModules",
+        "demo.svelte.clean": "cd ./demo-svelte && ns clean"
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "license": "Apache-2.0",
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/plugin-seed-tools": "portal:tools",
+        "@nativescript-community/text": "^1.6.25"
+    },
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
+        ]
+    },
+    "workspaces": [
+        "packages/*",
+        "demo-snippets",
+        "demo-svelte"
+    ],
+    "engines": {
+        "npm": "please use yarn or pnpm",
+        "yarn": ">=1.19.1",
+        "pnpm": ">=7.0.0",
+        "node": "^14.20.0 || ^16.13.0 || >=18.10.0"
+    },
+    "packageManager": "yarn@4.10.2"
+}
