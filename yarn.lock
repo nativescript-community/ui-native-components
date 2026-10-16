@@ -1711,6 +1711,7 @@ __metadata:
     "@nativescript-community/ui-core-tabs": "npm:*"
     "@nativescript-community/ui-dialogs": "npm:*"
     "@nativescript-community/ui-floatingactionbutton": "npm:*"
+    "@nativescript-community/ui-menu": "npm:*"
     "@nativescript-community/ui-progress": "npm:*"
     "@nativescript-community/ui-segmentedbar": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
@@ -1773,7 +1774,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@npm:^7.3.4, @nativescript-community/ui-button@workspace:packages/ui-button":
+"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@workspace:packages/ui-button":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-button@workspace:packages/ui-button"
   dependencies:
@@ -1795,6 +1796,11 @@ __metadata:
   resolution: "@nativescript-community/ui-core@workspace:packages/ui-core"
   dependencies:
     "@nativescript-community/text": "npm:^1.6.25"
+  peerDependencies:
+    "@nativescript-community/text": "*"
+  peerDependenciesMeta:
+    "@nativescript-community/text":
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -1810,6 +1816,14 @@ __metadata:
 "@nativescript-community/ui-floatingactionbutton@npm:*, @nativescript-community/ui-floatingactionbutton@workspace:packages/ui-floatingactionbutton":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-floatingactionbutton@workspace:packages/ui-floatingactionbutton"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-menu@npm:*, @nativescript-community/ui-menu@workspace:packages/ui-menu":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-menu@workspace:packages/ui-menu"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
@@ -1836,7 +1850,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-segmentedbar@workspace:packages/ui-segmentedbar"
   dependencies:
-    "@nativescript-community/ui-button": "npm:^7.3.4"
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft

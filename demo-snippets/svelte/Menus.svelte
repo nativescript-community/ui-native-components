@@ -1,0 +1,53 @@
+<script lang="ts">
+    import { Frame } from '@nativescript/core';
+    import { showMenu, setContextMenu } from '@nativescript-community/ui-menu';
+    import { onMount } from 'svelte';
+
+    let result = '';
+    let compact = true;
+    let longPressLabel;
+
+    function items() {
+        return [
+            { id: 'copy', title: 'Copy', icon: __IOS__ ? 'sys://doc.on.doc' : 'res://ic_add' },
+            { id: 'star', title: 'Starred', icon: __IOS__ ? 'sys://star' : 'res://ic_star', checked: compact },
+            {
+                title: 'Share as',
+                icon: __IOS__ ? 'sys://square.and.arrow.up' : undefined,
+                items: [{ id: 'link', title: 'Link' }, { id: 'file', title: 'File', disabled: true }]
+            },
+            { separator: true },
+            { id: 'delete', title: 'Delete', icon: __IOS__ ? 'sys://trash' : undefined, destructive: true }
+        ];
+    }
+
+    async function onTap(e) {
+        const item = await showMenu({ anchor: e.object, items: items() });
+        if (item) {
+            if (item.id === 'star') {
+                compact = !compact;
+            }
+            result = `selected ${item.id}`;
+        } else {
+            result = 'dismissed';
+        }
+    }
+
+    function onLabelLoaded(e) {
+        longPressLabel = e.object;
+        setContextMenu(longPressLabel, { items, onSelect: (item) => (result = `context: ${item.id}`) });
+    }
+</script>
+
+<page>
+    <actionBar title="Menus">
+        <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
+    </actionBar>
+    <stackLayout class="demo">
+        <label class="title" text="menu attached to a button" />
+        <uibutton text="show menu" on:tap={onTap} />
+        <label class="title" text="long press the label for a context menu" />
+        <label text="long press me" class="h2" on:loaded={onLabelLoaded} />
+        <label class="title" text={result} />
+    </stackLayout>
+</page>

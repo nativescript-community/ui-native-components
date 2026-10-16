@@ -22,6 +22,7 @@ import Controls from './Controls.svelte';
 import Dialogs from './Dialogs.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
 import SegmentedBar from './SegmentedBar.svelte';
+import Menus from './Menus.svelte';
 import Snackbar from './Snackbar.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
@@ -50,6 +51,7 @@ export const demos = [
     { name: 'Text fields', path: 'TextFields', component: TextFields },
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },
     { name: 'Segmented bar', path: 'SegmentedBar', component: SegmentedBar },
+    { name: 'Menus', path: 'Menus', component: Menus },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
     { name: 'Tabs', path: 'Tabs', component: Tabs },

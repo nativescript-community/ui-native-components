@@ -103,6 +103,12 @@
             ],
             "@nativescript-community/ui-segmentedbar/*": [
                 "src/ui-segmentedbar/*"
+            ],
+            "@nativescript-community/ui-menu": [
+                "src/ui-menu/menu"
+            ],
+            "@nativescript-community/ui-menu/*": [
+                "src/ui-menu/*"
             ]
         }
     }
