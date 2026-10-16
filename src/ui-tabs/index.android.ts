@@ -118,16 +118,7 @@ export class Tabs extends TabNavigation<TabsBar> {
     }
 
     protected override setTabStripItems(items: TabStripItem[]) {
-        if (items?.length > 0 && !this.mUnSelectedItemColor) {
-            items.some((item) => {
-                const color = item.label?.style.color;
-                if (color) {
-                    this.mUnSelectedItemColor = color;
-                    return true;
-                }
-                return false;
-            });
-        }
+        // no default unselected color from the labels: the Material 3 theme colors are used
         super.setTabStripItems(items);
     }
     protected override willSelectWithoutAnimation(index: number) {

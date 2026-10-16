@@ -188,6 +188,10 @@ public class MaterialTabs extends TabLayout {
      * Colors of the selected and unselected tabs (icons and labels). 0 keeps the theme color.
      */
     public void setItemColors(int selectedColor, int unselectedColor) {
+        if (selectedColor == 0 && unselectedColor == 0) {
+            // keep the Material 3 theme colors
+            return;
+        }
         ColorStateList current = getTabTextColors();
         int selected = selectedColor;
         int unselected = unselectedColor;
