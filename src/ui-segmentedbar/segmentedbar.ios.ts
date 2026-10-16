@@ -11,7 +11,7 @@ export { SegmentedBarItem };
 function applyItem(control: UISegmentedControl, item: SegmentedBarItem, index: number, insert = false) {
     let title = item.title;
     // a template image: tinted by the selection state
-    let image = item.image?.ios ? (item.image.ios as UIImage).imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
+    let image = item.image?.ios ? (item.image.ios as UIImage).imageWithRenderingMode(item.imageIsOriginal ? UIImageRenderingMode.AlwaysOriginal : UIImageRenderingMode.AlwaysTemplate) : null;
     if (item.formattedText) {
         // the spans are drawn into an image: UISegmentedControl only shows plain titles
         const spansImage = renderAttributedStringToImage(createNativeFormattedText(item.formattedText, item.textOwner));

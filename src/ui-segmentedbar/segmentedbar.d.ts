@@ -8,10 +8,10 @@ import { FormattedString, ImageSource, SegmentedBar as CoreSegmentedBar, Segment
 
 export class SegmentedBarItem extends SegmentedBarItemBase {
     /**
-     * Icon of the segment: file, resource, url, `sys://` (SF Symbol, iOS) or `font://` (font icon) path, or an ImageSource.
+     * Icon of the segment: file, resource, url, `sys://` (SF Symbol, iOS) or `font://` (font icon) path, an ImageSource, or a FormattedString (spans drawn into an icon).
      * On iOS a segment shows either the title or the icon (the title wins).
      */
-    src: string | ImageSource;
+    src: string | ImageSource | FormattedString;
     /**
      * Rich text (spans) of the segment, it wins over the title.
      * `@nativescript-community/text` is used when installed (optional).

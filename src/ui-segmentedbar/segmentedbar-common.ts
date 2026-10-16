@@ -1,3 +1,4 @@
+import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
 import { Color, FormattedString, ImageSource, Label, Property, Span, Utils } from '@nativescript/core';
 import { SegmentedBarBase, SegmentedBarItemBase } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
 
@@ -8,7 +9,11 @@ export { SegmentedBarBase, SegmentedBarItemBase };
  * `src` is a file, resource, url, `sys://` (SF Symbol, iOS) or `font://` (font icon, uses the font of the item) path, or an ImageSource.
  */
 export class SegmentedBarItem extends SegmentedBarItemBase {
-    src: string | ImageSource;
+    src: string | ImageSource | FormattedString;
+    /**
+     * @internal true for the icons drawn from spans: they keep their colors
+     */
+    imageIsOriginal = false;
     /**
      * @internal loaded icon, always a white (template) image for the font icons
      */
@@ -51,9 +56,14 @@ export class SegmentedBarItem extends SegmentedBarItemBase {
         }
     }
 
-    async loadImage(value: string | ImageSource) {
+    async loadImage(value: string | ImageSource | FormattedString) {
         let source: ImageSource;
-        if (typeof value === 'string') {
+        this.imageIsOriginal = false;
+        if (value instanceof FormattedString) {
+            // an icon drawn from spans (font icons, emojis...)
+            source = renderFormattedTextToImageSource(value, this.textOwner);
+            this.imageIsOriginal = true;
+        } else if (typeof value === 'string') {
             value = value.trim();
             if (Utils.isFontIconURI(value)) {
                 source = ImageSource.fromFontIconCodeSync(value.split('//')[1], this.style.fontInternal, new Color('white'));
@@ -80,7 +90,7 @@ export class SegmentedBarItem extends SegmentedBarItemBase {
     }
 }
 
-export const srcProperty = new Property<SegmentedBarItem, string | ImageSource>({
+export const srcProperty = new Property<SegmentedBarItem, string | ImageSource | FormattedString>({
     name: 'src',
     valueChanged: (target, oldValue, newValue) => {
         if (newValue) {

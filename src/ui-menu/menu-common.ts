@@ -1,4 +1,4 @@
-import type { View } from '@nativescript/core';
+import type { FormattedString, ImageSource, View } from '@nativescript/core';
 
 /**
  * An entry of a menu.
@@ -10,8 +10,8 @@ export interface MenuItem {
     title?: string;
     /** shown below the title (iOS only) */
     subtitle?: string;
-    /** `sys://name` (SF Symbol, iOS), `res://name` or a file path */
-    icon?: string;
+    /** `sys://name` (SF Symbol, iOS), `res://name` or a file path, an ImageSource, or a FormattedString (spans drawn into an icon) */
+    icon?: string | ImageSource | FormattedString;
     /** shows a check mark when true */
     checked?: boolean;
     /** red item */

@@ -1,4 +1,4 @@
-import { FormattedString, TextBase } from '@nativescript/core';
+import { FormattedString, ImageSource, TextBase } from '@nativescript/core';
 
 /**
  * Creates the native rich text of a FormattedString (spans): a SpannableStringBuilder on Android, a NSAttributedString on iOS.
@@ -13,3 +13,11 @@ export function createNativeFormattedText(formatted: FormattedString, owner: Tex
  * The text without color uses the label color.
  */
 export function renderAttributedStringToImage(attributed: any): any;
+
+/**
+ * Draws a FormattedString (spans) into an image: custom icons from font icons, emojis, styled text...
+ * The colors of the spans are kept, the text without color is black on Android and the label color on iOS.
+ * @param owner a label used for the default font
+ * @param fontSize default size of the text without size, in dip (24 by default, the size of the icons)
+ */
+export function renderFormattedTextToImageSource(formatted: FormattedString, owner: TextBase, fontSize?: number): ImageSource;

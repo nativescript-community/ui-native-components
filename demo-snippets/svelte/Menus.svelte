@@ -1,7 +1,14 @@
 <script lang="ts">
-    import { Frame } from '@nativescript/core';
+    import { Color, FormattedString, Frame, Span } from '@nativescript/core';
     import { showMenu, setContextMenu } from '@nativescript-community/ui-menu';
     import { onMount } from 'svelte';
+
+    // an icon drawn from spans (here an emoji, a font icon works the same)
+    const heart = new FormattedString();
+    const heartSpan = new Span();
+    heartSpan.text = '♥';
+    heartSpan.color = new Color('#d32f2f');
+    heart.spans.push(heartSpan);
 
     let result = '';
     let compact = true;
@@ -17,6 +24,7 @@
                 items: [{ id: 'link', title: 'Link' }, { id: 'file', title: 'File', disabled: true }]
             },
             { separator: true },
+            { id: 'love', title: 'Love it', icon: heart },
             { id: 'delete', title: 'Delete', icon: __IOS__ ? 'sys://trash' : undefined, destructive: true }
         ];
     }

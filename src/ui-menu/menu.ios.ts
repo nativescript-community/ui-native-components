@@ -1,10 +1,17 @@
-import { Application, ImageSource, Utils, View } from '@nativescript/core';
+import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
+import { Application, FormattedString, ImageSource, Label, Utils, View } from '@nativescript/core';
 import { ContextMenuOptions, MenuItem, ShowMenuOptions, splitSections } from './menu-common';
 export * from './menu-common';
 
-function getIcon(icon: string): UIImage {
+function getIcon(icon: string | ImageSource | FormattedString): UIImage {
     if (!icon) {
         return null;
+    }
+    if (icon instanceof FormattedString) {
+        return renderFormattedTextToImageSource(icon, new Label())?.ios;
+    }
+    if (icon instanceof ImageSource) {
+        return icon.ios;
     }
     if (icon.startsWith(Utils.SYSTEM_PREFIX)) {
         return UIImage.systemImageNamed(icon.slice(Utils.SYSTEM_PREFIX.length));

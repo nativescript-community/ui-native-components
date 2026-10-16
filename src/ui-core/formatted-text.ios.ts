@@ -1,4 +1,4 @@
-import { FormattedString, TextBase } from '@nativescript/core';
+import { FormattedString, ImageSource, TextBase } from '@nativescript/core';
 import { createNativeFormattedTextCommon } from './formatted-text-common';
 
 export function createNativeFormattedText(formatted: FormattedString, owner: TextBase): NSAttributedString {
@@ -24,4 +24,15 @@ export function renderAttributedStringToImage(attributed: NSAttributedString): U
         mutable.drawInRect(CGRectMake(0, 0, size.width, size.height));
     });
     return image.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+}
+
+export function renderFormattedTextToImageSource(formatted: FormattedString, owner: TextBase, fontSize = 24): ImageSource {
+    if (!formatted) {
+        return null;
+    }
+    if (owner && !owner.style.fontSize) {
+        owner.style.fontSize = fontSize;
+    }
+    const image = renderAttributedStringToImage(createNativeFormattedText(formatted, owner));
+    return image ? new ImageSource(image) : null;
 }

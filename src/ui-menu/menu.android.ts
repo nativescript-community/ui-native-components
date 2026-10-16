@@ -1,16 +1,21 @@
-import { GestureTypes, ImageSource, Utils, View } from '@nativescript/core';
+import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
+import { FormattedString, GestureTypes, ImageSource, Label, Utils, View } from '@nativescript/core';
 import { ContextMenuOptions, MenuItem, ShowMenuOptions, splitSections } from './menu-common';
 export * from './menu-common';
 
 // Material 3 error color
 const DESTRUCTIVE_COLOR = android.graphics.Color.parseColor('#B3261D');
 
-function getIcon(icon: string): android.graphics.drawable.Drawable {
+function getIcon(icon: string | ImageSource | FormattedString): android.graphics.drawable.Drawable {
     if (!icon) {
         return null;
     }
     let source: ImageSource;
-    if (icon.startsWith(Utils.RESOURCE_PREFIX)) {
+    if (icon instanceof FormattedString) {
+        source = renderFormattedTextToImageSource(icon, new Label());
+    } else if (icon instanceof ImageSource) {
+        source = icon;
+    } else if (icon.startsWith(Utils.RESOURCE_PREFIX)) {
         source = ImageSource.fromResourceSync(icon.slice(Utils.RESOURCE_PREFIX.length));
     } else if (Utils.isFileOrResourcePath(icon) && !icon.startsWith(Utils.SYSTEM_PREFIX)) {
         source = ImageSource.fromFileSync(icon);

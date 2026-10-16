@@ -1,7 +1,12 @@
 <script lang="ts">
-    import { Frame } from '@nativescript/core';
+    import { Color, FormattedString, Frame, Span } from '@nativescript/core';
     let index = 0;
     let iconIndex = 1;
+    const heart = new FormattedString();
+    const heartSpan = new Span();
+    heartSpan.text = '♥';
+    heartSpan.color = new Color('#d32f2f');
+    heart.spans.push(heartSpan);
     const titles = ['Day', 'Week', 'Month'];
 </script>
 
@@ -22,6 +27,7 @@
             <uisegmentedbaritem src={__IOS__ ? 'sys://list.bullet' : 'res://ic_add'} />
             <uisegmentedbaritem src={__IOS__ ? 'sys://square.grid.2x2' : 'res://ic_star'} />
             <uisegmentedbaritem src={__IOS__ ? 'sys://map' : 'res://ic_add'} />
+            <uisegmentedbaritem src={heart} />
         </uisegmentedbar>
 
         <label class="title" text="spans (formattedText)" />
