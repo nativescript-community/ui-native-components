@@ -16,7 +16,12 @@
                 <label text="Search" />
             </uitabstripitem>
             <uitabstripitem>
-                <label text="Settings" />
+                <label>
+                    <formattedstring>
+                        <span text="Sett" fontWeight="bold" />
+                        <span text="ings" color="#d32f2f" />
+                    </formattedstring>
+                </label>
             </uitabstripitem>
         </uitabstrip>
         <uitabcontentitem>

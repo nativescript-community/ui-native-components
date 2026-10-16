@@ -101,7 +101,7 @@ public class NavigationBar extends BottomNavigationView {
     }
 
     private void applySpec(MenuItem menuItem, TabItemSpec spec) {
-        menuItem.setTitle(spec.title);
+        menuItem.setTitle(spec.formattedTitle != null ? spec.formattedTitle : spec.title);
         if (spec.iconDrawable != null) {
             menuItem.setIcon(spec.iconDrawable);
         } else if (spec.iconId != 0) {

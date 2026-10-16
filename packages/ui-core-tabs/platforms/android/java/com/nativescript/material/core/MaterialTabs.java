@@ -103,7 +103,7 @@ public class MaterialTabs extends TabLayout {
     }
 
     private void applySpec(TabLayout.Tab tab, TabItemSpec spec) {
-        tab.setText(spec.title);
+        tab.setText(spec.formattedTitle != null ? spec.formattedTitle : spec.title);
         if (spec.iconDrawable != null) {
             tab.setIcon(spec.iconDrawable);
         } else if (spec.iconId != 0) {

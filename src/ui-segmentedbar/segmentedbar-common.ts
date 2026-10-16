@@ -1,4 +1,4 @@
-import { Color, ImageSource, Property, Utils } from '@nativescript/core';
+import { Color, FormattedString, ImageSource, Label, Property, Span, Utils } from '@nativescript/core';
 import { SegmentedBarBase, SegmentedBarItemBase } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
 
 export { SegmentedBarBase, SegmentedBarItemBase };
@@ -13,6 +13,43 @@ export class SegmentedBarItem extends SegmentedBarItemBase {
      * @internal loaded icon, always a white (template) image for the font icons
      */
     image: ImageSource;
+
+    private mLabel: Label;
+    /**
+     * Label used to create the native rich text (spans) of the item and as the owner of the formattedText.
+     * @internal
+     */
+    get textOwner(): Label {
+        if (!this.mLabel) {
+            this.mLabel = new Label();
+        }
+        return this.mLabel;
+    }
+
+    /**
+     * Rich text (spans) of the segment, it wins over the title.
+     * Uses `@nativescript-community/text` when it is installed.
+     * On iOS the text is drawn as an image (the native control only shows plain titles), so the colors are the ones of the spans.
+     */
+    get formattedText(): FormattedString {
+        return this.mLabel?.formattedText;
+    }
+    set formattedText(value: FormattedString) {
+        this.textOwner.formattedText = value;
+        this._update();
+    }
+
+    _addChildFromBuilder(name: string, value: any) {
+        if (value instanceof Span) {
+            if (!this.formattedText) {
+                this.formattedText = new FormattedString();
+            }
+            this.formattedText.spans.push(value);
+            this._update();
+        } else if (value instanceof FormattedString) {
+            this.formattedText = value;
+        }
+    }
 
     async loadImage(value: string | ImageSource) {
         let source: ImageSource;

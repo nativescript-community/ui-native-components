@@ -23,5 +23,21 @@
             <uisegmentedbaritem src={__IOS__ ? 'sys://square.grid.2x2' : 'res://ic_star'} />
             <uisegmentedbaritem src={__IOS__ ? 'sys://map' : 'res://ic_add'} />
         </uisegmentedbar>
+
+        <label class="title" text="spans (formattedText)" />
+        <uisegmentedbar selectedIndex="0">
+            <uisegmentedbaritem>
+                <formattedstring>
+                    <span text="Bold " fontWeight="bold" />
+                    <span text="red" color="#d32f2f" />
+                </formattedstring>
+            </uisegmentedbaritem>
+            <uisegmentedbaritem>
+                <formattedstring>
+                    <span text="Big" fontSize="22" />
+                    <span text=" small" fontSize="11" />
+                </formattedstring>
+            </uisegmentedbaritem>
+        </uisegmentedbar>
     </stackLayout>
 </page>

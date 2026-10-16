@@ -1,3 +1,4 @@
+import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { Application, Color, CoreTypes, Font, ImageAsset, ImageSource, Utils, getTransformedText } from '@nativescript/core';
 import { addGridLayoutRow } from '@nativescript-community/ui-core/android/utils';
 import { TabContentItem } from '../tab-content-item';
@@ -428,6 +429,10 @@ export abstract class TabNavigation<T extends android.view.ViewGroup = any> exte
             const textTransform = this.getItemLabelTextTransform(tabStripItem);
             title = getTransformedText(title, textTransform);
             tabItemSpec.title = title;
+            if (nestedLabel.formattedText) {
+                // rich text (spans)
+                tabItemSpec.formattedTitle = createNativeFormattedText(nestedLabel.formattedText, nestedLabel);
+            }
 
             // BACKGROUND-COLOR
             const backgroundColor = tabStripItem.style.backgroundColor;

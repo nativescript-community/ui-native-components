@@ -1,3 +1,4 @@
+import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { Utils } from '@nativescript/core';
 import { itemsProperty, selectedIndexProperty } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
 import { SegmentedBarBase, SegmentedBarItem } from './segmentedbar-common';
@@ -25,6 +26,8 @@ export class SegmentedBar extends SegmentedBarBase {
         const nativeView = this.nativeViewProtected;
         nativeView.setSingleSelection(true);
         nativeView.setSelectionRequired(true);
+        // the segments keep the same height whatever their text
+        nativeView.setBaselineAligned(false);
         const owner = new WeakRef(this);
         const listener = new com.google.android.material.button.MaterialButtonToggleGroup.OnButtonCheckedListener({
             onButtonChecked(group, checkedId, isChecked) {
@@ -51,8 +54,13 @@ export class SegmentedBar extends SegmentedBarBase {
     }
 
     private applyItem(button: com.google.android.material.button.MaterialButton, item: SegmentedBarItem) {
-        const title = item.title;
-        button.setText(title || '');
+        const formatted = item.formattedText;
+        if (formatted && !item.textOwner.fontSize) {
+            // spans without size: the size of the Material button text
+            item.textOwner.fontSize = 14;
+        }
+        const title = formatted ? formatted.toString() : item.title;
+        button.setText(formatted ? createNativeFormattedText(formatted, item.textOwner) || title : title || '');
         const image = item.image?.android as android.graphics.Bitmap;
         if (image) {
             button.setIcon(new android.graphics.drawable.BitmapDrawable(Utils.android.getApplicationContext().getResources(), image));

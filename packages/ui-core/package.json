@@ -41,5 +41,13 @@
     "readmeFilename": "README.md",
     "dependencies": {
         "@nativescript-community/text": "^1.6.25"
+    },
+    "peerDependencies": {
+        "@nativescript-community/text": "*"
+    },
+    "peerDependenciesMeta": {
+        "@nativescript-community/text": {
+            "optional": true
+        }
     }
 }

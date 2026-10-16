@@ -1,6 +1,7 @@
 /**
  * @module @nativescript-community/ui-core-tabs/tab-navigation
  */
+import { createNativeFormattedText, renderAttributedStringToImage } from '@nativescript-community/ui-core/formatted-text';
 import { Color, CoreTypes, Device, Font, Frame, IOSHelper, ImageAsset, ImageSource, Property, Utils, View, ViewBase, booleanConverter, getTransformedText } from '@nativescript/core';
 import { TabContentItem } from '../tab-content-item';
 import { getIconSpecSize, itemsProperty, selectedIndexProperty, tabStripProperty } from '../tab-navigation-base';
@@ -574,6 +575,14 @@ export abstract class TabNavigation<
             }
         }
 
+        if (item.isLoaded && item.label.formattedText) {
+            // rich text (spans): the segments only show plain titles, the spans are drawn into an image
+            const spansImage = renderAttributedStringToImage(createNativeFormattedText(item.label.formattedText, item.label));
+            if (spansImage) {
+                image = spansImage;
+                title = null;
+            }
+        }
         const tabBarItem = UITabBarItem.alloc().initWithTitleImageTag(title, image, index);
 
         return tabBarItem;

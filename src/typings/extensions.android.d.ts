@@ -120,6 +120,7 @@ declare namespace com {
 
                 export class TabItemSpec {
                     title: string;
+                    formattedTitle: globalAndroid.text.SpannableStringBuilder;
                     fontSize: number;
                     typeFace: globalAndroid.graphics.Typeface;
                     iconId: number;

@@ -5,6 +5,8 @@ import android.graphics.Typeface;
 
 public class TabItemSpec {
     public String title;
+    /** rich text (spans), wins over the title */
+    public CharSequence formattedTitle;
     public int fontSize;
     public Typeface typeFace;
     public int iconId;
