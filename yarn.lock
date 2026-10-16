@@ -1714,6 +1714,7 @@ __metadata:
     "@nativescript-community/ui-bottomnavigationbar": "npm:*"
     "@nativescript-community/ui-bottomsheet": "npm:*"
     "@nativescript-community/ui-button": "npm:*"
+    "@nativescript-community/ui-checkbox": "npm:*"
     "@nativescript-community/ui-collectionview": "npm:^6.0.29"
     "@nativescript-community/ui-core": "npm:*"
     "@nativescript-community/ui-core-tabs": "npm:*"
@@ -1723,6 +1724,7 @@ __metadata:
     "@nativescript-community/ui-menu": "npm:*"
     "@nativescript-community/ui-progress": "npm:*"
     "@nativescript-community/ui-refreshlayout": "npm:*"
+    "@nativescript-community/ui-searchbar": "npm:*"
     "@nativescript-community/ui-segmentedbar": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
@@ -1789,6 +1791,14 @@ __metadata:
   resolution: "@nativescript-community/ui-button@workspace:packages/ui-button"
   dependencies:
     "@nativescript-community/text": "npm:^1.5.2"
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-checkbox@npm:*, @nativescript-community/ui-checkbox@workspace:packages/ui-checkbox":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-checkbox@workspace:packages/ui-checkbox"
+  dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft
@@ -1876,6 +1886,14 @@ __metadata:
 "@nativescript-community/ui-refreshlayout@npm:*, @nativescript-community/ui-refreshlayout@workspace:packages/ui-refreshlayout":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-refreshlayout@workspace:packages/ui-refreshlayout"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-searchbar@npm:*, @nativescript-community/ui-searchbar@workspace:packages/ui-searchbar":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-searchbar@workspace:packages/ui-searchbar"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown

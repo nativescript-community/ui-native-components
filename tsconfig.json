@@ -121,6 +121,18 @@
             ],
             "@nativescript-community/ui-refreshlayout/*": [
                 "src/ui-refreshlayout/*"
+            ],
+            "@nativescript-community/ui-searchbar": [
+                "src/ui-searchbar/searchbar"
+            ],
+            "@nativescript-community/ui-searchbar/*": [
+                "src/ui-searchbar/*"
+            ],
+            "@nativescript-community/ui-checkbox": [
+                "src/ui-checkbox/checkbox"
+            ],
+            "@nativescript-community/ui-checkbox/*": [
+                "src/ui-checkbox/*"
             ]
         }
     }
