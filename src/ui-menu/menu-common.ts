@@ -27,15 +27,28 @@ export interface MenuItem {
     [key: string]: any;
 }
 
+/**
+ * Where the menu opens relative to its anchor.
+ * Android: `vertical` above/below and `horizontal` start/end (center behaves like start). The system flips the menu when there is no room.
+ * iOS: the system chooses the side with room, the placement sets the attachment point of the menu.
+ */
+export interface MenuPlacement {
+    horizontal?: 'start' | 'center' | 'end';
+    vertical?: 'auto' | 'above' | 'below';
+}
+
 export interface ShowMenuOptions {
     /** the view the menu is attached to */
     anchor: View;
     items: MenuItem[];
     /** title of the menu (iOS only) */
     title?: string;
+    /** where the menu opens, relative to the anchor */
+    placement?: MenuPlacement;
 }
 
 export interface ContextMenuOptions {
+    placement?: MenuPlacement;
     /** the items, or a function called each time the menu opens */
     items: MenuItem[] | (() => MenuItem[]);
     title?: string;

@@ -1,6 +1,6 @@
 import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
 import { Application, FormattedString, ImageSource, Label, Utils, View } from '@nativescript/core';
-import { ContextMenuOptions, MenuItem, ShowMenuOptions, splitSections } from './menu-common';
+import { ContextMenuOptions, MenuItem, MenuPlacement, ShowMenuOptions, splitSections } from './menu-common';
 export * from './menu-common';
 
 function getIcon(icon: string | ImageSource | FormattedString): UIImage {
@@ -51,6 +51,21 @@ function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) =>
         return UIMenu.menuWithTitleImageIdentifierOptionsChildren('', null, null, UIMenuOptions.DisplayInline, elements as any);
     });
     return UIMenu.menuWithTitleChildren(title || '', sections as any);
+}
+
+/**
+ * The invisible button which shows the menu: the attachment point of the menu depends on the placement
+ */
+@NativeClass
+class MenuButton extends UIButton {
+    placement: MenuPlacement;
+    menuAttachmentPointForConfiguration(configuration: UIContextMenuConfiguration): CGPoint {
+        const { width, height } = this.bounds.size;
+        const horizontal = this.placement?.horizontal;
+        const x = horizontal === 'start' ? 0 : horizontal === 'end' ? width : width / 2;
+        const y = this.placement?.vertical === 'above' ? 0 : height;
+        return CGPointMake(x, y);
+    }
 }
 
 @NativeClass
@@ -117,7 +132,8 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
             return;
         }
         // a menu can only be shown by a UIButton: an invisible one covers the anchor
-        const button = UIButton.buttonWithType(UIButtonType.Custom);
+        const button = MenuButton.buttonWithType(UIButtonType.Custom) as MenuButton;
+        button.placement = options.placement;
         if (typeof (button as any).performPrimaryAction !== 'function') {
             showActionSheet(options, resolve);
             return;

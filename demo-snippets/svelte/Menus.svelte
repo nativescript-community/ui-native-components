@@ -12,11 +12,13 @@
 
     let result = '';
     let compact = true;
+    let horizontal = 'start';
+    let vertical = 'below';
     let longPressLabel;
 
     function items() {
         return [
-            { id: 'copy', title: 'Copy', icon: __IOS__ ? 'sys://doc.on.doc' : 'res://ic_add' },
+            { id: 'copy', title: 'Copy', subtitle: 'to the clipboard', icon: __IOS__ ? 'sys://doc.on.doc' : 'res://ic_add' },
             { id: 'star', title: 'Starred', icon: __IOS__ ? 'sys://star' : 'res://ic_star', checked: compact },
             {
                 title: 'Share as',
@@ -30,7 +32,7 @@
     }
 
     async function onTap(e) {
-        const item = await showMenu({ anchor: e.object, items: items() });
+        const item = await showMenu({ anchor: e.object, items: items(), placement: { horizontal, vertical } });
         if (item) {
             if (item.id === 'star') {
                 compact = !compact;
@@ -53,7 +55,9 @@
     </actionBar>
     <stackLayout class="demo">
         <label class="title" text="menu attached to a button" />
-        <uibutton text="show menu" on:tap={onTap} />
+        <uibutton text="show menu" marginTop="300" width="160" horizontalAlignment="center" on:tap={onTap} />
+        <label class="title" text={`placement: ${horizontal} / ${vertical} (tap to change)`} on:tap={() => { horizontal = horizontal === 'start' ? 'center' : horizontal === 'center' ? 'end' : 'start'; }} />
+        <label class="title" text="vertical: below / above (tap)" on:tap={() => (vertical = vertical === 'below' ? 'above' : 'below')} />
         <label class="title" text="long press the label for a context menu" />
         <label text="long press me" class="h2" on:loaded={onLabelLoaded} />
         <label class="title" text={result} />

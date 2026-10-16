@@ -28,9 +28,17 @@ function buildMenu(menu: android.view.Menu, items: MenuItem[], registry: Map<num
         section.forEach((item) => {
             const id = state.nextId++;
             let title: any = item.title || '';
-            if (item.destructive) {
-                const spannable = new android.text.SpannableString(title);
-                spannable.setSpan(new android.text.style.ForegroundColorSpan(DESTRUCTIVE_COLOR), 0, title.length, 0);
+            if (item.destructive || item.subtitle) {
+                // the subtitle is a smaller second line
+                const text = item.subtitle ? `${title}\n${item.subtitle}` : title;
+                const spannable = new android.text.SpannableString(text);
+                if (item.destructive) {
+                    spannable.setSpan(new android.text.style.ForegroundColorSpan(DESTRUCTIVE_COLOR), 0, title.length, 0);
+                }
+                if (item.subtitle) {
+                    spannable.setSpan(new android.text.style.RelativeSizeSpan(0.8), title.length + 1, text.length, 0);
+                    spannable.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY), title.length + 1, text.length, 0);
+                }
                 title = spannable;
             }
             let menuItem: android.view.MenuItem;
@@ -67,7 +75,24 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
             return;
         }
         const PopupMenu = (global as any).androidx.appcompat.widget.PopupMenu;
-        const popup = new PopupMenu(anchor.getContext(), anchor);
+        const placement = options.placement;
+        let popupAnchor = anchor;
+        let helper: android.view.View;
+        if (placement?.vertical === 'above') {
+            // the popup always opens below its anchor: a helper view above the anchor, as high as the menu, makes it open above
+            const root = anchor.getRootView() as android.view.ViewGroup;
+            const location = Array.create('int', 2);
+            anchor.getLocationInWindow(location);
+            const itemCount = options.items.filter((i) => !i.separator).length;
+            const estimatedHeight = Utils.layout.toDevicePixels(itemCount * 48 + 16);
+            helper = new android.view.View(anchor.getContext());
+            root.addView(helper, new android.widget.FrameLayout.LayoutParams(anchor.getWidth(), 1));
+            helper.setX(location[0]);
+            helper.setY(Math.max(0, location[1] - estimatedHeight));
+            popupAnchor = helper;
+        }
+        const gravity = placement?.horizontal === 'end' ? android.view.Gravity.END : android.view.Gravity.START;
+        const popup = new PopupMenu(anchor.getContext(), popupAnchor, gravity);
         const registry = new Map<number, MenuItem>();
         buildMenu(popup.getMenu(), options.items, registry, { nextId: 1 });
         try {
@@ -87,7 +112,14 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
             })
         );
         // resolving twice is harmless: the click is reported before the dismissal
-        popup.setOnDismissListener(new PopupMenu.OnDismissListener({ onDismiss: () => resolve(undefined) }));
+        popup.setOnDismissListener(
+            new PopupMenu.OnDismissListener({
+                onDismiss: () => {
+                    (helper?.getParent() as android.view.ViewGroup)?.removeView(helper);
+                    resolve(undefined);
+                }
+            })
+        );
         popup.show();
     });
 }
@@ -95,7 +127,7 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
 export function setContextMenu(view: View, options: ContextMenuOptions): () => void {
     const handler = () => {
         const items = typeof options.items === 'function' ? options.items() : options.items;
-        showMenu({ anchor: view, items, title: options.title }).then((item) => item && options.onSelect?.(item));
+        showMenu({ anchor: view, items, title: options.title, placement: options.placement }).then((item) => item && options.onSelect?.(item));
     };
     view.on(GestureTypes.longPress as any, handler);
     return () => view.off(GestureTypes.longPress as any, handler);
