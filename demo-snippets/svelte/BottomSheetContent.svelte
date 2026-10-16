@@ -5,7 +5,7 @@
     let sheet;
 </script>
 
-<stackLayout class="sheet" backgroundColor="white" on:loaded={(e) => (sheet = e.object)}>
+<stackLayout class="sheet" on:loaded={(e) => (sheet = e.object)}>
     <label text={title} fontSize="20" fontWeight="bold" />
     <label text="UISheetPresentationController on iOS, BottomSheetDialogFragment on Android" textWrap="true" />
     {#each Array(count) as _, index}

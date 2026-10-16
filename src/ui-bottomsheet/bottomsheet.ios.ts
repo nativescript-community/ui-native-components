@@ -51,12 +51,48 @@ class SheetDelegateImpl extends NSObject {
     }
 }
 
+/**
+ * With an undimmed detent UIKit has no dimming view, so there is no tap outside to dismiss the sheet: this recognizer replaces it
+ */
+@NativeClass
+class OutsideTapTarget extends NSObject {
+    _owner: WeakRef<ViewWithBottomSheet>;
+    static initWithOwner(owner: ViewWithBottomSheet) {
+        const target = OutsideTapTarget.new() as OutsideTapTarget;
+        target._owner = new WeakRef(owner);
+        return target;
+    }
+    outsideTapped() {
+        this._owner.get()?._onOutsideTap();
+    }
+    static ObjCExposedMethods = {
+        outsideTapped: { returns: interop.types.void, params: [] }
+    };
+}
+
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     bottomSheetDelegate: SheetDelegateImpl;
     _detentIds: string[] = [];
     _onDetentChange: (index: number) => void;
     _onWillDismiss: () => boolean | void;
     _onDismissAttempt: () => void;
+    _outsideTapRecognizer: UITapGestureRecognizer;
+    _outsideTapTarget: OutsideTapTarget;
+    _outsideTapView: UIView;
+
+    _onOutsideTap() {
+        const sheet = this.bottomSheetController?.sheetPresentationController;
+        const undimmedId = sheet?.largestUndimmedDetentIdentifier;
+        // the system dimming view handles the taps at the larger detents
+        if (undimmedId && sheet.selectedDetentIdentifier !== undimmedId && this._detentIds.indexOf(sheet.selectedDetentIdentifier) > this._detentIds.indexOf(undimmedId)) {
+            return;
+        }
+        if (this._onWillDismiss?.() === false) {
+            this._onDismissAttempt?.();
+            return;
+        }
+        this.closeBottomSheet();
+    }
     bottomSheetController: UIViewController;
     protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
         options.context = options.context || {};
@@ -101,7 +137,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         controller.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
         const sheet = controller.sheetPresentationController;
         if (sheet) {
-            this.configureSheet(sheet, controller, options);
+            this.configureSheet(sheet, controller, options, parentController);
         }
         controller.nsAnimated = true;
         parentController.presentViewControllerAnimatedCompletion(controller, true, null);
@@ -127,7 +163,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
     }
 
-    private configureSheet(sheet: UISheetPresentationController, controller: IMDLayoutViewController, options: BottomSheetOptions) {
+    private configureSheet(sheet: UISheetPresentationController, controller: IMDLayoutViewController, options: BottomSheetOptions, parentController: UIViewController) {
         const large = UISheetPresentationControllerDetent.largeDetent();
         const detentIds: string[] = [];
         this._onDetentChange = options.onDetentChange;
@@ -197,6 +233,17 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
         if (options.largestUndimmedDetentIndex !== undefined && detentIds[options.largestUndimmedDetentIndex]) {
             sheet.largestUndimmedDetentIdentifier = detentIds[options.largestUndimmedDetentIndex];
+            if (options.canTouchBehind !== true && options.dismissOnBackgroundTap !== false) {
+                // tap outside dismisses, the touch is not given to the content behind
+                const view = parentController?.view;
+                if (view) {
+                    this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
+                    this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
+                    this._outsideTapRecognizer.cancelsTouchesInView = true;
+                    view.addGestureRecognizer(this._outsideTapRecognizer);
+                    this._outsideTapView = view;
+                }
+            }
         } else if (options.canTouchBehind === true || options.disableDimBackground === true) {
             // no dimming at the biggest detent => touches go through to the content behind
             sheet.largestUndimmedDetentIdentifier = detentIds[detentIds.length - 1];
@@ -236,6 +283,12 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             this.bottomSheetController = null;
         }
         this.bottomSheetDelegate = null;
+        if (this._outsideTapRecognizer) {
+            this._outsideTapView?.removeGestureRecognizer(this._outsideTapRecognizer);
+            this._outsideTapRecognizer = null;
+            this._outsideTapTarget = null;
+            this._outsideTapView = null;
+        }
         this._onDetentChange = null;
         this._onWillDismiss = null;
         this._onDismissAttempt = null;

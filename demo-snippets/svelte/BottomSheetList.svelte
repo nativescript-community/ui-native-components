@@ -4,7 +4,7 @@
     const items = Array.from({ length: 60 }, (_, i) => ({ title: `row ${i + 1}` }));
 </script>
 
-<gridLayout rows="auto,*" backgroundColor="white">
+<gridLayout rows="auto,*">
     <label text="CollectionView in a sheet" fontSize="20" fontWeight="bold" padding="16" />
     <collectionview row="1" {items} rowHeight="48">
         <Template let:item>
