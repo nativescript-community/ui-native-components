@@ -1,0 +1,30 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/ui-tabs",
+        "outDir": "./",
+        "paths": {
+            "@nativescript-community/ui-core": [
+                "packages/ui-core/index"
+            ],
+            "@nativescript-community/ui-core/*": [
+                "packages/ui-core/*"
+            ],
+            "@nativescript-community/ui-core-tabs": [
+                "packages/ui-core-tabs/tab-navigation-base/index"
+            ],
+            "@nativescript-community/ui-core-tabs/*": [
+                "packages/ui-core-tabs/*"
+            ]
+        }
+    },
+    "include": [
+        "../../src/ui-tabs/**/*.ts",
+        "../../references.d.ts",
+        "../../tools/references.d.ts",
+        "../../src/references.d.ts"
+    ],
+    "exclude": [
+        "../../src/ui-tabs/angular/**"
+    ]
+}

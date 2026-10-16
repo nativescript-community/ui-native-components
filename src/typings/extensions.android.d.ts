@@ -90,6 +90,26 @@ declare namespace com {
                     getItemCount(): number;
                 }
 
+                export class MaterialTabs extends com.google.android.material.tabs.TabLayout {
+                    constructor(context: globalAndroid.content.Context);
+
+                    onTap(position: number): boolean;
+                    onSelectedPositionChange(position: number, prevPosition: number): void;
+                    setSelectedPosition(position: number): void;
+                    getSelectedPosition(): number;
+                    setViewPager(viewPager: androidx.viewpager2.widget.ViewPager2): void;
+                    setItems(items: Array<TabItemSpec>): void;
+                    updateItemAt(position: number, itemSpec: TabItemSpec): void;
+                    forceTransitionToPosition(position: number): void;
+                    scrollToTab(position: number): void;
+                    setSelectedIndicatorColors(colors: native.Array<number> | number[]): void;
+                    setItemColors(selectedColor: number, unselectedColor: number): void;
+
+                    getTextViewForItemAt(index: number): globalAndroid.widget.TextView;
+                    getViewForItemAt(index: number): globalAndroid.view.View;
+                    getItemCount(): number;
+                }
+
                 export class TabViewPager extends androidx.viewpager2.widget.ViewPager2 {
                     constructor(context: globalAndroid.content.Context);
                     constructor(context: globalAndroid.content.Context, attrs: globalAndroid.util.AttributeSet);

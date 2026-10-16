@@ -91,6 +91,12 @@
             ],
             "@nativescript-community/ui-bottom-navigation/*": [
                 "src/ui-bottom-navigation/*"
+            ],
+            "@nativescript-community/ui-tabs": [
+                "src/ui-tabs/index"
+            ],
+            "@nativescript-community/ui-tabs/*": [
+                "src/ui-tabs/*"
             ]
         }
     }

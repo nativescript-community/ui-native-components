@@ -34,6 +34,7 @@
         "@nativescript-community/ui-slider": "*",
         "@nativescript-community/ui-snackbar": "*",
         "@nativescript-community/ui-switch": "*",
+        "@nativescript-community/ui-tabs": "*",
         "@nativescript-community/ui-textfield": "*",
         "@nativescript-community/ui-textview": "*",
         "@nativescript/hook": "~2.0.0",

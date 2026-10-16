@@ -1715,6 +1715,7 @@ __metadata:
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
     "@nativescript-community/ui-switch": "npm:*"
+    "@nativescript-community/ui-tabs": "npm:*"
     "@nativescript-community/ui-textfield": "npm:*"
     "@nativescript-community/ui-textview": "npm:*"
     "@nativescript/hook": "npm:~2.0.0"
@@ -1851,6 +1852,15 @@ __metadata:
   resolution: "@nativescript-community/ui-switch@workspace:packages/ui-switch"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-tabs@npm:*, @nativescript-community/ui-tabs@workspace:packages/ui-tabs":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-tabs@workspace:packages/ui-tabs"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+    "@nativescript-community/ui-core-tabs": "npm:^7.3.4"
   languageName: unknown
   linkType: soft
 

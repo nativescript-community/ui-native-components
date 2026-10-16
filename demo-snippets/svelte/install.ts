@@ -9,6 +9,7 @@ import FloatingActionButtonPlugin from '@nativescript-community/ui-floatingactio
 import ProgressPlugin from '@nativescript-community/ui-progress/svelte';
 import SliderPlugin from '@nativescript-community/ui-slider/svelte';
 import SwitchPlugin from '@nativescript-community/ui-switch/svelte';
+import TabsPlugin from '@nativescript-community/ui-tabs/svelte';
 import TextFieldPlugin from '@nativescript-community/ui-textfield/svelte';
 import TextViewPlugin from '@nativescript-community/ui-textview/svelte';
 
@@ -20,6 +21,7 @@ import Controls from './Controls.svelte';
 import Dialogs from './Dialogs.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
 import Snackbar from './Snackbar.svelte';
+import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
 import '../app.scss';
 
@@ -34,6 +36,7 @@ export function installPlugin() {
     ProgressPlugin.register();
     SliderPlugin.register();
     SwitchPlugin.register();
+    TabsPlugin.register();
     TextFieldPlugin.register();
     TextViewPlugin.register();
 }
@@ -45,6 +48,7 @@ export const demos = [
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
+    { name: 'Tabs', path: 'Tabs', component: Tabs },
     { name: 'Bottom navigation', path: 'BottomNavigation', component: BottomNavigation },
     { name: 'Bottom navigation bar', path: 'BottomNavigationBar', component: BottomNavigationBar },
     { name: 'Snackbar', path: 'Snackbar', component: Snackbar }
