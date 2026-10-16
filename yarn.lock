@@ -1703,6 +1703,7 @@ __metadata:
   dependencies:
     "@mdi/font": "npm:6.5.95"
     "@nativescript-community/ui-activityindicator": "npm:*"
+    "@nativescript-community/ui-bottomnavigationbar": "npm:*"
     "@nativescript-community/ui-bottomsheet": "npm:*"
     "@nativescript-community/ui-button": "npm:*"
     "@nativescript-community/ui-cardview": "npm:*"
@@ -1740,6 +1741,14 @@ __metadata:
 "@nativescript-community/ui-activityindicator@npm:*, @nativescript-community/ui-activityindicator@workspace:packages/ui-activityindicator":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-activityindicator@workspace:packages/ui-activityindicator"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-bottomnavigationbar@npm:*, @nativescript-community/ui-bottomnavigationbar@workspace:packages/ui-bottomnavigationbar":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-bottomnavigationbar@workspace:packages/ui-bottomnavigationbar"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown

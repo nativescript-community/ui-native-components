@@ -2,34 +2,96 @@
     "extends": "./tools/tsconfig",
     "compilerOptions": {
         "paths": {
-            "@nativescript-community/ui-activityindicator": ["src/ui-activityindicator/index"],
-            "@nativescript-community/ui-activityindicator/*": ["src/ui-activityindicator/*"],
-            "@nativescript-community/ui-bottomsheet": ["src/ui-bottomsheet/bottomsheet"],
-            "@nativescript-community/ui-bottomsheet/*": ["src/ui-bottomsheet/*"],
-            "@nativescript-community/ui-button": ["src/ui-button/button"],
-            "@nativescript-community/ui-button/*": ["src/ui-button/*"],
-            "@nativescript-community/ui-cardview": ["src/ui-cardview/cardview"],
-            "@nativescript-community/ui-cardview/*": ["src/ui-cardview/*"],
-            "@nativescript-community/ui-core": ["src/ui-core/index"],
-            "@nativescript-community/ui-core/*": ["src/ui-core/*"],
-            "@nativescript-community/ui-dialogs": ["src/ui-dialogs/dialogs"],
-            "@nativescript-community/ui-dialogs/*": ["src/ui-dialogs/*"],
-            "@nativescript-community/ui-floatingactionbutton": ["src/ui-floatingactionbutton/floatingactionbutton"],
-            "@nativescript-community/ui-floatingactionbutton/*": ["src/ui-floatingactionbutton/*"],
-            "@nativescript-community/ui-progress": ["src/ui-progress/progress"],
-            "@nativescript-community/ui-progress/*": ["src/ui-progress/*"],
-            "@nativescript-community/ui-ripple": ["src/ui-ripple/ripple"],
-            "@nativescript-community/ui-ripple/*": ["src/ui-ripple/*"],
-            "@nativescript-community/ui-slider": ["src/ui-slider/slider"],
-            "@nativescript-community/ui-slider/*": ["src/ui-slider/*"],
-            "@nativescript-community/ui-snackbar": ["src/ui-snackbar/snackbar"],
-            "@nativescript-community/ui-snackbar/*": ["src/ui-snackbar/*"],
-            "@nativescript-community/ui-switch": ["src/ui-switch/index"],
-            "@nativescript-community/ui-switch/*": ["src/ui-switch/*"],
-            "@nativescript-community/ui-textfield": ["src/ui-textfield/textfield"],
-            "@nativescript-community/ui-textfield/*": ["src/ui-textfield/*"],
-            "@nativescript-community/ui-textview": ["src/ui-textview/textview"],
-            "@nativescript-community/ui-textview/*": ["src/ui-textview/*"]
+            "@nativescript-community/ui-activityindicator": [
+                "src/ui-activityindicator/index"
+            ],
+            "@nativescript-community/ui-activityindicator/*": [
+                "src/ui-activityindicator/*"
+            ],
+            "@nativescript-community/ui-bottomsheet": [
+                "src/ui-bottomsheet/bottomsheet"
+            ],
+            "@nativescript-community/ui-bottomsheet/*": [
+                "src/ui-bottomsheet/*"
+            ],
+            "@nativescript-community/ui-button": [
+                "src/ui-button/button"
+            ],
+            "@nativescript-community/ui-button/*": [
+                "src/ui-button/*"
+            ],
+            "@nativescript-community/ui-cardview": [
+                "src/ui-cardview/cardview"
+            ],
+            "@nativescript-community/ui-cardview/*": [
+                "src/ui-cardview/*"
+            ],
+            "@nativescript-community/ui-core": [
+                "src/ui-core/index"
+            ],
+            "@nativescript-community/ui-core/*": [
+                "src/ui-core/*"
+            ],
+            "@nativescript-community/ui-dialogs": [
+                "src/ui-dialogs/dialogs"
+            ],
+            "@nativescript-community/ui-dialogs/*": [
+                "src/ui-dialogs/*"
+            ],
+            "@nativescript-community/ui-floatingactionbutton": [
+                "src/ui-floatingactionbutton/floatingactionbutton"
+            ],
+            "@nativescript-community/ui-floatingactionbutton/*": [
+                "src/ui-floatingactionbutton/*"
+            ],
+            "@nativescript-community/ui-progress": [
+                "src/ui-progress/progress"
+            ],
+            "@nativescript-community/ui-progress/*": [
+                "src/ui-progress/*"
+            ],
+            "@nativescript-community/ui-ripple": [
+                "src/ui-ripple/ripple"
+            ],
+            "@nativescript-community/ui-ripple/*": [
+                "src/ui-ripple/*"
+            ],
+            "@nativescript-community/ui-slider": [
+                "src/ui-slider/slider"
+            ],
+            "@nativescript-community/ui-slider/*": [
+                "src/ui-slider/*"
+            ],
+            "@nativescript-community/ui-snackbar": [
+                "src/ui-snackbar/snackbar"
+            ],
+            "@nativescript-community/ui-snackbar/*": [
+                "src/ui-snackbar/*"
+            ],
+            "@nativescript-community/ui-switch": [
+                "src/ui-switch/index"
+            ],
+            "@nativescript-community/ui-switch/*": [
+                "src/ui-switch/*"
+            ],
+            "@nativescript-community/ui-textfield": [
+                "src/ui-textfield/textfield"
+            ],
+            "@nativescript-community/ui-textfield/*": [
+                "src/ui-textfield/*"
+            ],
+            "@nativescript-community/ui-textview": [
+                "src/ui-textview/textview"
+            ],
+            "@nativescript-community/ui-textview/*": [
+                "src/ui-textview/*"
+            ],
+            "@nativescript-community/ui-bottomnavigationbar": [
+                "src/ui-bottomnavigationbar/bottomnavigationbar"
+            ],
+            "@nativescript-community/ui-bottomnavigationbar/*": [
+                "src/ui-bottomnavigationbar/*"
+            ]
         }
     }
 }
