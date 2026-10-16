@@ -34,6 +34,13 @@ class SheetDelegateImpl extends NSObject {
         }
         owner?._onDetentChange?.(owner.getBottomSheetDetentIndex());
     }
+    presentationControllerShouldDismiss(presentationController: UIPresentationController) {
+        const owner = this._owner.get();
+        return owner?._onWillDismiss ? owner._onWillDismiss() !== false : true;
+    }
+    presentationControllerDidAttemptToDismiss(presentationController: UIPresentationController) {
+        this._owner.get()?._onDismissAttempt?.();
+    }
     presentationControllerDidDismiss(presentationController: UIPresentationController) {
         // called when dismissed by the user (dragging down or background tap)
         const owner = this._owner.get();
@@ -48,6 +55,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     bottomSheetDelegate: SheetDelegateImpl;
     _detentIds: string[] = [];
     _onDetentChange: (index: number) => void;
+    _onWillDismiss: () => boolean | void;
+    _onDismissAttempt: () => void;
     bottomSheetController: UIViewController;
     protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
         options.context = options.context || {};
@@ -122,6 +131,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         const large = UISheetPresentationControllerDetent.largeDetent();
         const detentIds: string[] = [];
         this._onDetentChange = options.onDetentChange;
+        this._onWillDismiss = options.onWillDismiss;
+        this._onDismissAttempt = options.onDismissAttempt;
         if (majorVersion >= 16) {
             // the sheet follows the size of its content (measured in MDLayoutViewController)
             const contentHeight = () => controller.preferredContentSize.height || Utils.layout.toDeviceIndependentPixels(0);
@@ -184,7 +195,9 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         if (options.cornerRadius !== undefined) {
             sheet.preferredCornerRadius = options.cornerRadius;
         }
-        if (options.canTouchBehind === true || options.disableDimBackground === true) {
+        if (options.largestUndimmedDetentIndex !== undefined && detentIds[options.largestUndimmedDetentIndex]) {
+            sheet.largestUndimmedDetentIdentifier = detentIds[options.largestUndimmedDetentIndex];
+        } else if (options.canTouchBehind === true || options.disableDimBackground === true) {
             // no dimming at the biggest detent => touches go through to the content behind
             sheet.largestUndimmedDetentIdentifier = detentIds[detentIds.length - 1];
         }
@@ -224,6 +237,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
         this.bottomSheetDelegate = null;
         this._onDetentChange = null;
+        this._onWillDismiss = null;
+        this._onDismissAttempt = null;
         // it is very important to clear the viewController as N does not do it
         // and the destroy of the view from svelte could trigger a layout pass on the viewController
         this.viewController = null;

@@ -62,6 +62,9 @@ export interface BottomSheetOptions {
     detents?: BottomSheetDetent[]; // the heights the sheet can rest at, from the smallest to the largest. Replaces peekHeight/skipCollapsedState
     initialDetentIndex?: number; // index in `detents` of the detent the sheet opens at. Default: the first one
     onDetentChange?: (index: number) => void; // called when the sheet rests at another detent
+    largestUndimmedDetentIndex?: number; // index in `detents`: the background is not dimmed while the sheet rests at this detent or a smaller one. iOS also lets the touches go through to the content behind
+    onWillDismiss?: () => boolean | void; // called when the user starts to dismiss the sheet (drag down on iOS, tap outside, back button on Android). Return false to prevent it. Android: the drag down can not be prevented, use dismissOnDraggingDownSheet: false
+    onDismissAttempt?: () => void; // called when the user tried to dismiss the sheet but it was prevented (dismissOnXXX: false or onWillDismiss returning false). Android: not called for the drag down
     grabber?: boolean; // shows the drag handle. Default: true
     cornerRadius?: number; // corner radius of the sheet, in dip
     scrollExpands?: boolean; // (iOS only) scrolling the content to its edge expands/collapses the sheet. Default: true

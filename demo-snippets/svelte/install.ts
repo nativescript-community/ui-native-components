@@ -5,6 +5,7 @@ import ActivityIndicatorPlugin from '@nativescript-community/ui-activityindicato
 import BottomNavigationPlugin from '@nativescript-community/ui-bottom-navigation/svelte';
 import BottomNavigationBarPlugin from '@nativescript-community/ui-bottomnavigationbar/svelte';
 import ButtonPlugin from '@nativescript-community/ui-button/svelte';
+import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
 import FloatingActionButtonPlugin from '@nativescript-community/ui-floatingactionbutton/svelte';
 import ProgressPlugin from '@nativescript-community/ui-progress/svelte';
 import SegmentedBarPlugin from '@nativescript-community/ui-segmentedbar/svelte';
@@ -35,6 +36,7 @@ export function installPlugin() {
     BottomNavigationBarPlugin.register();
     BottomNavigationPlugin.register();
     ButtonPlugin.register();
+    CollectionViewPlugin.register();
     FloatingActionButtonPlugin.register();
     ProgressPlugin.register();
     SegmentedBarPlugin.register();

@@ -26,6 +26,7 @@
         "@nativescript-community/ui-bottomnavigationbar": "*",
         "@nativescript-community/ui-bottomsheet": "*",
         "@nativescript-community/ui-button": "*",
+        "@nativescript-community/ui-collectionview": "^6.0.29",
         "@nativescript-community/ui-core": "*",
         "@nativescript-community/ui-core-tabs": "*",
         "@nativescript-community/ui-dialogs": "*",

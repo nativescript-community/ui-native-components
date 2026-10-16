@@ -1616,6 +1616,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nativescript-community/arraybuffers@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "@nativescript-community/arraybuffers@npm:1.1.5"
+  checksum: 10/b6d0aca5cfdba26048f543095d1ebba4bfcaa2407e9c17e3ff2da5d0ee25f5c4b959a9483ccb63ea89b5e868954116cad7e31aa93dd57a430d1d9585e65a4035
+  languageName: node
+  linkType: hard
+
 "@nativescript-community/plugin-seed-tools@portal:tools::locator=%40nativescript-community%2Fui-native-components%40workspace%3A.":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/plugin-seed-tools@portal:tools::locator=%40nativescript-community%2Fui-native-components%40workspace%3A."
@@ -1707,6 +1714,7 @@ __metadata:
     "@nativescript-community/ui-bottomnavigationbar": "npm:*"
     "@nativescript-community/ui-bottomsheet": "npm:*"
     "@nativescript-community/ui-button": "npm:*"
+    "@nativescript-community/ui-collectionview": "npm:^6.0.29"
     "@nativescript-community/ui-core": "npm:*"
     "@nativescript-community/ui-core-tabs": "npm:*"
     "@nativescript-community/ui-dialogs": "npm:*"
@@ -1782,6 +1790,15 @@ __metadata:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft
+
+"@nativescript-community/ui-collectionview@npm:^6.0.29":
+  version: 6.0.29
+  resolution: "@nativescript-community/ui-collectionview@npm:6.0.29"
+  dependencies:
+    "@nativescript-community/arraybuffers": "npm:^1.1.5"
+  checksum: 10/5bd2adfe2c164b0a7693e89c7dba27fd77e7effea0a316bd63bcc354d5d92f61bf8804b590df93b52668f59e2d96f5b8ed9f819d18d5633c51794c3cf08b8eca
+  languageName: node
+  linkType: hard
 
 "@nativescript-community/ui-core-tabs@npm:*, @nativescript-community/ui-core-tabs@npm:^7.3.4, @nativescript-community/ui-core-tabs@workspace:packages/ui-core-tabs":
   version: 0.0.0-use.local

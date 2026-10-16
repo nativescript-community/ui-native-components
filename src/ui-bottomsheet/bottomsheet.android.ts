@@ -25,6 +25,7 @@ class ChangeStateBottomSheet extends com.google.android.material.bottomsheet.Bot
 
     onSlide(bottomSheet: android.view.View, slideOffset: number) {
         const owner = this.owner?.get();
+        owner?.updateDimForSlide(slideOffset);
         if (owner && this.checkActiveCallback()) {
             owner._onChangeStateBottomSheetCallback(StateBottomSheet.DRAGGING, slideOffset);
         }
@@ -35,6 +36,7 @@ class ChangeStateBottomSheet extends com.google.android.material.bottomsheet.Bot
         if (!owner) {
             return;
         }
+        owner.updateDimForState(newState);
         if (this.checkActiveCallback()) {
             const status = this.getStateBottomSheetFromBottomSheetBehavior(newState);
             if (status !== undefined) {
@@ -77,13 +79,48 @@ const DRAG_HANDLE_MARGIN = 28;
  */
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     _bottomSheetFragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment;
+    _bottomSheetOptions: BottomSheetOptions;
     _bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<android.view.View>;
     _detentCount = 0;
+    _detentHeights: number[] = [];
+    _baseDimAmount = 0.32;
+    _undimmedIndex: number;
+    _bottomSheetWindow: android.view.Window;
     _onDetentChange: (index: number) => void;
 
     /**
      * State of the behavior for the index of a detent: 1 detent = expanded, 2 = collapsed/expanded, 3 = collapsed/half expanded/expanded
      */
+    /**
+     * `largestUndimmedDetentIndex`: no dim at the undimmed detent and below it, the dim grows above it
+     */
+    updateDimForSlide(slideOffset: number) {
+        const heights = this._detentHeights;
+        if (this._undimmedIndex === undefined || !this._bottomSheetWindow || heights.length < 2 || slideOffset < 0) {
+            return;
+        }
+        const min = heights[0];
+        const max = heights[heights.length - 1];
+        const undimmed = heights[Math.min(this._undimmedIndex, heights.length - 1)];
+        const height = min + slideOffset * (max - min);
+        const ratio = max > undimmed ? Math.min(1, Math.max(0, (height - undimmed) / (max - undimmed))) : 1;
+        this._bottomSheetWindow.setDimAmount(this._baseDimAmount * ratio);
+    }
+
+    updateDimForState(state: number) {
+        if (this._undimmedIndex === undefined || !this._bottomSheetWindow || this._detentCount === 0) {
+            return;
+        }
+        const BSB = com.google.android.material.bottomsheet.BottomSheetBehavior;
+        if (state === BSB.STATE_DRAGGING || state === BSB.STATE_SETTLING) {
+            return;
+        }
+        const index = this.getBottomSheetDetentIndex();
+        if (index >= 0) {
+            this._bottomSheetWindow.setDimAmount(index <= this._undimmedIndex ? 0 : this._baseDimAmount);
+        }
+    }
+
     private stateForDetentIndex(index: number) {
         const BSB = com.google.android.material.bottomsheet.BottomSheetBehavior;
         const count = this._detentCount;
@@ -150,6 +187,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         const count = heights.length;
         const max = heights[count - 1];
         this._detentCount = count;
+        this._detentHeights = heights;
         // the content can be smaller than the largest detent
         sheet.setMinimumHeight(max);
         behavior.setPeekHeight(heights[0]);
@@ -163,6 +201,30 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             behavior.setSkipCollapsed(false);
         }
         behavior.setState(this.stateForDetentIndex(options.initialDetentIndex || 0));
+        this.updateDimForState(behavior.getState());
+    }
+
+    /**
+     * BottomSheetBehavior only follows a child which supports nested scrolling: RecyclerView (@nativescript-community/ui-collectionview) does,
+     * the ScrollView and the ListView of NativeScript do not by default.
+     * `trackingScrollView` is the id of the view to enable, else the scrollable views of the content are enabled.
+     */
+    enableNestedScrolling(sheet: android.view.View) {
+        const trackingId = this._bottomSheetOptions?.trackingScrollView;
+        const enable = (view: View) => {
+            const native = view.nativeViewProtected;
+            if (native instanceof android.view.View && (native instanceof android.widget.ScrollView || native instanceof android.widget.AbsListView || native instanceof android.webkit.WebView || (trackingId && view.id === trackingId))) {
+                androidx.core.view.ViewCompat.setNestedScrollingEnabled(native, true);
+            }
+        };
+        this.eachChildView(function visit(child: View) {
+            enable(child);
+            child.eachChildView(visit);
+            return true;
+        });
+        enable(this);
+        // the behavior finds its scrolling child when laid out
+        sheet.requestLayout();
     }
 
     applyGrabber(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment, sheet: android.view.View) {
@@ -196,6 +258,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     }
 
     protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
+        this._bottomSheetOptions = options;
         this._commonShowNativeBottomSheet(parent, options);
         const that = new WeakRef(this);
         const domId = this._domId;
@@ -217,7 +280,13 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     },
 
                     onBackPressed(dialog: com.nativescript.material.bottomsheet.BottomSheetDialog) {
-                        if (bottomSheetOptions.options && bottomSheetOptions.options.dismissOnBackButton === false) {
+                        const sheetOptions = bottomSheetOptions.options;
+                        if (sheetOptions?.dismissOnBackButton === false) {
+                            sheetOptions.onDismissAttempt?.();
+                            return true;
+                        }
+                        if (sheetOptions?.onWillDismiss && sheetOptions.onWillDismiss() === false) {
+                            sheetOptions.onDismissAttempt?.();
                             return true;
                         }
                         const owner = that?.get();
@@ -331,6 +400,28 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 }
 
                 owner._bottomSheetBehavior = behavior;
+                const window = fragment.getDialog().getWindow();
+                owner._bottomSheetWindow = window;
+                owner._baseDimAmount = window.getAttributes().dimAmount || 0.32;
+                owner._undimmedIndex = bottomSheetOptions.options?.largestUndimmedDetentIndex;
+                const sheetOptions = bottomSheetOptions.options;
+                if (!sheetOptions?.canTouchBehind && (sheetOptions?.onWillDismiss || sheetOptions?.onDismissAttempt)) {
+                    // the tap outside is handled here to call onWillDismiss/onDismissAttempt
+                    const touchOutside = (view.getParent() as any as android.view.View).findViewById(getId('touch_outside'));
+                    touchOutside?.setOnClickListener(
+                        new android.view.View.OnClickListener({
+                            onClick: () => {
+                                if (sheetOptions.dismissOnBackgroundTap !== false && sheetOptions.onWillDismiss?.() !== false) {
+                                    fragment.getDialog().cancel();
+                                } else {
+                                    sheetOptions.onDismissAttempt?.();
+                                }
+                            }
+                        })
+                    );
+                }
+                // the scrollable content (ScrollView, ListView, CollectionView...) must take part in the nested scrolling to be scrolled before the sheet
+                owner.enableNestedScrolling(view);
                 owner._onDetentChange = bottomSheetOptions.options?.onDetentChange;
                 if (bottomSheetOptions.options?.detents?.length) {
                     // once laid out
@@ -351,7 +442,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 }
 
                 const onChangeState = bottomSheetOptions.options?.onChangeState;
-                if (onChangeState || bottomSheetOptions.options?.onDetentChange) {
+                if (onChangeState || bottomSheetOptions.options?.onDetentChange || bottomSheetOptions.options?.largestUndimmedDetentIndex !== undefined) {
                     const changeStateBottomSheet = new ChangeStateBottomSheet(that);
                     behavior.addBottomSheetCallback(changeStateBottomSheet);
                     that?.get()?._onChangeStateBottomSheetCallback?.(changeStateBottomSheet.getStateBottomSheetFromBottomSheetBehavior(behavior.getState()));
