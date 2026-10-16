@@ -5,9 +5,9 @@
  */
 
 import { View, ViewBase } from '@nativescript/core';
-import { BottomSheetOptions } from './bottomsheet-common';
+import { BottomSheetDetent, BottomSheetOptions } from './bottomsheet-common';
 
-export { BottomSheetOptions };
+export { BottomSheetDetent, BottomSheetOptions };
 
 export declare abstract class ViewWithBottomSheetBase extends View {
     // used when triggering the closing of the bottomsheet
@@ -76,6 +76,17 @@ export declare abstract class ViewWithBottomSheetBase extends View {
      * @returns {View} view - the view shown in the BottomSheet
      */
     public showBottomSheet(options: BottomSheetOptions): ViewBase;
+
+    /**
+     * Moves the shown sheet to a detent
+     * @param index index in the `detents` option
+     */
+    public setBottomSheetDetentIndex(index: number, animated?: boolean): void;
+
+    /**
+     * Index of the detent the sheet currently rests at
+     */
+    public getBottomSheetDetentIndex(): number;
 }
 export function install(): void;
 
@@ -83,5 +94,7 @@ declare module '@nativescript/core/ui/core/view' {
     interface View {
         closeBottomSheet(...args: any): void;
         showBottomSheet(options: BottomSheetOptions): ViewBase;
+        setBottomSheetDetentIndex(index: number, animated?: boolean): void;
+        getBottomSheetDetentIndex(): number;
     }
 }

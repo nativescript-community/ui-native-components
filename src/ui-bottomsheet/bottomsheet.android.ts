@@ -1,6 +1,6 @@
 import { applyMixins } from '@nativescript-community/ui-core';
 import { AndroidActivityBackPressedEventData, Application, Utils, View, fromObject } from '@nativescript/core';
-import { BottomSheetOptions, StateBottomSheet, ViewWithBottomSheetBase } from './bottomsheet-common';
+import { BottomSheetDetent, BottomSheetOptions, StateBottomSheet, ViewWithBottomSheetBase } from './bottomsheet-common';
 
 export { ViewWithBottomSheetBase } from './bottomsheet-common';
 
@@ -32,10 +32,19 @@ class ChangeStateBottomSheet extends com.google.android.material.bottomsheet.Bot
 
     onStateChanged(bottomSheet: android.view.View, newState: number) {
         const owner = this.owner?.get();
-        if (owner && this.checkActiveCallback()) {
+        if (!owner) {
+            return;
+        }
+        if (this.checkActiveCallback()) {
             const status = this.getStateBottomSheetFromBottomSheetBehavior(newState);
             if (status !== undefined) {
                 owner._onChangeStateBottomSheetCallback(status);
+            }
+        }
+        if (owner._onDetentChange && owner._detentCount > 0 && newState !== com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_DRAGGING && newState !== com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_SETTLING) {
+            const index = owner.getBottomSheetDetentIndex();
+            if (index >= 0) {
+                owner._onDetentChange(index);
             }
         }
     }
@@ -61,8 +70,120 @@ class ChangeStateBottomSheet extends com.google.android.material.bottomsheet.Bot
     }
 }
 
+const DRAG_HANDLE_MARGIN = 28;
+
+/**
+ * Android: the detents are the stops of BottomSheetBehavior (collapsed, half expanded, expanded).
+ */
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     _bottomSheetFragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment;
+    _bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<android.view.View>;
+    _detentCount = 0;
+    _onDetentChange: (index: number) => void;
+
+    /**
+     * State of the behavior for the index of a detent: 1 detent = expanded, 2 = collapsed/expanded, 3 = collapsed/half expanded/expanded
+     */
+    private stateForDetentIndex(index: number) {
+        const BSB = com.google.android.material.bottomsheet.BottomSheetBehavior;
+        const count = this._detentCount;
+        if (count <= 1 || index >= count - 1) {
+            return BSB.STATE_EXPANDED;
+        }
+        return index <= 0 ? BSB.STATE_COLLAPSED : BSB.STATE_HALF_EXPANDED;
+    }
+
+    setBottomSheetDetentIndex(index: number, animated = true) {
+        const behavior = this._bottomSheetBehavior;
+        if (!behavior || this._detentCount === 0) {
+            return;
+        }
+        // setState animates
+        behavior.setState(this.stateForDetentIndex(index));
+    }
+
+    getBottomSheetDetentIndex() {
+        const behavior = this._bottomSheetBehavior;
+        if (!behavior || this._detentCount === 0) {
+            return -1;
+        }
+        const BSB = com.google.android.material.bottomsheet.BottomSheetBehavior;
+        switch (behavior.getState()) {
+            case BSB.STATE_COLLAPSED:
+                return this._detentCount > 1 ? 0 : -1;
+            case BSB.STATE_HALF_EXPANDED:
+                return 1;
+            case BSB.STATE_EXPANDED:
+                return this._detentCount - 1;
+            default:
+                return -1;
+        }
+    }
+
+    /**
+     * Applies the `detents` option once the sheet is laid out (the available and the content heights are known)
+     */
+    applyDetents(sheet: android.view.View, behavior: com.google.android.material.bottomsheet.BottomSheetBehavior<android.view.View>, options: BottomSheetOptions) {
+        const parentHeight = (sheet.getParent() as any as android.view.View).getHeight();
+        const contentHeight = this.nativeViewProtected?.getHeight() || parentHeight;
+        const resolve = (detent: BottomSheetDetent) => {
+            let height: number;
+            if (detent === 'large') {
+                height = parentHeight;
+            } else if (detent === 'medium') {
+                height = parentHeight / 2;
+            } else if (detent === 'content') {
+                height = contentHeight;
+            } else if (typeof detent === 'number') {
+                height = Utils.layout.toDevicePixels(detent);
+            } else {
+                height = detent.fraction * parentHeight;
+            }
+            return Math.round(Math.min(height, parentHeight));
+        };
+        let detents = options.detents;
+        if (detents.length > 3) {
+            // collapsed, half expanded, expanded
+            detents = [detents[0], detents[Math.floor(detents.length / 2)], detents[detents.length - 1]];
+        }
+        const heights = detents.map(resolve);
+        const count = heights.length;
+        const max = heights[count - 1];
+        this._detentCount = count;
+        // the content can be smaller than the largest detent
+        sheet.setMinimumHeight(max);
+        behavior.setPeekHeight(heights[0]);
+        if (count <= 2) {
+            behavior.setFitToContents(true);
+            behavior.setSkipCollapsed(count === 1);
+        } else {
+            behavior.setFitToContents(false);
+            behavior.setExpandedOffset(parentHeight - max);
+            behavior.setHalfExpandedRatio(Math.min(0.99, Math.max(0.01, heights[1] / parentHeight)));
+            behavior.setSkipCollapsed(false);
+        }
+        behavior.setState(this.stateForDetentIndex(options.initialDetentIndex || 0));
+    }
+
+    applyGrabber(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment, sheet: android.view.View) {
+        const handle = new com.google.android.material.bottomsheet.BottomSheetDragHandleView(fragment.getActivity());
+        (sheet as android.view.ViewGroup).addView(handle, new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.Gravity.TOP));
+        // the content starts below the handle
+        const content = this.nativeViewProtected;
+        const params = content?.getLayoutParams();
+        if (params instanceof android.view.ViewGroup.MarginLayoutParams) {
+            params.topMargin = Utils.layout.toDevicePixels(DRAG_HANDLE_MARGIN);
+            content.setLayoutParams(params);
+        }
+    }
+
+    applyCornerRadius(sheet: android.view.View, radius: number) {
+        const background = sheet.getBackground();
+        if (background instanceof com.google.android.material.shape.MaterialShapeDrawable) {
+            const size = Utils.layout.toDevicePixels(radius);
+            background.setShapeAppearanceModel(background.getShapeAppearanceModel().toBuilder().setTopLeftCornerSize(size).setTopRightCornerSize(size).build());
+        }
+    }
     protected _hideNativeBottomSheet(parent: View, whenClosedCallback: () => void) {
         // call whenClosedCallback first because dismiss will call another one (without result)
         whenClosedCallback();
@@ -190,7 +311,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 const dismissOnDraggingDownSheet = bottomSheetOptions.options?.dismissOnDraggingDownSheet !== false;
                 behavior.setHideable(dismissOnDraggingDownSheet);
 
-                const peekHeight = bottomSheetOptions.options?.peekHeight;
+                const peekHeight = bottomSheetOptions.options?.detents?.length ? undefined : bottomSheetOptions.options?.peekHeight;
                 if (peekHeight) {
                     behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED);
                     behavior.setPeekHeight(Utils.layout.toDevicePixels(peekHeight));
@@ -201,7 +322,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     // set to maximum possible value to prevent dragging the sheet between peek and expanded height
                     behavior.setPeekHeight(java.lang.Integer.MAX_VALUE);
                 }
-                const skipCollapsedState = bottomSheetOptions.options?.skipCollapsedState === true;
+                const skipCollapsedState = bottomSheetOptions.options?.skipCollapsedState === true && !bottomSheetOptions.options?.detents?.length;
                 if (skipCollapsedState) {
                     // directly expand the bottom sheet after start
                     behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
@@ -209,11 +330,31 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     behavior.setSkipCollapsed(true);
                 }
 
+                owner._bottomSheetBehavior = behavior;
+                owner._onDetentChange = bottomSheetOptions.options?.onDetentChange;
+                if (bottomSheetOptions.options?.detents?.length) {
+                    // once laid out
+                    view.post(
+                        new java.lang.Runnable({
+                            run: () => {
+                                owner.applyDetents(view, behavior, bottomSheetOptions.options);
+                            }
+                        })
+                    );
+                }
+                if (bottomSheetOptions.options?.grabber !== false) {
+                    owner.applyGrabber(fragment, view);
+                }
+                if (bottomSheetOptions.options?.cornerRadius !== undefined) {
+                    // the background is set after the start
+                    setTimeout(() => owner.applyCornerRadius(view, bottomSheetOptions.options.cornerRadius), 0);
+                }
+
                 const onChangeState = bottomSheetOptions.options?.onChangeState;
-                if (onChangeState) {
+                if (onChangeState || bottomSheetOptions.options?.onDetentChange) {
                     const changeStateBottomSheet = new ChangeStateBottomSheet(that);
                     behavior.addBottomSheetCallback(changeStateBottomSheet);
-                    that?.get()?._onChangeStateBottomSheetCallback(changeStateBottomSheet.getStateBottomSheetFromBottomSheetBehavior(behavior.getState()));
+                    that?.get()?._onChangeStateBottomSheetCallback?.(changeStateBottomSheet.getStateBottomSheetFromBottomSheetBehavior(behavior.getState()));
                 }
 
                 if (owner && !owner.isLoaded) {

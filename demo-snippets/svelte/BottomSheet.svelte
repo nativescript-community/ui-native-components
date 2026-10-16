@@ -26,6 +26,9 @@
             <uibutton text="skip collapsed state" on:tap={() => open({ skipCollapsedState: true })} />
             <uibutton text="not dismissable by dragging or tapping outside" on:tap={() => open({ dismissOnDraggingDownSheet: false, dismissOnBackgroundTap: false })} />
             <uibutton text="touch behind allowed, no dimming" on:tap={() => open({ canTouchBehind: true, disableDimBackground: true })} />
+            <uibutton text="detents: content, large" on:tap={() => open({ detents: ['content', 'large'], onDetentChange: (i) => (result = `detent ${i}`) })} />
+            <uibutton text="detents: 150, medium, large (starts at medium)" on:tap={() => open({ detents: [150, 'medium', 'large'], initialDetentIndex: 1, onDetentChange: (i) => (result = `detent ${i}`) })} />
+            <uibutton text="fraction 0.3 + 0.7, no grabber, radius 40" on:tap={() => open({ detents: [{ fraction: 0.3 }, { fraction: 0.7 }], grabber: false, cornerRadius: 40 })} />
             <uibutton text="transparent background" on:tap={() => open({ transparent: true })} />
             <label text={`result: ${result}`} margin="12" textWrap="true" />
         </stackLayout>

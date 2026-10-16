@@ -32,6 +32,7 @@ class SheetDelegateImpl extends NSObject {
         if (owner?._onChangeStateBottomSheetCallback) {
             owner._onChangeStateBottomSheetCallback(sheet.selectedDetentIdentifier === LARGE_DETENT || sheet.selectedDetentIdentifier === CONTENT_DETENT ? StateBottomSheet.EXPANDED : StateBottomSheet.COLLAPSED);
         }
+        owner?._onDetentChange?.(owner.getBottomSheetDetentIndex());
     }
     presentationControllerDidDismiss(presentationController: UIPresentationController) {
         // called when dismissed by the user (dragging down or background tap)
@@ -45,6 +46,8 @@ class SheetDelegateImpl extends NSObject {
 
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     bottomSheetDelegate: SheetDelegateImpl;
+    _detentIds: string[] = [];
+    _onDetentChange: (index: number) => void;
     bottomSheetController: UIViewController;
     protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
         options.context = options.context || {};
@@ -118,23 +121,52 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     private configureSheet(sheet: UISheetPresentationController, controller: IMDLayoutViewController, options: BottomSheetOptions) {
         const large = UISheetPresentationControllerDetent.largeDetent();
         const detentIds: string[] = [];
+        this._onDetentChange = options.onDetentChange;
         if (majorVersion >= 16) {
             // the sheet follows the size of its content (measured in MDLayoutViewController)
             const contentHeight = () => controller.preferredContentSize.height || Utils.layout.toDeviceIndependentPixels(0);
             const detents: UISheetPresentationControllerDetent[] = [];
             const peekHeight = options.peekHeight;
-            if (peekHeight && options.skipCollapsedState !== true) {
+            if (options.detents?.length) {
+                options.detents.forEach((detent, index) => {
+                    const id = `detent-${index}`;
+                    detents.push(
+                        UISheetPresentationControllerDetent.customDetentWithIdentifierResolver(id, (context) => {
+                            const max = context.maximumDetentValue;
+                            let height: number;
+                            if (detent === 'large') {
+                                height = max;
+                            } else if (detent === 'medium') {
+                                height = max / 2;
+                            } else if (detent === 'content') {
+                                height = contentHeight() || max;
+                            } else if (typeof detent === 'number') {
+                                height = detent;
+                            } else {
+                                height = detent.fraction * max;
+                            }
+                            return Math.min(height, max);
+                        })
+                    );
+                    detentIds.push(id);
+                });
+            } else if (peekHeight && options.skipCollapsedState !== true) {
                 detents.push(UISheetPresentationControllerDetent.customDetentWithIdentifierResolver(PEEK_DETENT, (context) => Math.min(peekHeight, context.maximumDetentValue)));
                 detentIds.push(PEEK_DETENT);
             }
-            detents.push(
-                UISheetPresentationControllerDetent.customDetentWithIdentifierResolver(CONTENT_DETENT, (context) => {
-                    const height = contentHeight();
-                    return height > 0 ? Math.min(height, context.maximumDetentValue) : context.maximumDetentValue;
-                })
-            );
-            detentIds.push(CONTENT_DETENT);
+            if (!options.detents?.length) {
+                detents.push(
+                    UISheetPresentationControllerDetent.customDetentWithIdentifierResolver(CONTENT_DETENT, (context) => {
+                        const height = contentHeight();
+                        return height > 0 ? Math.min(height, context.maximumDetentValue) : context.maximumDetentValue;
+                    })
+                );
+                detentIds.push(CONTENT_DETENT);
+            }
             sheet.detents = NSArray.arrayWithArray(detents as any);
+            if (options.detents?.length) {
+                sheet.selectedDetentIdentifier = detentIds[Math.min(options.initialDetentIndex || 0, detentIds.length - 1)];
+            }
             // update the detent once the content is measured
             controller.onLayoutCallback = () => {
                 sheet.invalidateDetents();
@@ -144,8 +176,14 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             sheet.detents = NSArray.arrayWithArray([options.skipCollapsedState || !options.peekHeight ? large : UISheetPresentationControllerDetent.mediumDetent(), large] as any);
             detentIds.push(LARGE_DETENT);
         }
-        sheet.prefersGrabberVisible = true;
-        sheet.prefersScrollingExpandsWhenScrolledToEdge = true;
+        this._detentIds = detentIds;
+        sheet.prefersGrabberVisible = options.grabber !== false;
+        sheet.prefersScrollingExpandsWhenScrolledToEdge = options.scrollExpands !== false;
+        sheet.prefersEdgeAttachedInCompactHeight = options.edgeAttachedInCompactHeight === true;
+        sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true;
+        if (options.cornerRadius !== undefined) {
+            sheet.preferredCornerRadius = options.cornerRadius;
+        }
         if (options.canTouchBehind === true || options.disableDimBackground === true) {
             // no dimming at the biggest detent => touches go through to the content behind
             sheet.largestUndimmedDetentIdentifier = detentIds[detentIds.length - 1];
@@ -155,6 +193,23 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
         this.bottomSheetDelegate = SheetDelegateImpl.initWithOwner(this);
         sheet.delegate = this.bottomSheetDelegate;
+    }
+
+    setBottomSheetDetentIndex(index: number, animated = true) {
+        const sheet = this.bottomSheetController?.sheetPresentationController;
+        const id = this._detentIds[index];
+        if (!sheet || !id) {
+            return;
+        }
+        const apply = () => {
+            sheet.selectedDetentIdentifier = id;
+        };
+        animated ? sheet.animateChanges(apply) : apply();
+    }
+
+    getBottomSheetDetentIndex() {
+        const sheet = this.bottomSheetController?.sheetPresentationController;
+        return sheet ? this._detentIds.indexOf(sheet.selectedDetentIdentifier) : -1;
     }
 
     _bottomSheetClosed() {
@@ -168,6 +223,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             this.bottomSheetController = null;
         }
         this.bottomSheetDelegate = null;
+        this._onDetentChange = null;
         // it is very important to clear the viewController as N does not do it
         // and the destroy of the view from svelte could trigger a layout pass on the viewController
         this.viewController = null;

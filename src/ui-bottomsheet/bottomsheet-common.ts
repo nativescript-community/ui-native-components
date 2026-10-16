@@ -27,6 +27,18 @@ export const shownInBottomSheetEvent = 'shownInBottomSheet';
 export const showingInBottomSheetEvent = 'showingInBottomSheet';
 export const closedSheetEvent = 'closedBottomSheet';
 
+/**
+ * A height the sheet can rest at:
+ * - `'content'`: the height of the content
+ * - `'medium'`: half of the available height
+ * - `'large'`: the full available height
+ * - a number: a height in dip
+ * - `{ fraction }`: a fraction of the available height (0-1)
+ * The detents are given from the smallest to the largest, the indexes follow this order.
+ * iOS supports any number of detents (UISheetPresentationController). Android (BottomSheetBehavior) supports up to 3 stops: collapsed, half expanded and expanded.
+ */
+export type BottomSheetDetent = 'content' | 'medium' | 'large' | number | { fraction: number };
+
 export interface BottomSheetOptions {
     view: string | View; // View instance to be shown in bottom sheet. Or the name of the module to load starting from the application root.
     context?: any; // Any context you want to pass to the view shown in bottom sheet. This same context will be available in the arguments of the shownInBottomSheet event handler.
@@ -47,6 +59,13 @@ export interface BottomSheetOptions {
     onChangeState?: onChangeStateBottomSheet; // One works to be called on the scroll of the sheet. Parameters: state (CLOSED, DRAGGING, DRAGGING, COLLAPSED) and slideOffset is the new offset of this bottom sheet within [-1,1] range. Offset increases as this bottom sheet is moving upward. From 0 to 1 the sheet is between collapsed and expanded states and from -1 to 0 it is between hidden and collapsed states.
     canTouchBehind?: boolean; //(Android only) allows to interact with the screen behind the sheet. For it to work properly need dismissOnBackgroundTap set to true
     windowSoftInputMode?: number; //(Android only) window softInputMode
+    detents?: BottomSheetDetent[]; // the heights the sheet can rest at, from the smallest to the largest. Replaces peekHeight/skipCollapsedState
+    initialDetentIndex?: number; // index in `detents` of the detent the sheet opens at. Default: the first one
+    onDetentChange?: (index: number) => void; // called when the sheet rests at another detent
+    grabber?: boolean; // shows the drag handle. Default: true
+    cornerRadius?: number; // corner radius of the sheet, in dip
+    scrollExpands?: boolean; // (iOS only) scrolling the content to its edge expands/collapses the sheet. Default: true
+    edgeAttachedInCompactHeight?: boolean; // (iOS only) in landscape the sheet is attached to the bottom edge instead of covering the full screen. Default: false
 }
 
 export abstract class ViewWithBottomSheetBase extends View {
@@ -100,6 +119,17 @@ export abstract class ViewWithBottomSheetBase extends View {
     }
 
     protected abstract _showNativeBottomSheet(parent: View, options: BottomSheetOptions);
+
+    /**
+     * Moves the shown sheet to a detent
+     * @param index index in the `detents` option
+     */
+    public abstract setBottomSheetDetentIndex(index: number, animated?: boolean): void;
+
+    /**
+     * Index of the detent the sheet currently rests at
+     */
+    public abstract getBottomSheetDetentIndex(): number;
 
     protected _commonShowNativeBottomSheet(parent: View, options: BottomSheetOptions) {
         this._getRootModalViews().push(this);
