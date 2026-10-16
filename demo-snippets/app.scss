@@ -1,0 +1,18 @@
+// demo styles. The components are styled with their own CSS properties (Android Material only ones are ignored on iOS)
+label {
+    color: black;
+    .ns-dark & {
+        color: white;
+    }
+}
+page {
+    background-color: white;
+    .ns-dark & {
+        background-color: black;
+    }
+}
+
+// spacing of the demo buttons
+Button {
+    margin: 4 12;
+}

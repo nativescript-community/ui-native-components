@@ -1,0 +1,27 @@
+# NativeScript
+hooks/
+node_modules/
+platforms/
+app/linked-components/*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+.idea
+.cloud
+.project
+tmp/
+typings/
+package-lock.json
+
+# Visual Studio Code
+.vscode/*
+pnpm-lock.yaml

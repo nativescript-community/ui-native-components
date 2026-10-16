@@ -1,0 +1,43 @@
+{
+    "name": "@nativescript-community/template-snippet",
+    "version": "0.0.1",
+    "private": true,
+    "nativescript": {
+        "platforms": {
+            "android": "*",
+            "ios": "*"
+        },
+        "hooks": [
+            {
+                "type": "after-prepare",
+                "script": "scripts/after-prepare.js",
+                "inject": true
+            }
+        ]
+    },
+    "scripts": {
+        "preuninstall": "node preuninstall.js",
+        "postinstall": "node postinstall.js"
+    },
+    "dependencies": {
+        "@mdi/font": "6.5.95",
+        "@nativescript-community/ui-activityindicator": "*",
+        "@nativescript-community/ui-bottomsheet": "*",
+        "@nativescript-community/ui-button": "*",
+        "@nativescript-community/ui-cardview": "*",
+        "@nativescript-community/ui-core": "*",
+        "@nativescript-community/ui-dialogs": "*",
+        "@nativescript-community/ui-floatingactionbutton": "*",
+        "@nativescript-community/ui-progress": "*",
+        "@nativescript-community/ui-ripple": "*",
+        "@nativescript-community/ui-slider": "*",
+        "@nativescript-community/ui-snackbar": "*",
+        "@nativescript-community/ui-switch": "*",
+        "@nativescript-community/ui-textfield": "*",
+        "@nativescript-community/ui-textview": "*",
+        "@nativescript/hook": "~2.0.0",
+        "copy-webpack-plugin": "^11.0.0",
+        "scss-symbols-parser": "^2.0.1",
+        "string-replace-loader": "^3.1.0"
+    }
+}
