@@ -109,6 +109,12 @@
             ],
             "@nativescript-community/ui-menu/*": [
                 "src/ui-menu/*"
+            ],
+            "@nativescript-community/ui-datetimepicker": [
+                "src/ui-datetimepicker/datetimepicker"
+            ],
+            "@nativescript-community/ui-datetimepicker/*": [
+                "src/ui-datetimepicker/*"
             ]
         }
     }

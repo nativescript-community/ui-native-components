@@ -20,6 +20,7 @@ import BottomNavigationBar from './BottomNavigationBar.svelte';
 import BottomSheet from './BottomSheet.svelte';
 import Buttons from './Buttons.svelte';
 import Controls from './Controls.svelte';
+import DateTimePickers from './DateTimePickers.svelte';
 import Dialogs from './Dialogs.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
 import SegmentedBar from './SegmentedBar.svelte';
@@ -54,6 +55,7 @@ export const demos = [
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },
     { name: 'Segmented bar', path: 'SegmentedBar', component: SegmentedBar },
     { name: 'Menus', path: 'Menus', component: Menus },
+    { name: 'Date and time pickers', path: 'DateTimePickers', component: DateTimePickers },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
     { name: 'Tabs', path: 'Tabs', component: Tabs },

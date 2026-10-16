@@ -1717,6 +1717,7 @@ __metadata:
     "@nativescript-community/ui-collectionview": "npm:^6.0.29"
     "@nativescript-community/ui-core": "npm:*"
     "@nativescript-community/ui-core-tabs": "npm:*"
+    "@nativescript-community/ui-datetimepicker": "npm:*"
     "@nativescript-community/ui-dialogs": "npm:*"
     "@nativescript-community/ui-floatingactionbutton": "npm:*"
     "@nativescript-community/ui-menu": "npm:*"
@@ -1818,6 +1819,14 @@ __metadata:
   peerDependenciesMeta:
     "@nativescript-community/text":
       optional: true
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-datetimepicker@npm:*, @nativescript-community/ui-datetimepicker@workspace:packages/ui-datetimepicker":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-datetimepicker@workspace:packages/ui-datetimepicker"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft
 
