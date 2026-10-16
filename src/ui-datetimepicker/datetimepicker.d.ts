@@ -4,7 +4,7 @@
  * @module @nativescript-community/ui-datetimepicker
  */
 
-import { PickDateOptions, PickDateTimeOptions, PickTimeOptions } from './datetimepicker-common';
+import { DateRange, PickDateOptions, PickDateRangeOptions, PickDateTimeOptions, PickTimeOptions } from './datetimepicker-common';
 export * from './datetimepicker-common';
 
 /**
@@ -24,3 +24,9 @@ export function pickTime(options?: PickTimeOptions): Promise<Date | undefined>;
  * @returns the picked date and time, or undefined when cancelled
  */
 export function pickDateTime(options?: PickDateTimeOptions): Promise<Date | undefined>;
+
+/**
+ * Shows a date range picker: one picker on Android, two (start then end) on iOS.
+ * @returns the picked range, or undefined when cancelled
+ */
+export function pickDateRange(options?: PickDateRangeOptions): Promise<DateRange | undefined>;

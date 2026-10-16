@@ -130,6 +130,18 @@ declare namespace com {
                     color: number;
                 }
             }
+            export namespace pulltorefresh {
+                export class PullToRefreshLayout extends androidx.swiperefreshlayout.widget.SwipeRefreshLayout {
+                    constructor(context: globalAndroid.content.Context);
+                    setTopEnabled(enabled: boolean): void;
+                    setBottomEnabled(enabled: boolean): void;
+                    isBottomRefreshing(): boolean;
+                    setBottomRefreshing(refreshing: boolean): void;
+                    setBottomRefreshListener(listener: java.lang.Runnable): void;
+                    setIndicatorColor(color: number): void;
+                    setIndicatorBackgroundColor(color: number): void;
+                }
+            }
             export namespace textfield {
                 class TextInputEditText extends google.android.material.textfield.TextInputEditText {
                     fullClearFocus();

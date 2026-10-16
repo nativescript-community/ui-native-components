@@ -1,5 +1,5 @@
-import { Application, Utils } from '@nativescript/core';
-import { PickDateOptions, PickDateTimeOptions, PickTimeOptions } from './datetimepicker-common';
+import { Application, Color, Utils } from '@nativescript/core';
+import { DateRange, PickDateOptions, PickDateRangeOptions, PickDateTimeOptions, PickTimeOptions, PickerBaseOptions } from './datetimepicker-common';
 export * from './datetimepicker-common';
 
 @NativeClass
@@ -11,17 +11,34 @@ class PickerPresentationDelegate extends NSObject {
     }
 }
 
-interface PickerConfig {
+interface PickerConfig extends PickerBaseOptions {
     mode: UIDatePickerMode;
     style: UIDatePickerStyle;
     /** height of the sheet in dip */
     height: number;
-    title?: string;
     date?: Date;
     minDate?: Date;
     maxDate?: Date;
     minuteInterval?: number;
     is24Hour?: boolean;
+    firstDayOfWeek?: number;
+}
+
+const toStyle = (style: 'inline' | 'wheels' | undefined, fallback: UIDatePickerStyle) => (style === 'wheels' ? UIDatePickerStyle.Wheels : style === 'inline' ? UIDatePickerStyle.Inline : fallback);
+
+/**
+ * A bar button with the title when there is one, else the system glass icon
+ */
+function createBarButton(systemItem: UIBarButtonSystemItem, title: string | undefined, handler: () => void, prominent: boolean) {
+    const action = UIAction.actionWithTitleImageIdentifierHandler(title || '', null, null, handler);
+    if (!title) {
+        return UIBarButtonItem.alloc().initWithBarButtonSystemItemPrimaryAction(systemItem, action);
+    }
+    const item = UIBarButtonItem.alloc().initWithPrimaryAction(action);
+    if (prominent) {
+        item.style = UIBarButtonItemStyle.Done;
+    }
+    return item;
 }
 
 /**
@@ -44,8 +61,18 @@ function present(config: PickerConfig): Promise<Date | undefined> {
         if (config.minuteInterval) {
             picker.minuteInterval = config.minuteInterval;
         }
-        if (config.is24Hour !== undefined) {
+        if (config.locale) {
+            picker.locale = NSLocale.alloc().initWithLocaleIdentifier(config.locale);
+        } else if (config.is24Hour !== undefined) {
             picker.locale = NSLocale.alloc().initWithLocaleIdentifier(config.is24Hour ? 'en_GB' : 'en_US');
+        }
+        if (config.firstDayOfWeek) {
+            const calendar = (picker.calendar as NSCalendar).copy() as NSCalendar;
+            calendar.firstWeekday = config.firstDayOfWeek;
+            picker.calendar = calendar;
+        }
+        if (config.tintColor) {
+            picker.tintColor = (config.tintColor instanceof Color ? config.tintColor : new Color(config.tintColor as string)).ios;
         }
         const container = UIView.new();
         container.backgroundColor = UIColor.systemBackgroundColor;
@@ -76,14 +103,8 @@ function present(config: PickerConfig): Promise<Date | undefined> {
             finish(value);
             navigation.dismissViewControllerAnimatedCompletion(true, null);
         };
-        controller.navigationItem.leftBarButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItemPrimaryAction(
-            UIBarButtonSystemItem.Cancel,
-            UIAction.actionWithTitleImageIdentifierHandler('', null, null, () => close(undefined))
-        );
-        controller.navigationItem.rightBarButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItemPrimaryAction(
-            UIBarButtonSystemItem.Done,
-            UIAction.actionWithTitleImageIdentifierHandler('', null, null, () => close(picker.date as any as Date))
-        );
+        controller.navigationItem.leftBarButtonItem = createBarButton(UIBarButtonSystemItem.Cancel, config.negativeButtonText, () => close(undefined), false);
+        controller.navigationItem.rightBarButtonItem = createBarButton(UIBarButtonSystemItem.Done, config.positiveButtonText, () => close(picker.date as any as Date), true);
 
         navigation.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
         const sheet = navigation.sheetPresentationController;
@@ -104,13 +125,28 @@ function present(config: PickerConfig): Promise<Date | undefined> {
 }
 
 export function pickDate(options: PickDateOptions = {}): Promise<Date | undefined> {
-    return present({ mode: UIDatePickerMode.Date, style: UIDatePickerStyle.Inline, height: 480, ...options });
+    const style = toStyle(options.style, UIDatePickerStyle.Inline);
+    return present({ ...options, mode: UIDatePickerMode.Date, style, height: style === UIDatePickerStyle.Wheels ? 300 : 480 });
 }
 
 export function pickTime(options: PickTimeOptions = {}): Promise<Date | undefined> {
-    return present({ mode: UIDatePickerMode.Time, style: UIDatePickerStyle.Wheels, height: 300, title: options.title, date: options.time, is24Hour: options.is24Hour, minuteInterval: options.minuteInterval });
+    return present({ ...options, mode: UIDatePickerMode.Time, style: UIDatePickerStyle.Wheels, height: 300, date: options.time });
 }
 
 export function pickDateTime(options: PickDateTimeOptions = {}): Promise<Date | undefined> {
-    return present({ mode: UIDatePickerMode.DateAndTime, style: UIDatePickerStyle.Inline, height: 540, ...options });
+    const style = toStyle(options.style, UIDatePickerStyle.Inline);
+    return present({ ...options, mode: UIDatePickerMode.DateAndTime, style, height: style === UIDatePickerStyle.Wheels ? 300 : 540 });
+}
+
+/**
+ * UIDatePicker has no range: the start is picked, then the end (not before the start)
+ */
+export async function pickDateRange(options: PickDateRangeOptions = {}): Promise<DateRange | undefined> {
+    const { start: initialStart, end: initialEnd, endTitle, ...pickerOptions } = options;
+    const start = await pickDate({ ...pickerOptions, date: initialStart });
+    if (!start) {
+        return undefined;
+    }
+    const end = await pickDate({ ...pickerOptions, title: endTitle || 'End date', date: initialEnd && initialEnd >= start ? initialEnd : start, minDate: start });
+    return end ? { start, end } : undefined;
 }

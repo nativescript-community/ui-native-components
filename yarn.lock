@@ -1722,6 +1722,7 @@ __metadata:
     "@nativescript-community/ui-floatingactionbutton": "npm:*"
     "@nativescript-community/ui-menu": "npm:*"
     "@nativescript-community/ui-progress": "npm:*"
+    "@nativescript-community/ui-pulltorefresh": "npm:*"
     "@nativescript-community/ui-segmentedbar": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
@@ -1867,6 +1868,14 @@ __metadata:
 "@nativescript-community/ui-progress@npm:*, @nativescript-community/ui-progress@workspace:packages/ui-progress":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-progress@workspace:packages/ui-progress"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-pulltorefresh@npm:*, @nativescript-community/ui-pulltorefresh@workspace:packages/ui-pulltorefresh":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-pulltorefresh@workspace:packages/ui-pulltorefresh"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown

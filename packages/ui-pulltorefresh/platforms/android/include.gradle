@@ -1,0 +1,4 @@
+dependencies {
+	def androidxSwipeRefreshLayoutVersion = project.hasProperty("androidxSwipeRefreshLayoutVersion") ? project.androidxSwipeRefreshLayoutVersion : "1.1.0"
+	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$androidxSwipeRefreshLayoutVersion"
+}
