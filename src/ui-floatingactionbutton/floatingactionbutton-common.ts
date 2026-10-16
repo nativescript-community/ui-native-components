@@ -29,11 +29,7 @@ export abstract class FloatingActionButtonBase extends Button {
         this.style['css:margin-top'] = 11;
         this.style['css:margin-bottom'] = 16;
     }
-    @cssProperty elevation: number;
     @cssProperty color: Color;
-    @cssProperty rippleColor: Color;
-    @cssProperty dynamicElevationOffset: number;
-    @cssProperty shape: string;
 
     /**
      * Gets or sets the variant of the button. Read once when the native view is created.

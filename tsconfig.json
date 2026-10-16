@@ -20,12 +20,6 @@
             "@nativescript-community/ui-button/*": [
                 "src/ui-button/*"
             ],
-            "@nativescript-community/ui-cardview": [
-                "src/ui-cardview/cardview"
-            ],
-            "@nativescript-community/ui-cardview/*": [
-                "src/ui-cardview/*"
-            ],
             "@nativescript-community/ui-core": [
                 "src/ui-core/index"
             ],
@@ -49,12 +43,6 @@
             ],
             "@nativescript-community/ui-progress/*": [
                 "src/ui-progress/*"
-            ],
-            "@nativescript-community/ui-ripple": [
-                "src/ui-ripple/ripple"
-            ],
-            "@nativescript-community/ui-ripple/*": [
-                "src/ui-ripple/*"
             ],
             "@nativescript-community/ui-slider": [
                 "src/ui-slider/slider"

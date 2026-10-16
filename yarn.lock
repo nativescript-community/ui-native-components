@@ -1714,6 +1714,7 @@ __metadata:
     "@nativescript-community/ui-ripple": "npm:*"
     "@nativescript-community/ui-slider": "npm:*"
     "@nativescript-community/ui-snackbar": "npm:*"
+    "@nativescript-community/ui-speeddial": "npm:*"
     "@nativescript-community/ui-switch": "npm:*"
     "@nativescript-community/ui-textfield": "npm:*"
     "@nativescript-community/ui-textview": "npm:*"
@@ -1762,7 +1763,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@workspace:packages/ui-button":
+"@nativescript-community/ui-button@npm:*, @nativescript-community/ui-button@npm:^7.3.4, @nativescript-community/ui-button@workspace:packages/ui-button":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-button@workspace:packages/ui-button"
   dependencies:
@@ -1841,6 +1842,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-snackbar@workspace:packages/ui-snackbar"
   dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-speeddial@npm:*, @nativescript-community/ui-speeddial@workspace:packages/ui-speeddial":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-speeddial@workspace:packages/ui-speeddial"
+  dependencies:
+    "@nativescript-community/ui-button": "npm:^7.3.4"
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft

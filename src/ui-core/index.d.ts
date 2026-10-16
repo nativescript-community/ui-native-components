@@ -1,7 +1,7 @@
 /**
  * Core module shared by all augmented components.
  * Android implementations use Material Components, iOS implementations use native UIKit.
- * Material only properties (elevation, ripple, shape...) are registered on all platforms but are no-op on iOS.
+ * Material only properties (elevation, ripple, shape...) are Android only.
  * @module @nativescript-community/ui-core
  */
 
@@ -16,7 +16,7 @@ declare module '@nativescript/core/ui/core/view' {
         /**
          * @nativescript-community/ui-core {@link installMixins}.
          *
-         * Gets or sets the elevation of the view.
+         * Gets or sets the elevation of the view. Android only.
          */
         elevation: number;
 

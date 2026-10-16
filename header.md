@@ -9,7 +9,7 @@ NativeScript components with the same API on every platform, each using the plat
 * **Android**: Material Components
 * **iOS**: native UIKit (Liquid Glass on iOS 26+), following the Apple Human Interface Guidelines
 
-Material only features (ripple, elevation, shape, floating labels...) are registered everywhere but do nothing on iOS.
+Material only features (ripple, elevation, shape, floating labels...) only exist on Android: they are not part of the iOS guidelines.
 
 ## Installation
 
@@ -32,4 +32,4 @@ yarn build
 yarn demo.svelte.android
 yarn demo.svelte.ios
 ```
-Svelte elements are registered with `<Component>Plugin.register()` from `@nativescript-community/ui-<component>/svelte`: `<uibutton>`, `<uifloatingactionbutton>`, `<uitextfield>`, `<uitextview>`, `<uiswitch>`, `<uislider>`, `<uiprogress>`, `<uiactivityindicator>`, `<uicardview>`, `<uiripple>`.
+Svelte elements are registered with `<Component>Plugin.register()` from `@nativescript-community/ui-<component>/svelte`: `<uibutton>`, `<uifloatingactionbutton>`, `<uitextfield>`, `<uitextview>`, `<uiswitch>`, `<uislider>`, `<uiprogress>`, `<uiactivityindicator>`.

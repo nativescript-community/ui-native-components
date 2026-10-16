@@ -29,7 +29,7 @@ class SliderStepHandlerImpl extends NSObject {
 /**
  * iOS: native UISlider.
  * `trackFillColor`, `trackBackgroundColor` and `thumbColor` map to the UISlider tints.
- * `stepSize` snaps the value. Material only properties (ripple, elevation, hollow thumb) are no-op.
+ * `stepSize` snaps the value.
  */
 export class Slider extends SliderBase {
     nativeViewProtected: UISlider;

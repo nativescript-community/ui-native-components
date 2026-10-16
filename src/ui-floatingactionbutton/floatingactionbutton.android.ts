@@ -1,3 +1,4 @@
+import { cssProperty } from '@nativescript-community/ui-core';
 import { dynamicElevationOffsetProperty, elevationProperty, rippleColorAlphaProperty, rippleColorProperty, shapeProperty, themer } from '@nativescript-community/ui-core';
 import { createStateListAnimator, getColorStateList, isPostLollipop } from '@nativescript-community/ui-core/android/utils';
 import { Background, Color, ImageSource, Length, backgroundInternalProperty, colorProperty } from '@nativescript/core';
@@ -8,6 +9,12 @@ import { getRippleColor } from '@nativescript-community/ui-core/index.android';
 let MDCFabButton: typeof com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 export class FloatingActionButton extends FloatingActionButtonBase {
+    // Material only properties: Android only
+    @cssProperty elevation: number;
+    @cssProperty dynamicElevationOffset: number;
+    @cssProperty rippleColor: Color;
+    @cssProperty shape: string;
+
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
     

@@ -1,4 +1,5 @@
 import { VerticalTextAlignment, verticalTextAlignmentProperty } from '@nativescript-community/text';
+import { cssProperty } from '@nativescript-community/ui-core';
 import { dynamicElevationOffsetProperty, elevationProperty, getRippleColor, rippleColorAlphaProperty, rippleColorProperty, shapeProperty, themer } from '@nativescript-community/ui-core';
 import { createStateListAnimator, getAttrColor, getColorStateList, getHorizontalGravity, getVerticalGravity, inflateLayout, isPostLollipop } from '@nativescript-community/ui-core/android/utils';
 import {
@@ -18,6 +19,13 @@ import { textAlignmentProperty, textTransformProperty } from '@nativescript/core
 import { ButtonBase, ButtonRole, imageSourceProperty, roleProperty, srcProperty, toMaterialVariant } from './button-common';
 
 export class Button extends ButtonBase {
+    // Material only properties: Android only
+    @cssProperty elevation: number;
+    @cssProperty dynamicElevationOffset: number;
+    @cssProperty rippleColor: Color;
+    @cssProperty rippleColorAlpha: number;
+    @cssProperty shape: string;
+
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
 

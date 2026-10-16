@@ -6,7 +6,7 @@ import { ButtonBase, ButtonRole, busyProperty, imageSourceProperty, roleProperty
 /**
  * iOS: native UIButton rendered with UIButton.Configuration (iOS 15+), Liquid Glass styles on iOS 26+.
  * `variant` accepts the Material names (mapped to the closest native style) and the native names (`prominentGlass`, `glass`, `tinted`...).
- * Material only properties (elevation, ripple, shape...) are no-op.
+ * Material only properties (elevation, ripple, shape) do not exist on iOS.
  * Before iOS 15 it is the plain core UIButton.
  */
 export class Button extends ButtonBase {

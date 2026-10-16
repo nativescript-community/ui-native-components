@@ -156,3 +156,9 @@ One monorepo for now: new package family next to the existing one, workspace-lin
   - `UIAlertController` custom view (`contentViewController` key) works on iOS 26.5 (Liquid Glass alert), the view must be loaded explicitly (`viewDidLoad` is not called when `view` is set manually).
   - the iOS bottom sheet (`UISheetPresentationController`) works: grabber, content-fit detent, close with result.
 - Not done: Material 3 circular progress for `ui-activityindicator` (still a plain `ProgressBar`), FAB `size` on Android (only padding), Material 3 Expressive (material 1.14 alphas).
+
+## Scope change (2026-10-16)
+
+Only components with a real native implementation on each platform, or a common guideline use case, are kept:
+`cardview`, `ripple` and `speeddial` were dropped (they are Material only concepts), and elevation / ripple / shape no longer exist on iOS
+(they are declared in the Android classes only, the iOS core mixin only keeps `requestFocus()`/`clearFocus()`).

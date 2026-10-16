@@ -1,6 +1,5 @@
 import { Color, View } from '@nativescript/core';
 import { ShapeProperties } from '.';
-import { cssProperty } from './cssproperties';
 import { CornerFamily, applyMixins } from './index.common';
 export * from './cssproperties';
 export { CornerFamily, applyMixins };
@@ -122,16 +121,10 @@ export function getRippleColor(color: string | Color, alpha = 61.5): UIColor {
 
 export function overrideViewBase() {
     const NSView = require('@nativescript/core').View;
-    // ripple and elevation are Material concepts: on iOS the properties are registered
-    // (so they can be set from CSS / templates) but they have no effect.
+    // elevation, ripple and shape are Material concepts: they only exist on Android
     class ViewWithFocusHelpers extends View {
         //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
         [key: symbol]: (...args: any[]) => any | void;
-
-        @cssProperty elevation: number;
-        @cssProperty dynamicElevationOffset: number;
-        @cssProperty rippleColor: Color;
-        @cssProperty rippleColorAlpha: number;
 
         public requestFocus() {
             this.focus();

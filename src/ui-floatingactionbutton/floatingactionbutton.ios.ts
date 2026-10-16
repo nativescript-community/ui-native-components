@@ -8,7 +8,7 @@ const NORMAL_SIZE = 56;
 
 /**
  * iOS: native UIButton rendered with UIButton.Configuration, a capsule (round when only the icon is shown).
- * `prominentGlass` by default (Liquid Glass on iOS 26+, filled before). Material only properties (elevation, ripple, shape) are no-op.
+ * `prominentGlass` by default (Liquid Glass on iOS 26+, filled before). Material only properties (elevation, ripple, shape) do not exist on iOS.
  */
 export class FloatingActionButton extends FloatingActionButtonBase {
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
