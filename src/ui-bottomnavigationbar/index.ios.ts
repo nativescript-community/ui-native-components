@@ -227,16 +227,16 @@ export class BottomNavigationBar extends BottomNavigationBarBase {
             return;
         }
         if (!this._items[index].isSelectable) {
-            // UITabBar has no shouldSelect: restore the previous selection
+            // UITabBar has no shouldSelect: the previous selection is restored
             this._emitTabPressed(index);
             const selected = this._items[this.selectedTabIndex];
             if (selected) {
-                // UITabBar ignores the change while it is handling the selection
-                setTimeout(() => {
+                // UIKit applies the tapped selection after the delegate returns: the restore is queued on the main queue, behind it
+                NSOperationQueue.mainQueue.addOperationWithBlock(() => {
                     if (this.nativeViewProtected) {
                         this.nativeViewProtected.selectedItem = selected.nativeViewProtected;
                     }
-                }, 0);
+                });
             }
             return;
         }
