@@ -153,7 +153,7 @@ Also done: Android `searchMode="bar"` (M3 SearchBar + SearchView with `searchCon
 Also done: a view (`uibutton`...) inside an `<appBarItem>` is its `actionView`.
 Not done yet: badges, iOS 26 integrated search placement, Vue / Angular registration.
 Done since: `AppPage.overlay` (`<appPageOverlay>`) for bottom anchored views, `hide` for medium / large bars, translucent bar with content under it on both platforms.
-Known: iOS pushed large title has no inline title once collapsed; Android collapsed bar shows the status bar scrim color.
+Known: none open for the modes above (see the list of not done items).
 
 ## 9. Risks
 
