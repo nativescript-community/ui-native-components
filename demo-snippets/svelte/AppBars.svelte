@@ -28,6 +28,11 @@
         // the button hides when the list scrolls down
         fab.nativeView.hideOnScroll = list.nativeView;
     });
+    const bottomItems = [
+        { text: 'Home', icon: icon('house', 'ic_star'), onTap: () => (log = 'bottom: home') },
+        { spacer: true },
+        { text: 'Add', icon: icon('plus', 'ic_add'), onTap: () => (log = 'bottom: add') }
+    ];
     let log = 'size / behavior / translucent: use the buttons';
 
     const formatted = new FormattedString();
@@ -51,7 +56,7 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
+    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
         <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
         <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
@@ -62,8 +67,8 @@
         </Template>
     </collectionview>
     <appPageOverlay>
-        <uifloatingactionbutton bind:this={fab} horizontalAlignment="right" verticalAlignment="bottom" marginBottom="170" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
-        <stackLayout verticalAlignment="bottom" backgroundColor="rgba(255,255,255,0.92)" padding="8 8 24 8">
+        <uifloatingactionbutton bind:this={fab} horizontalAlignment="right" verticalAlignment="bottom" marginBottom="260" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
+        <stackLayout verticalAlignment="bottom" marginBottom="90" backgroundColor="rgba(255,255,255,0.92)" padding="8 8 8 8">
             <label text={log} on:loaded={attachPan} padding="8" backgroundColor="#c8e6c9" />
             <wrapLayout>
                 <uibutton text="small" on:tap={() => (size = 'small')} />

@@ -1,8 +1,8 @@
 import { Color, GridLayout, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarItem, AppBarScrollBehavior, AppBarSize };
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize };
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected as any;
@@ -13,6 +13,27 @@ function findScrollView(view: View): UIScrollView {
         return native;
     }
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
+}
+
+@NativeClass
+class BottomItemHandler extends NSObject {
+    static ObjCExposedMethods = {
+        tap: { returns: interop.types.void, params: [interop.types.id] }
+    };
+    owner: WeakRef<AppBar>;
+    item: AppBarBottomItem;
+    static initWithOwnerItem(owner: AppBar, item: AppBarBottomItem) {
+        const handler = BottomItemHandler.new() as BottomItemHandler;
+        handler.owner = new WeakRef(owner);
+        handler.item = item;
+        return handler;
+    }
+    tap(sender: any) {
+        const bar = this.owner?.deref();
+        if (bar) {
+            notifyBottomItemTap(bar, this.item);
+        }
+    }
 }
 
 /** a view which lets the touches go through its empty areas */
@@ -191,8 +212,41 @@ export class AppBar extends AppBarBase {
         }
 
         this.applyOverflowSafeArea();
+        this.applyBottomItems(viewController, navController);
         this.applySearch(navigationItem, behavior);
         this.applyScrollTarget(viewController);
+    }
+
+    private _bottomHandlers: BottomItemHandler[] = [];
+    /** the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26) */
+    private applyBottomItems(viewController: UIViewController, navController: UINavigationController) {
+        const items = this.bottomItems;
+        if (!items?.length) {
+            if (!navController.toolbarHidden) {
+                navController.setToolbarHiddenAnimated(true, false);
+            }
+            viewController.setToolbarItemsAnimated(null, false);
+            this._bottomHandlers = [];
+            return;
+        }
+        const handlers: BottomItemHandler[] = [];
+        const barButtonItems = NSMutableArray.new<UIBarButtonItem>();
+        for (const item of items) {
+            if (item.spacer) {
+                barButtonItems.addObject(UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null));
+                continue;
+            }
+            const handler = BottomItemHandler.initWithOwnerItem(this, item);
+            handlers.push(handler);
+            const image = item.icon ? getNativeIcon(item.icon) : null;
+            const barButtonItem = image ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap') : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
+            barButtonItem.accessibilityLabel = item.text;
+            barButtonItems.addObject(barButtonItem);
+        }
+        // the handlers must stay alive
+        this._bottomHandlers = handlers;
+        viewController.setToolbarItemsAnimated(barButtonItems, false);
+        navController.setToolbarHiddenAnimated(false, false);
     }
 
     private _ignoredSafeArea = false;
@@ -249,6 +303,57 @@ export class AppBar extends AppBarBase {
         (this.page.ios as UIViewController).definesPresentationContext = true;
     }
 
+    private _inlineTitleTarget: View;
+    private _inlineTitleListener: () => void;
+    private _expandedBarHeight = 0;
+    private _inlineTitleShown = false;
+
+    /**
+     * A large title on a pushed page uses the UIKit `Always` mode, which never shows the inline title once collapsed:
+     * a title view is shown while the bar is collapsed (the height of the bar tells).
+     */
+    private observeInlineTitle(target: View) {
+        const viewController = this.page?.ios as UIViewController;
+        if (!viewController || this._inlineTitleTarget === target) {
+            return;
+        }
+        if (this._inlineTitleTarget) {
+            this._inlineTitleTarget.off('scroll', this._inlineTitleListener);
+        }
+        this._inlineTitleTarget = target;
+        this._inlineTitleListener = () => this.updateInlineTitle();
+        target.on('scroll', this._inlineTitleListener);
+    }
+
+    private updateInlineTitle() {
+        const viewController = this.page?.ios as UIViewController;
+        const navigationItem = viewController?.navigationItem;
+        const navigationBar = viewController?.navigationController?.navigationBar;
+        if (!navigationItem || !navigationBar || this.titleView || this.size === 'small' || navigationItem.largeTitleDisplayMode !== UINavigationItemLargeTitleDisplayMode.Always) {
+            return;
+        }
+        const height = navigationBar.frame.size.height;
+        this._expandedBarHeight = Math.max(this._expandedBarHeight, height);
+        const collapsed = height < this._expandedBarHeight - 20;
+        if (collapsed === this._inlineTitleShown) {
+            return;
+        }
+        this._inlineTitleShown = collapsed;
+        if (!collapsed) {
+            navigationItem.titleView = null;
+            return;
+        }
+        const label = UILabel.new();
+        label.textAlignment = NSTextAlignment.Center;
+        const attributes = (navigationItem.standardAppearance ?? navigationBar.standardAppearance)?.titleTextAttributes;
+        const text = NSMutableAttributedString.new();
+        const title = this.formattedTitle ? (createNativeFormattedText(this.formattedTitle) as NSAttributedString) : NSAttributedString.alloc().initWithStringAttributes(this.title ?? '', attributes);
+        text.appendAttributedString(title);
+        label.attributedText = text;
+        label.sizeToFit();
+        navigationItem.titleView = label;
+    }
+
     private applyScrollTarget(viewController: UIViewController) {
         const target = this.scrollTarget;
         if (!target) {
@@ -257,6 +362,7 @@ export class AppBar extends AppBarBase {
         const scrollView = findScrollView(target);
         if (scrollView) {
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Top);
+            this.observeInlineTitle(target);
         } else if (!this._scrollTargetLoadedHandler) {
             // not created yet
             this._scrollTargetLoadedHandler = () => {

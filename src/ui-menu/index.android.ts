@@ -132,3 +132,8 @@ export function setContextMenu(view: View, options: ContextMenuOptions): () => v
     view.on(GestureTypes.longPress as any, handler);
     return () => view.off(GestureTypes.longPress as any, handler);
 }
+
+/** icon of a menu / bar item as a drawable: `res://`, a file, an ImageSource or a FormattedString */
+export function getNativeIcon(icon: string | ImageSource | FormattedString): android.graphics.drawable.Drawable {
+    return getIcon(icon);
+}

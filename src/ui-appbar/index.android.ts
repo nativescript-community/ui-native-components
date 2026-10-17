@@ -1,7 +1,8 @@
 import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
-import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay } from './index-common';
-export { AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay };
+import { getNativeIcon } from '@nativescript-community/ui-menu';
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -243,6 +244,7 @@ export class AppPage extends Page {
         this._appBarLayout = null;
         this._nativeContent = null;
         this._nativeOverlay = null;
+        this._bottomBar = null;
         this._collapsing = null;
         super.disposeNativeView();
     }
@@ -366,7 +368,98 @@ export class AppPage extends Page {
         }
         appBarLayout.setElevation(translucent ? 0 : appBarLayout.getElevation());
         this.syncTranslucentInset(appBar, translucent);
+        this.syncBottomBar(appBar, behavior);
     }
+
+    private _bottomBar: com.google.android.material.bottomappbar.BottomAppBar;
+    private _bottomInsetListener: any;
+    /** `bottomItems`: a Material BottomAppBar, over the content, below the overlay */
+    private syncBottomBar(appBar: AppBar, behavior: AppBarScrollBehavior) {
+        const items = (appBar?.bottomItems || []).filter((item) => !item.spacer);
+        const coordinator = this._coordinator as androidx.coordinatorlayout.widget.CoordinatorLayout;
+        if (!items.length) {
+            if (this._bottomBar) {
+                this._bottomBar.setVisibility(android.view.View.GONE);
+                this.syncBottomInset(appBar, false);
+            }
+            return;
+        }
+        const BottomAppBar = com.google.android.material.bottomappbar.BottomAppBar as any;
+        const CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout as any;
+        if (!this._bottomBar) {
+            const bar = new BottomAppBar(this._context) as com.google.android.material.bottomappbar.BottomAppBar;
+            const params = new CoordinatorLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+            params.gravity = android.view.Gravity.BOTTOM;
+            // below the overlay (a FAB, a panel)
+            coordinator.addView(bar, coordinator.indexOfChild(this._nativeOverlay), params);
+            this._bottomBar = bar;
+        }
+        const bar = this._bottomBar;
+        bar.setVisibility(android.view.View.VISIBLE);
+        bar.setHideOnScroll(behavior === 'hide');
+        const menu = bar.getMenu();
+        menu.clear();
+        const owner = new WeakRef(appBar);
+        items.forEach((item, index) => {
+            const menuItem = menu.add(0, index, index, item.text || '');
+            const icon = item.icon ? getNativeIcon(item.icon) : null;
+            if (icon) {
+                menuItem.setIcon(icon);
+            }
+            menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
+        });
+        bar.setOnMenuItemClickListener(
+            new androidx.appcompat.widget.Toolbar.OnMenuItemClickListener({
+                onMenuItemClick: (menuItem: android.view.MenuItem) => {
+                    const target = owner.get();
+                    if (target) {
+                        notifyBottomItemTap(target, items[menuItem.getItemId()]);
+                    }
+                    return true;
+                }
+            })
+        );
+        this.syncBottomInset(appBar, true);
+    }
+
+    /** the last items of the scrolling view must not stay under the bottom bar */
+    private syncBottomInset(appBar: AppBar, visible: boolean) {
+        const bar = this._bottomBar;
+        const target = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        if (this._bottomInsetListener) {
+            bar.removeOnLayoutChangeListener(this._bottomInsetListener);
+            this._bottomInsetListener = null;
+        }
+        if (!target) {
+            return;
+        }
+        if (!visible) {
+            if (target['__appBarBottomPadding'] !== undefined) {
+                target.setPadding(target.getPaddingLeft(), target.getPaddingTop(), target.getPaddingRight(), target['__appBarBottomPadding']);
+                target['__appBarBottomPadding'] = undefined;
+            }
+            return;
+        }
+        const apply = () => {
+            if (target['__appBarBottomPadding'] === undefined) {
+                target['__appBarBottomPadding'] = target.getPaddingBottom();
+            }
+            if (target instanceof android.view.ViewGroup) {
+                target.setClipToPadding(false);
+            }
+            target.setPadding(target.getPaddingLeft(), target.getPaddingTop(), target.getPaddingRight(), bar.getHeight());
+        };
+        this._bottomInsetListener = new android.view.View.OnLayoutChangeListener({
+            onLayoutChange: () => {
+                if (target.getPaddingBottom() !== bar.getHeight() && this._bottomInsetListener) {
+                    apply();
+                }
+            }
+        });
+        bar.addOnLayoutChangeListener(this._bottomInsetListener);
+        apply();
+    }
+
 
     private _insetListener: any;
     /** translucent: the first items of the scrolling view must start below the bar: its top padding follows the height of the bar */

@@ -25,7 +25,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
 | `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
 
-Status and limits: see [APPBAR_PLAN.md](../../APPBAR_PLAN.md). On iOS a large title on a pushed page does not show the inline title once collapsed (UIKit `Always` mode); on the root page of the Frame it does.
+Status and limits: see [APPBAR_PLAN.md](../../APPBAR_PLAN.md). On iOS a large title on a pushed page uses the UIKit `Always` mode, which never shows the inline title: a title view is shown while the bar is collapsed (the height of the bar tells). On the root page of the Frame UIKit does it.
 On Android the bar draws under the status bar (edge to edge) and the page handles the inset.
 
 ## Items
@@ -42,6 +42,15 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 ## Hide on scroll
 
 `hideOnScroll` (the scrolling view) of `@nativescript-community/ui-floatingactionbutton` and `@nativescript-community/ui-bottomnavigationbar`: hidden when the content scrolls down, shown when it scrolls up.
+
+## Bottom items
+
+`bottomItems` (`{ text, icon, spacer, onTap }`, event `bottomItemTap`): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
+The last items of the `scrollTarget` stay above the Android bar.
+
+```svelte
+<appBar bottomItems={[{ icon: 'sys://house', text: 'Home', onTap }, { spacer: true }, { icon: 'sys://plus', text: 'Add', onTap }]} />
+```
 
 ## Overlay
 

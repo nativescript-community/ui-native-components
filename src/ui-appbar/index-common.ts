@@ -1,4 +1,4 @@
-import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, Property, View, isAndroid } from '@nativescript/core';
+import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, ImageSource, Property, View, isAndroid } from '@nativescript/core';
 import { MenuItem, showMenu } from '@nativescript-community/ui-menu';
 
 /** small: standard bar, medium / large: a title that collapses on scroll (M3 collapsing app bar on Android, large title on iOS) */
@@ -53,7 +53,27 @@ export interface AppBarSearchEventData extends EventData {
     text: string;
 }
 
+/**
+ * An action of the bottom bar (`bottomItems`): iOS a button of the bottom toolbar (Liquid Glass on iOS 26), Android an action of the Material `BottomAppBar`.
+ */
+export interface AppBarBottomItem {
+    /** `sys://name` (SF Symbol, iOS), `res://name` or a file path, an ImageSource, or a FormattedString */
+    icon?: string | ImageSource | FormattedString;
+    text?: string;
+    /** iOS: a flexible space between the buttons. Android: ignored (the actions are at the end of the bar) */
+    spacer?: boolean;
+    /** called when the action is tapped */
+    onTap?: (item: AppBarBottomItem) => void;
+    [key: string]: any;
+}
+
+export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
+
 export class AppBarBase extends ActionBar {
+    static bottomItemTapEvent = 'bottomItemTap';
+    /** actions of a bar at the bottom of the page: iOS the bottom toolbar, Android a `BottomAppBar` */
+    bottomItems: AppBarBottomItem[];
+
     /** raised when the text of the search changes */
     static searchChangeEvent = 'searchChange';
     /** raised when the search is submitted (keyboard search key) */
@@ -88,9 +108,16 @@ translucentProperty.register(AppBarBase);
 scrollTargetProperty.register(AppBarBase);
 searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
+bottomItemsProperty.register(AppBarBase);
 
 /**
  * Layout for the views anchored to the page itself (a floating action button, a bottom bar...), not to the scrolling content: use it as the `overlay` of an AppPage.
  * Android: the content of an AppPage is taller than the screen while the bar is expanded (the content moves up when the bar collapses), so a view anchored to the bottom of the content would be off screen.
  */
 export class AppPageOverlay extends GridLayout {}
+
+/** raises the tap of a bottom item: the `onTap` of the item and the `bottomItemTap` event of the bar */
+export function notifyBottomItemTap(bar: AppBarBase, item: AppBarBottomItem) {
+    item.onTap?.(item);
+    bar.notify({ eventName: AppBarBase.bottomItemTapEvent, object: bar, item } as any);
+}

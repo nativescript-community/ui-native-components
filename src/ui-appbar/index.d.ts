@@ -7,8 +7,8 @@
 
 import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
-import { AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarScrollBehavior, AppBarSize };
+import { AppBarBottomItem, AppBarScrollBehavior, AppBarSize } from './index-common';
+export { AppBarBottomItem, AppBarScrollBehavior, AppBarSize };
 
 /**
  * An ActionBar with scroll behaviors. Use it as the `actionBar` of an `AppPage` (Android needs the AppPage: it hosts the AppBarLayout).
@@ -24,6 +24,10 @@ export class AppBar extends ActionBar {
     formattedTitle: FormattedString;
     /** the content goes under the bar: it is see through until the content scrolls (blur on iOS) */
     translucent: boolean;
+    /** actions of a bar at the bottom of the page: iOS the bottom toolbar (Liquid Glass on iOS 26), Android a Material `BottomAppBar` (`scrollBehavior="hide"` hides it on scroll too) */
+    bottomItems: AppBarBottomItem[];
+    /** raised when a bottom item is tapped (`item`) */
+    static bottomItemTapEvent: string;
     /** the scrolling view the bar follows. iOS: `setContentScrollView`. By default the first scrolling view found */
     scrollTarget: View;
 }
