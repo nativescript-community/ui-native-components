@@ -21,7 +21,9 @@
     },
     "dependencies": {
         "@mdi/font": "6.5.95",
+        "@nativescript-community/gesturehandler": "^2.0.45",
         "@nativescript-community/ui-activityindicator": "*",
+        "@nativescript-community/ui-appbar": "*",
         "@nativescript-community/ui-bottom-navigation": "*",
         "@nativescript-community/ui-bottomnavigationbar": "*",
         "@nativescript-community/ui-bottomsheet": "*",

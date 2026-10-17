@@ -1623,6 +1623,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nativescript-community/gesturehandler@npm:^2.0.45":
+  version: 2.0.45
+  resolution: "@nativescript-community/gesturehandler@npm:2.0.45"
+  dependencies:
+    "@nativescript-community/observable": "npm:^2.0.10"
+  checksum: 10/e45f984d59f73d30494287a4ffa282335ac0685d3f56aee7beecb5a664109fbcfb6f165c0adb3fa4f4ee5b1076e4cae5154b6db47427ed2df1e361b0d89433df
+  languageName: node
+  linkType: hard
+
+"@nativescript-community/observable@npm:^2.0.10":
+  version: 2.0.11
+  resolution: "@nativescript-community/observable@npm:2.0.11"
+  checksum: 10/3f8fcba495af0265ab08b8f86f692ce85595b26ea6dc7e4909462fa587f4c9235664b318ea850b3e4858d5a3d7bb0863cb48a1a3c94bae67fa9cf75f47f10492
+  languageName: node
+  linkType: hard
+
 "@nativescript-community/plugin-seed-tools@portal:tools::locator=%40nativescript-community%2Fui-native-components%40workspace%3A.":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/plugin-seed-tools@portal:tools::locator=%40nativescript-community%2Fui-native-components%40workspace%3A."
@@ -1709,7 +1725,9 @@ __metadata:
   resolution: "@nativescript-community/template-snippet@workspace:demo-snippets"
   dependencies:
     "@mdi/font": "npm:6.5.95"
+    "@nativescript-community/gesturehandler": "npm:^2.0.45"
     "@nativescript-community/ui-activityindicator": "npm:*"
+    "@nativescript-community/ui-appbar": "npm:*"
     "@nativescript-community/ui-bottom-navigation": "npm:*"
     "@nativescript-community/ui-bottomnavigationbar": "npm:*"
     "@nativescript-community/ui-bottomsheet": "npm:*"
@@ -1759,6 +1777,14 @@ __metadata:
 "@nativescript-community/ui-activityindicator@npm:*, @nativescript-community/ui-activityindicator@workspace:packages/ui-activityindicator":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/ui-activityindicator@workspace:packages/ui-activityindicator"
+  dependencies:
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-appbar@npm:*, @nativescript-community/ui-appbar@workspace:packages/ui-appbar":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-appbar@workspace:packages/ui-appbar"
   dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown

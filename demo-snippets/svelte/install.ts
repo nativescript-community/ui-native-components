@@ -1,5 +1,8 @@
 import { install as installBottomSheet } from '@nativescript-community/ui-bottomsheet';
 import { installMixins } from '@nativescript-community/ui-core';
+import { install as installGestureHandler } from '@nativescript-community/gesturehandler';
+import { AppPage } from '@nativescript-community/ui-appbar';
+import { PageElement, registerElement } from '@nativescript-community/svelte-native/dom';
 
 import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
 import { registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
@@ -39,12 +42,25 @@ import RefreshLayout from './RefreshLayout.svelte';
 import SearchBars from './SearchBars.svelte';
 import Styling from './Styling.svelte';
 import Snackbar from './Snackbar.svelte';
+import AppBars from './AppBars.svelte';
 import Toolbars from './Toolbars.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
 import '../app.scss';
 
 installMixins();
+installGestureHandler();
+
+// svelte-native `navigate` needs a PageElement: this one wraps an AppPage instead of the core Page
+class AppPageElement extends PageElement {
+    constructor() {
+        super();
+        const page = new AppPage();
+        (page as any).__SvelteNativeElement__ = this;
+        (this as any)._nativeElement = page;
+    }
+}
+registerElement('AppPage', () => new AppPageElement());
 installBottomSheet();
 export function installPlugin() {
     // each component is a NativeScript view: registering it for svelte-native is one line
@@ -95,5 +111,6 @@ export const demos = [
     { name: 'Bottom navigation', path: 'BottomNavigation', component: BottomNavigation },
     { name: 'Bottom navigation bar', path: 'BottomNavigationBar', component: BottomNavigationBar },
     { name: 'Styling audit', path: 'Styling', component: Styling },
-    { name: 'Snackbar', path: 'Snackbar', component: Snackbar }
+    { name: 'Snackbar', path: 'Snackbar', component: Snackbar },
+    { name: 'App bar', path: 'AppBars', component: AppBars }
 ];

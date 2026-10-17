@@ -151,6 +151,12 @@
             ],
             "@nativescript-community/ui-toolbar/*": [
                 "src/ui-toolbar/*"
+            ],
+            "@nativescript-community/ui-appbar": [
+                "src/ui-appbar/index"
+            ],
+            "@nativescript-community/ui-appbar/*": [
+                "src/ui-appbar/*"
             ]
         }
     }
