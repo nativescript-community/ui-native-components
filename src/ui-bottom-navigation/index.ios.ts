@@ -1,5 +1,6 @@
 // Types
 import { BottomAccessory } from './bottom-accessory';
+import { BottomSearchContent } from './search-content';
 import { TabContentItem } from '@nativescript-community/ui-core-tabs/tab-content-item';
 import { TabNavigationBase, getIconSpecSize, itemsProperty, selectedIndexProperty, tabStripProperty } from '@nativescript-community/ui-core-tabs/tab-navigation-base';
 import { TabsPosition } from '@nativescript-community/ui-core-tabs/tab-navigation/index-common';
@@ -78,8 +79,10 @@ class MDTabBarControllerImpl extends UITabBarController {
                     updateBackgroundPositions(tabStrip, tabStripItem);
 
                     const index = tabStripItem.index;
-                    const tabBarItemController = this.viewControllers[index];
-                    updateTitleAndIconPositions(tabStripItem, tabBarItemController.tabBarItem, tabBarItemController);
+                    const tabBarItemController = owner.mItemControllers[index];
+                    if (tabBarItemController) {
+                        updateTitleAndIconPositions(tabStripItem, tabBarItemController.tabBarItem, tabBarItemController);
+                    }
                 });
             }
         }, null);
@@ -101,6 +104,26 @@ class MDTabBarControllerImpl extends UITabBarController {
                 });
             }
         }
+    }
+}
+
+/**
+ * Delegate of the search controller of the search tab
+ */
+@NativeClass
+class SearchHandlerImpl extends NSObject {
+    public static ObjCProtocols = [UISearchResultsUpdating, UISearchBarDelegate];
+    private _owner: WeakRef<BottomNavigation>;
+    public static initWithOwner(owner: WeakRef<BottomNavigation>) {
+        const handler = SearchHandlerImpl.new() as SearchHandlerImpl;
+        handler._owner = owner;
+        return handler;
+    }
+    public updateSearchResultsForSearchController(searchController: UISearchController) {
+        this._owner.get()?._onSearchText(searchController.searchBar.text);
+    }
+    public searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        this._owner.get()?._onSearchSubmit(searchBar.text);
     }
 }
 
@@ -129,9 +152,9 @@ class BNTabBarControllerDelegateImpl extends NSObject implements UITabBarControl
             const backToMoreWillBeVisible = false;
             owner._handleTwoNavigationBars(backToMoreWillBeVisible);
 
-            if (tabBarController.viewControllers) {
-                const position = tabBarController.viewControllers.indexOfObject(viewController);
-                if (position !== NSNotFound) {
+            if (owner.mItemControllers.length) {
+                const position = owner.mItemControllers.indexOf(viewController);
+                if (position > -1) {
                     const tabStrip = owner.tabStrip;
                     const tabStripItems = tabStrip && tabStrip.items;
 
@@ -154,6 +177,21 @@ class BNTabBarControllerDelegateImpl extends NSObject implements UITabBarControl
         (tabBarController as any)._willSelectViewController = viewController;
 
         return true;
+    }
+
+    /**
+     * tabs mode (search tab): the identifiers of the item tabs are `tab-<index>`, the search tab keeps the selected index
+     */
+    public tabBarControllerDidSelectTabPreviousTab(tabBarController: UITabBarController, tab: any, previousTab: any): void {
+        const owner = this._owner.get();
+        const identifier: string = tab?.identifier;
+        if (owner && identifier && identifier.startsWith('tab-')) {
+            const index = parseInt(identifier.slice(4), 10);
+            const controller = owner.mItemControllers[index];
+            if (controller) {
+                owner._onViewControllerShown(controller);
+            }
+        }
     }
 
     public tabBarControllerDidSelectViewController(tabBarController: UITabBarController, viewController: UIViewController): void {
@@ -194,7 +232,7 @@ class BNNavigationControllerDelegateImpl extends NSObject implements UINavigatio
         if (owner) {
             // If viewController is one of our tab item controllers, then "< More" will be visible shortly.
             // Otherwise viewController is the UIMoreListController which shows the list of all tabs beyond the 4th tab.
-            const backToMoreWillBeVisible = owner.viewController.viewControllers.containsObject(viewController);
+            const backToMoreWillBeVisible = owner.mItemControllers.indexOf(viewController) > -1;
             owner._handleTwoNavigationBars(backToMoreWillBeVisible);
         }
     }
@@ -284,7 +322,7 @@ export const iosCustomPositioningProperty = new Property<BottomNavigation, boole
     valueConverter: booleanConverter
 });
 
-export { BottomAccessory };
+export { BottomAccessory, BottomSearchContent };
 
 /**
  * iOS 26: how the tab bar minimizes when the content is scrolled. `automatic` is the system choice.
@@ -293,6 +331,20 @@ export type MinimizeBehavior = 'automatic' | 'never' | 'onScrollDown' | 'onScrol
 const MINIMIZE_BEHAVIORS: { [key in MinimizeBehavior]: number } = { automatic: 0, never: 1, onScrollDown: 2, onScrollUp: 3 };
 
 export const minimizeBehaviorProperty = new Property<BottomNavigation, MinimizeBehavior>({ name: 'minimizeBehavior', defaultValue: 'automatic' });
+export const searchTabProperty = new Property<BottomNavigation, boolean>({ name: 'searchTab', defaultValue: false, valueConverter: booleanConverter });
+export const searchHintProperty = new Property<BottomNavigation, string>({ name: 'searchHint', defaultValue: '' });
+export const searchContentProperty = new Property<BottomNavigation, View>({
+    name: 'searchContent',
+    valueChanged: (target, oldValue, newValue) => {
+        if (oldValue) {
+            target._removeView(oldValue);
+        }
+        if (newValue) {
+            target._addView(newValue);
+        }
+        target.scheduleSearchTab();
+    }
+});
 export const accessoryProperty = new Property<BottomNavigation, BottomAccessory>({
     name: 'accessory',
     valueChanged: (target, oldValue, newValue) => {
@@ -312,6 +364,23 @@ export class BottomNavigation extends TabNavigationBase {
     public minimizeBehavior: MinimizeBehavior;
     /** iOS 26: a view above the tab bar, inline with it when the bar is minimized. Ignored on older iOS versions */
     public accessory: BottomAccessory;
+    /**
+     * iOS 18+: adds a search tab at the end of the tab bar: the search field is integrated in the bar (a separate glass button on iOS 26)
+     * and the tab shows `searchContent` (the results). Events: `search` (text changed) and `searchSubmit`.
+     */
+    public searchTab: boolean;
+    /** placeholder of the search field */
+    public searchHint: string;
+    /** the view shown by the search tab: the results of the search */
+    public searchContent: View;
+    private mSearchHandler: SearchHandlerImpl;
+    private mSearchController: UISearchController;
+    private mSearchTab: any;
+    private mSearchViewController: UIViewController;
+    /** the controllers of the items: `viewControllers` is null when the tab bar uses `tabs` (search tab) */
+    mItemControllers: UIViewController[] = [];
+    /** the UITab of each item controller: a controller can not be in two UITab */
+    private mItemTabs = new Map<UIViewController, any>();
 
     tabsPosition = TabsPosition.Bottom;
     public viewController: MDTabBarControllerImpl;
@@ -350,6 +419,7 @@ export class BottomNavigation extends TabNavigationBase {
         super.onLoaded();
         this.setViewControllers(this.items);
         this.updateAccessory();
+        this.scheduleSearchTab();
         const selectedIndex = this.selectedIndex;
         const selectedView = this.items && this.items[selectedIndex] && this.items[selectedIndex].content;
         if (selectedView instanceof Frame) {
@@ -366,6 +436,10 @@ export class BottomNavigation extends TabNavigationBase {
             this.accessory = value;
             return;
         }
+        if (name === 'SearchContent' || (value && value.__searchContent)) {
+            this.searchContent = value;
+            return;
+        }
         super._addChildFromBuilder(name, value);
     }
     public eachChild(callback: (child: ViewBase) => boolean) {
@@ -373,24 +447,136 @@ export class BottomNavigation extends TabNavigationBase {
         if (this.accessory) {
             callback(this.accessory);
         }
+        if (this.searchContent) {
+            callback(this.searchContent);
+        }
     }
     public eachChildView(callback: (child: View) => boolean) {
         super.eachChildView(callback);
         if (this.accessory) {
             callback(this.accessory);
         }
+        if (this.searchContent) {
+            callback(this.searchContent);
+        }
     }
     public _addViewToNativeVisualTree(child: ViewBase, atIndex?: number): boolean {
-        if (child === this.accessory) {
+        if (child === this.accessory || child === this.searchContent) {
             return true;
         }
         return super._addViewToNativeVisualTree(child, atIndex);
     }
     public _removeViewFromNativeVisualTree(child: ViewBase): void {
-        if (child === this.accessory) {
+        if (child === this.accessory || child === this.searchContent) {
             return;
         }
         super._removeViewFromNativeVisualTree(child);
+    }
+
+    _onSearchText(text: string) {
+        this.notify({ eventName: 'search', object: this, text: text || '' });
+    }
+    _onSearchSubmit(text: string) {
+        this.notify({ eventName: 'searchSubmit', object: this, text: text || '' });
+    }
+
+    /**
+     * iOS 18+: the UISearchTab at the end of the tab bar. The regular tabs stay view controllers, the search tab is added with the `tabs` API.
+     */
+    private mSearchTabTimer: any;
+    /**
+     * The tabs copy the title and the icon of the bar items: it is done once the strip items are loaded and have their native values.
+     */
+    scheduleSearchTab() {
+        if (this.mSearchTabTimer) {
+            clearTimeout(this.mSearchTabTimer);
+        }
+        this.mSearchTabTimer = setTimeout(() => {
+            this.mSearchTabTimer = null;
+            this.updateSearchTab();
+        }, 50);
+    }
+
+    updateSearchTab() {
+        const controller = this.viewController as any;
+        const UISearchTab = (global as any).UISearchTab;
+        if (!controller || !UISearchTab || !('tabs' in controller) || !this.isLoaded) {
+            return;
+        }
+        if (!this.searchTab) {
+            if (this.mSearchTab) {
+                controller.tabs = NSArray.arrayWithArray(this.getRegularTabs() as any);
+                this.mSearchTab = null;
+            }
+            return;
+        }
+        if (this.mSearchTab) {
+            this.updateSearchController();
+            return;
+        }
+        // the content of the search tab: a view controller hosting `searchContent`
+        const content = this.searchContent;
+        let viewController: UIViewController;
+        if (content) {
+            viewController = IOSHelper.UILayoutViewController.initWithOwner(new WeakRef(content)) as UIViewController;
+            viewController.view.addSubview(content.nativeViewProtected);
+            content.viewController = viewController;
+        } else {
+            viewController = UIViewController.new();
+        }
+        this.mSearchViewController = viewController;
+        this.mSearchHandler = this.mSearchHandler || SearchHandlerImpl.initWithOwner(new WeakRef(this));
+        const searchController = UISearchController.alloc().initWithSearchResultsController(null);
+        searchController.searchResultsUpdater = this.mSearchHandler;
+        searchController.searchBar.delegate = this.mSearchHandler;
+        // the results are in the content of the tab, not in a controller of the search controller
+        searchController.obscuresBackgroundDuringPresentation = false;
+        this.mSearchController = searchController;
+        viewController.navigationItem.searchController = searchController;
+        const searchTab = UISearchTab.alloc().initWithViewControllerProvider(() => {
+            const navigation = UINavigationController.alloc().initWithRootViewController(viewController);
+            return navigation;
+        });
+        searchTab.automaticallyActivatesSearch = true;
+        this.mSearchTab = searchTab;
+        this.updateSearchController();
+        const before = this.getRegularTabs();
+        // the tabs of the controllers are reused: detach the previous ones first
+        if (this.viewController.tabs && (this.viewController.tabs as NSArray<any>).count) {
+            (this.viewController as any).tabs = NSArray.array();
+        }
+        controller.tabs = NSArray.arrayWithArray([...before, searchTab] as any);
+    }
+
+    /**
+     * `viewControllers` and `tabs` are exclusive: with a search tab every tab is a UITab wrapping the controller of the item
+     */
+    private getRegularTabs(): any[] {
+        const UITab = (global as any).UITab;
+        const tabs: any[] = [];
+        for (let i = 0; i < this.mItemControllers.length; i++) {
+            const controller = this.mItemControllers[i];
+            // the tab bar item of the strip item: it has the title and the icons
+            const item: UITabBarItem = (this.tabStrip?.items?.[i]?.nativeView as UITabBarItem) || controller.tabBarItem;
+            let tab = this.mItemTabs.get(controller);
+            if (!tab) {
+                tab = UITab.alloc().initWithTitleImageIdentifierViewControllerProvider(item?.title || '', item?.image || null, `tab-${i}`, () => controller);
+                this.mItemTabs.set(controller, tab);
+            } else {
+                // follows the tab bar item (title, icon, badge)
+                tab.title = item?.title || '';
+                tab.image = item?.image || null;
+            }
+            tab.badgeValue = item?.badgeValue || null;
+            tabs.push(tab);
+        }
+        return tabs;
+    }
+
+    private updateSearchController() {
+        if (this.mSearchController) {
+            this.mSearchController.searchBar.placeholder = this.searchHint || null;
+        }
     }
 
     /**
@@ -404,6 +590,13 @@ export class BottomNavigation extends TabNavigationBase {
         }
         const content = this.accessory?.nativeViewProtected;
         controller.bottomAccessory = content ? UITabAccessory.alloc().initWithContentView(content) : null;
+    }
+
+    [searchTabProperty.setNative](value: boolean) {
+        this.scheduleSearchTab();
+    }
+    [searchHintProperty.setNative](value: string) {
+        this.updateSearchController();
     }
 
     [minimizeBehaviorProperty.setNative](value: MinimizeBehavior) {
@@ -487,6 +680,22 @@ export class BottomNavigation extends TabNavigationBase {
 
     public setTabBarItemTitle(tabStripItem: TabStripItem, value: string): void {
         tabStripItem.nativeView.title = value;
+        this.syncSearchTabs();
+    }
+
+    /**
+     * With a search tab, every tab is a UITab: they follow the title, the icons and the badge of the bar items
+     */
+    private mSyncTimer: any;
+    syncSearchTabs() {
+        if (!this.mSearchTab || this.mSyncTimer) {
+            return;
+        }
+        // grouped: the title and the icons of an item are set one after the other
+        this.mSyncTimer = setTimeout(() => {
+            this.mSyncTimer = null;
+            this.getRegularTabs();
+        }, 0);
     }
 
     public setTabBarItemBackgroundColor(tabStripItem: TabStripItem, value: UIColor | Color): void {
@@ -534,10 +743,12 @@ export class BottomNavigation extends TabNavigationBase {
 
     public setTabBarIconColor(tabStripItem: TabStripItem, value: UIColor | Color): void {
         this.setIconColor(tabStripItem);
+        this.syncSearchTabs();
     }
 
     public setTabBarIconSource(tabStripItem: TabStripItem, value: UIColor | Color): void {
         this.updateItemColors(tabStripItem);
+        this.syncSearchTabs();
     }
 
     public setTabBarItemFontInternal(tabStripItem: TabStripItem, value: Font): void {
@@ -593,8 +804,9 @@ export class BottomNavigation extends TabNavigationBase {
         // if (Trace.isEnabled()) {
         //     Trace.write("TabView._onViewControllerShown(" + viewController + ");", Trace.categories.Debug);
         // }
-        if (this.viewController.viewControllers && this.viewController.viewControllers.containsObject(viewController)) {
-            this.selectedIndex = this.viewController.viewControllers.indexOfObject(viewController);
+        const shownIndex = this.mItemControllers.indexOf(viewController);
+        if (shownIndex > -1) {
+            this.selectedIndex = shownIndex;
         } else {
             // TODO
             // if (Trace.isEnabled()) {
@@ -707,11 +919,18 @@ export class BottomNavigation extends TabNavigationBase {
 
         this.setItemImages();
 
+        this.mItemControllers = [];
+        for (let i = 0; i < controllers.count; i++) {
+            this.mItemControllers.push(controllers.objectAtIndex(i));
+        }
         this.viewController.viewControllers = controllers;
         this.viewController.customizableViewControllers = null;
 
         // When we set this.viewController.viewControllers, someone is clearing the moreNavigationController.delegate, so we have to reassign it each time here.
         this.viewController.moreNavigationController.delegate = this.mMoreNavigationControllerDelegate;
+        // `viewControllers` replaced the tabs: the search tab is added again
+        this.mSearchTab = null;
+        this.scheduleSearchTab();
     }
 
     private setItemImages() {
@@ -891,8 +1110,16 @@ export class BottomNavigation extends TabNavigationBase {
         //     Trace.write("TabView._onSelectedIndexPropertyChangedSetNativeValue(" + value + ")", Trace.categories.Debug);
         // }
         if (value > -1) {
-            (this.viewController as any)._willSelectViewController = this.viewController.viewControllers[value];
-            this.viewController.selectedIndex = value;
+            (this.viewController as any)._willSelectViewController = this.mItemControllers[value];
+            if (this.mSearchTab && this.viewController.viewControllers == null) {
+                // tabs mode: the tabs have the identifiers `tab-<index>`
+                const tab = (this.viewController as any).tabForIdentifier(`tab-${value}`);
+                if (tab) {
+                    (this.viewController as any).selectedTab = tab;
+                }
+            } else {
+                this.viewController.selectedIndex = value;
+            }
         }
     }
 
@@ -958,3 +1185,6 @@ export class BottomNavigation extends TabNavigationBase {
 iosCustomPositioningProperty.register(BottomNavigation);
 minimizeBehaviorProperty.register(BottomNavigation);
 accessoryProperty.register(BottomNavigation);
+searchTabProperty.register(BottomNavigation);
+searchHintProperty.register(BottomNavigation);
+searchContentProperty.register(BottomNavigation);

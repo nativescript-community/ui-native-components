@@ -4,7 +4,7 @@ import { installMixins } from '@nativescript-community/ui-core';
 import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
 import { registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
 import { ActivityIndicator } from '@nativescript-community/ui-activityindicator';
-import { BottomAccessory, BottomNavigation as NativeBottomNavigation } from '@nativescript-community/ui-bottom-navigation';
+import { BottomAccessory, BottomNavigation as NativeBottomNavigation, BottomSearchContent } from '@nativescript-community/ui-bottom-navigation';
 import { BottomNavigationBar as NativeBottomNavigationBar, BottomNavigationTab } from '@nativescript-community/ui-bottomnavigationbar';
 import { Button } from '@nativescript-community/ui-button';
 import { Card } from '@nativescript-community/ui-card';
@@ -52,6 +52,7 @@ export function installPlugin() {
     registerNativeViewElement('uiactivityindicator', () => ActivityIndicator);
     registerNativeViewElement('uibottomnavigation', () => NativeBottomNavigation);
     registerNativeViewElement('uibottomaccessory', () => BottomAccessory);
+    registerNativeViewElement('uibottomsearchcontent', () => BottomSearchContent);
     registerNativeViewElement('uibottomnavigationbar', () => NativeBottomNavigationBar);
     registerNativeViewElement('uibottomnavigationtab', () => BottomNavigationTab);
     registerNativeViewElement('uibutton', () => Button);

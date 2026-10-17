@@ -160,4 +160,5 @@ export class BottomNavigation extends TabNavigation<com.nativescript.material.co
 }
 
 // iOS 26 only: the minimize behavior and the accessory of the tab bar are ignored on Android
-export { BottomAccessory };
+import { BottomSearchContent } from './search-content';
+export { BottomAccessory, BottomSearchContent };
