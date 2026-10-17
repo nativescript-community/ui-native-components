@@ -24,6 +24,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
 | `searchMode` | Android: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) |
+| `searchPlacement` | iOS 26: where the search bar goes: `stacked` (under the title, default), `integrated` (a glass button / field in the bar), `integratedButton`, `integratedCentered`, `automatic` |
 | `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
 
 Status and limits: see [APPBAR_PLAN.md](../../APPBAR_PLAN.md). On iOS a large title on a pushed page uses the UIKit `Always` mode, which never shows the inline title: a title view is shown while the bar is collapsed (the height of the bar tells). On the root page of the Frame UIKit does it.
@@ -52,6 +53,8 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 </appPage>
 ```
 On iOS `searchMode` and `searchContent` are ignored: the `UISearchController` is used, filter the main content from `searchChange`.
+
+`badge` on an item (and on a bottom item): a number, a text or `true` (a dot). Android `BadgeDrawable`, iOS 26 `UIBarButtonItemBadge` (the iOS 26.5 bottom toolbar does not draw it, the navigation bar does).
 
 A view inside the item is its `actionView`: use our components in the bar. The view gets its own `tap` event.
 On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text variant of the button.

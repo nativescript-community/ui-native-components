@@ -1,8 +1,8 @@
 import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageOverlay, AppPageSearchContent, notifyBottomItemTap } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageOverlay, AppPageSearchContent };
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -14,6 +14,36 @@ function getActionBarSize(context: android.content.Context) {
         return android.util.TypedValue.complexToDimensionPixelSize(value.data, context.getResources().getDisplayMetrics());
     }
     return Math.round(56 * Utils.layout.getDisplayDensity());
+}
+
+/**
+ * Badges (a number, a text, or a dot) on the actions of a toolbar. The previous ones are detached. The action views must exist: attached after the layout.
+ */
+function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.google.android.material.badge.BadgeDrawable[], wanted: { id: number; badge: string | number | boolean }[]) {
+    const BadgeDrawable = com.google.android.material.badge.BadgeDrawable;
+    const BadgeUtils = com.google.android.material.badge.BadgeUtils as any;
+    previous.splice(0).forEach((badge: any) => BadgeUtils.detachBadgeDrawable(badge, toolbar, badge.__itemId));
+    if (!wanted.length) {
+        return;
+    }
+    toolbar.post(
+        new java.lang.Runnable({
+            run: () => {
+                wanted.forEach(({ id, badge }) => {
+                    const drawable = BadgeDrawable.create(toolbar.getContext()) as any;
+                    if (typeof badge === 'number') {
+                        drawable.setNumber(badge);
+                    } else if (typeof badge === 'string') {
+                        drawable.setText(badge);
+                    }
+                    // `true`: the dot (no number, no text)
+                    drawable.__itemId = id;
+                    BadgeUtils.attachBadgeDrawable(drawable, toolbar, id);
+                    previous.push(drawable);
+                });
+            }
+        })
+    );
 }
 
 /**
@@ -40,9 +70,20 @@ export class AppBar extends AppBarBase {
     _addActionItems() {
         // @ts-ignore
         super._addActionItems();
+        this.syncBadges();
         if (this.searchable && this.searchMode !== 'bar') {
             this.addSearchItem();
         }
+    }
+
+    private _badges: com.google.android.material.badge.BadgeDrawable[] = [];
+
+    /** the badges of the actions (a number, a text or a dot): attached once the action views exist */
+    private syncBadges() {
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        const items = ((this.actionItems as any)?.getVisibleItems() ?? []) as AppBarItem[];
+        const wanted = items.filter((item) => item instanceof AppBarItem && item.badge !== undefined && item.badge !== null && (item.badge as any) !== false && (item.badge as any) !== '');
+        attachBadges(toolbar, this._badges, wanted.map((item) => ({ id: (item as any)._getItemId(), badge: item.badge })));
     }
 
     /** a collapsible SearchView as the first action */
@@ -492,6 +533,7 @@ export class AppPage extends Page {
         }
     }
 
+    private _bottomBadges: com.google.android.material.badge.BadgeDrawable[] = [];
     private _bottomBar: com.google.android.material.bottomappbar.BottomAppBar;
     private _bottomInsetListener: any;
     /** `bottomItems`: a Material BottomAppBar, over the content, below the overlay */
@@ -529,6 +571,11 @@ export class AppPage extends Page {
             }
             menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
         });
+        attachBadges(
+            bar,
+            this._bottomBadges,
+            items.map((item, index) => ({ id: index, badge: item.badge })).filter((entry) => entry.badge !== undefined && entry.badge !== null && (entry.badge as any) !== false && (entry.badge as any) !== '')
+        );
         bar.setOnMenuItemClickListener(
             new androidx.appcompat.widget.Toolbar.OnMenuItemClickListener({
                 onMenuItemClick: (menuItem: android.view.MenuItem) => {

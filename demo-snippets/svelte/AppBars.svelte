@@ -20,6 +20,7 @@
     let translucent = false;
     let spans = false;
     let searchMode: 'collapsible' | 'bar' = 'collapsible';
+    let searchPlacement: 'stacked' | 'integrated' | 'integratedButton' = 'stacked';
     let bar;
     let list;
     let fab;
@@ -30,7 +31,7 @@
         fab.nativeView.hideOnScroll = list.nativeView;
     });
     const bottomItems = [
-        { text: 'Home', icon: icon('house', 'ic_star'), onTap: () => (log = 'bottom: home') },
+        { text: 'Home', badge: 'new', icon: icon('house', 'ic_star'), onTap: () => (log = 'bottom: home') },
         { spacer: true },
         { text: 'Add', icon: icon('plus', 'ic_add'), onTap: () => (log = 'bottom: add') }
     ];
@@ -57,9 +58,9 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
+    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} {searchPlacement} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
-        <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
+        <appBarItem text="More" badge={3} icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
         <appBarItem ios.position="right" android.position="actionBar">
             <uibutton text="Go" variant="text" on:tap={() => (log = 'custom button tapped')} />
         </appBarItem>
@@ -86,6 +87,7 @@
                 <uibutton text="hide" on:tap={() => (behavior = 'hide')} />
                 <uibutton text="translucent" on:tap={() => (translucent = !translucent)} />
                 <uibutton text="spans" on:tap={() => (spans = !spans)} />
+                <uibutton text="placement" on:tap={() => (searchPlacement = searchPlacement === 'stacked' ? 'integrated' : searchPlacement === 'integrated' ? 'integratedButton' : 'stacked')} />
                 <uibutton text="search bar" on:tap={() => (searchMode = searchMode === 'bar' ? 'collapsible' : 'bar')} />
             </wrapLayout>
         </stackLayout>

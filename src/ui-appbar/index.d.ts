@@ -7,8 +7,8 @@
 
 import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
-import { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize } from './index-common';
-export { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize };
+import { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize } from './index-common';
+export { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize };
 
 /**
  * An ActionBar with scroll behaviors. Use it as the `actionBar` of an `AppPage` (Android needs the AppPage: it hosts the AppBarLayout).
@@ -26,6 +26,8 @@ export class AppBar extends ActionBar {
     translucent: boolean;
     /** Android search style: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) */
     searchMode: AppBarSearchMode;
+    /** iOS 26: where the search bar goes: `stacked` (under the title, default), `integrated` (a field / button in the bar), `integratedButton`, `integratedCentered`, `automatic`. Ignored before iOS 26 */
+    searchPlacement: AppBarSearchPlacement;
     /** actions of a bar at the bottom of the page: iOS the bottom toolbar (Liquid Glass on iOS 26), Android a Material `BottomAppBar` (`scrollBehavior="hide"` hides it on scroll too) */
     bottomItems: AppBarBottomItem[];
     /** raised when a bottom item is tapped (`item`) */
@@ -42,6 +44,8 @@ export class AppBarItem extends ActionItem {
     menu: MenuItem[];
     /** iOS 26: tinted Liquid Glass button */
     prominent: boolean;
+    /** a badge on the action: a number, a text, or `true` for a dot (iOS 26 and Android) */
+    badge: string | number | boolean;
 }
 
 /**

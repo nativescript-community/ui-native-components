@@ -1,8 +1,8 @@
 import { Color, GridLayout, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageSearchContent, notifyBottomItemTap } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageSearchContent };
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent };
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected as any;
@@ -35,6 +35,27 @@ class BottomItemHandler extends NSObject {
         }
     }
 }
+
+declare const UIBarButtonItemBadge: any;
+
+/** iOS 26: the badge of a bar button item (a count, a text, or a dot) */
+function applyBadge(barButtonItem: UIBarButtonItem, badge: string | number | boolean) {
+    if (typeof UIBarButtonItemBadge === 'undefined' || !('badge' in barButtonItem)) {
+        return;
+    }
+    const value = badge as any;
+    if (value === undefined || value === null || value === false || value === '') {
+        (barButtonItem as any).badge = null;
+    } else if (value === true) {
+        (barButtonItem as any).badge = UIBarButtonItemBadge.indicatorBadge();
+    } else if (typeof value === 'number') {
+        (barButtonItem as any).badge = UIBarButtonItemBadge.badgeWithCount(value);
+    } else {
+        (barButtonItem as any).badge = UIBarButtonItemBadge.badgeWithString(String(value));
+    }
+}
+
+const SEARCH_PLACEMENTS = { automatic: 0, integrated: 1, stacked: 2, integratedCentered: 3, integratedButton: 4 };
 
 /** a view which lets the touches go through its empty areas */
 @NativeClass
@@ -117,6 +138,9 @@ export class AppBar extends AppBarBase {
         } else {
             // @ts-ignore
             barButtonItem = super.createBarButtonItem(item);
+        }
+        if (item instanceof AppBarItem && barButtonItem) {
+            applyBadge(barButtonItem, item.badge);
         }
         if (item instanceof AppBarItem && item.prominent && barButtonItem && 'style' in barButtonItem) {
             // UIBarButtonItemStylePlain = 0, Done / prominent = 2
@@ -230,6 +254,7 @@ export class AppBar extends AppBarBase {
             return;
         }
         const handlers: BottomItemHandler[] = [];
+        const badges: [UIBarButtonItem, string | number | boolean][] = [];
         const barButtonItems = NSMutableArray.new<UIBarButtonItem>();
         for (const item of items) {
             if (item.spacer) {
@@ -241,12 +266,15 @@ export class AppBar extends AppBarBase {
             const image = item.icon ? getNativeIcon(item.icon) : null;
             const barButtonItem = image ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap') : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
             barButtonItem.accessibilityLabel = item.text;
+            badges.push([barButtonItem, item.badge]);
             barButtonItems.addObject(barButtonItem);
         }
         // the handlers must stay alive
         this._bottomHandlers = handlers;
         viewController.setToolbarItemsAnimated(barButtonItems, false);
         navController.setToolbarHiddenAnimated(false, false);
+        // the badge is set once the items are in the toolbar
+        badges.forEach(([barButtonItem, badge]) => applyBadge(barButtonItem, badge));
     }
 
     private _ignoredSafeArea = false;
@@ -297,7 +325,7 @@ export class AppBar extends AppBarBase {
         navigationItem.hidesSearchBarWhenScrolling = behavior === 'hide';
         if ('preferredSearchBarPlacement' in navigationItem) {
             // iOS 16+: the search bar under the title, as with large titles
-            (navigationItem as any).preferredSearchBarPlacement = 2; /* UINavigationItemSearchBarPlacementStacked */
+            (navigationItem as any).preferredSearchBarPlacement = SEARCH_PLACEMENTS[this.searchPlacement || 'stacked'] ?? 2;
         }
         navigationItem.searchController = this._searchController;
         (this.page.ios as UIViewController).definesPresentationContext = true;

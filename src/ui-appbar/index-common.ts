@@ -26,6 +26,7 @@ export const scrollTargetProperty = new Property<AppBarBase, View>({ name: 'scro
 function itemChanged(target: AppBarItem) {
     (target.actionBar as AppBarBase)?.update?.();
 }
+export const badgeProperty = new Property<AppBarItem, string | number | boolean>({ name: 'badge', valueChanged: itemChanged });
 export const menuProperty = new Property<AppBarItem, MenuItem[]>({ name: 'menu', valueChanged: itemChanged });
 export const prominentProperty = new Property<AppBarItem, boolean>({ name: 'prominent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: itemChanged });
 
@@ -37,6 +38,8 @@ export const prominentProperty = new Property<AppBarItem, boolean>({ name: 'prom
 export class AppBarItem extends ActionItem {
     menu: MenuItem[];
     prominent: boolean;
+    /** a badge on the action: a number, a text, or `true` for a dot. iOS 26 and Android */
+    badge: string | number | boolean;
 
     // a view inside the item is its `actionView`: <appBarItem><uibutton .../></appBarItem>
     _addChildFromBuilder(name: string, value: any) {
@@ -61,6 +64,7 @@ export class AppBarItem extends ActionItem {
     }
 }
 menuProperty.register(AppBarItem);
+badgeProperty.register(AppBarItem);
 prominentProperty.register(AppBarItem);
 
 export interface AppBarSearchEventData extends EventData {
@@ -76,6 +80,8 @@ export interface AppBarBottomItem {
     text?: string;
     /** iOS: a flexible space between the buttons. Android: ignored (the actions are at the end of the bar) */
     spacer?: boolean;
+    /** a badge on the action: a number, a text, or `true` for a dot */
+    badge?: string | number | boolean;
     /** called when the action is tapped */
     onTap?: (item: AppBarBottomItem) => void;
     [key: string]: any;
@@ -84,6 +90,10 @@ export interface AppBarBottomItem {
 /** collapsible: a search icon in the bar that expands (Android SearchView action). bar: Android Material 3 `SearchBar` under the title that opens a full screen `SearchView`. iOS: always the `UISearchController` */
 export type AppBarSearchMode = 'collapsible' | 'bar';
 export const searchModeProperty = new Property<AppBarBase, AppBarSearchMode>({ name: 'searchMode', defaultValue: 'collapsible', valueChanged: changed });
+
+/** iOS 26 placement of the search bar of the navigation bar: stacked (under the title, default), integrated (a field / button in the bar), integratedButton (always a button), integratedCentered (centered on iPad), automatic */
+export type AppBarSearchPlacement = 'automatic' | 'stacked' | 'integrated' | 'integratedButton' | 'integratedCentered';
+export const searchPlacementProperty = new Property<AppBarBase, AppBarSearchPlacement>({ name: 'searchPlacement', defaultValue: 'stacked', valueChanged: changed });
 
 export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
 
@@ -102,6 +112,7 @@ export class AppBarBase extends ActionBar {
     searchable: boolean;
     searchHint: string;
     searchMode: AppBarSearchMode;
+    searchPlacement: AppBarSearchPlacement;
     /** the current text of the search (read only) */
     searchText = '';
 
@@ -129,6 +140,7 @@ searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
 bottomItemsProperty.register(AppBarBase);
 searchModeProperty.register(AppBarBase);
+searchPlacementProperty.register(AppBarBase);
 
 /**
  * Layout for the views anchored to the page itself (a floating action button, a bottom bar...), not to the scrolling content: use it as the `overlay` of an AppPage.
