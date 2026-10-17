@@ -1,5 +1,5 @@
 dependencies {
-	def androidXMaterial =  project.hasProperty("androidXMaterial") ? project.androidXMaterial : "1.12.0"
+	def androidXMaterial =  project.hasProperty("androidXMaterial") ? project.androidXMaterial : "1.14.0"
 
 	implementation "com.google.android.material:material:$androidXMaterial"
 }

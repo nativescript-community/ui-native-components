@@ -24,9 +24,14 @@
             <uiprogress value="70" maxValue="100" progressColor="#ff8a39" progressBackgroundColor="#ffe0b2" />
             <label class="title" text="indeterminate (a spinner on iOS)" />
             <uiprogress indeterminate="true" busy="true" />
+            <label class="title" text="wavy progress (Android)" />
+            <uiprogress wavy="true" value={value} maxValue="100" height="12" />
+            <uiprogress wavy="true" indeterminate="true" busy="true" height="12" />
 
             <label class="title" text="activity indicator" />
             <uiactivityindicator {busy} width="48" height="48" horizontalAlignment="left" />
+            <label class="title" text="wavy (Material 3 Expressive, Android)" />
+            <uiactivityindicator {busy} wavy="true" width="56" height="56" horizontalAlignment="left" />
             <uibutton variant="flat" text={busy ? 'stop' : 'start'} on:tap={() => (busy = !busy)} />
         </stackLayout>
     </scrollView>

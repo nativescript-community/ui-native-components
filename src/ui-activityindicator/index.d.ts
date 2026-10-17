@@ -1,6 +1,6 @@
 /**
  * ActivityIndicator component: core ActivityIndicator augmented with `indeterminate`, `value` and `maxValue`.
- * Android uses Material progress. iOS uses the native UIActivityIndicatorView (`indeterminate`, `value` and `maxValue` are no-op).
+ * Android uses the Material 3 Expressive circular progress indicator (`wavy` for the wavy one). iOS uses the native UIActivityIndicatorView (`indeterminate`, `value` and `maxValue` are no-op).
  * @module @nativescript-community/ui-activityindicator
  */
 

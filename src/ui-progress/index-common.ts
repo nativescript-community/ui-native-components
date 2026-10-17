@@ -6,6 +6,8 @@ export abstract class ProgressBase extends NSProgress {
     @cssProperty progressColor: Color;
     @cssProperty progressBackgroundColor: Color;
     public indeterminate: boolean;
+    /** Android (Material 3 Expressive): a wavy indicator */
+    public wavy: boolean;
     public busy: boolean;
     public startAnimating() {
         this.busy = true;
@@ -50,3 +52,10 @@ busyProperty.register(ProgressBase);
 indeterminateProperty.register(ProgressBase);
 progressColorProperty.register(Style);
 progressBackgroundColorProperty.register(Style);
+
+export const wavyProperty = new Property<ProgressBase, boolean>({
+    name: 'wavy',
+    defaultValue: false,
+    valueConverter: booleanConverter
+});
+wavyProperty.register(ProgressBase);

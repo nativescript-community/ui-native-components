@@ -11,7 +11,6 @@
         <item name="android:windowBackground">@drawable/splash_screen</item>
 
         <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="LaunchScreenTheme" parent="LaunchScreenThemeBase">
@@ -23,6 +22,8 @@
 
         <item name="colorPrimary">@color/ns_primary</item>
         <item name="colorSecondary">@color/ns_accent</item>
+        <!-- edge to edge (done by NativeScript): the action bar is under the status bar, light icons on the purple bar -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase">

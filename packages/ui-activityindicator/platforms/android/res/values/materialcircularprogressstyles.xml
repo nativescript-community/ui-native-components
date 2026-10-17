@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="CircularProgress" parent="@android:style/Widget.Material.ProgressBar">
+<resources>
+    <!-- Material 3 Expressive circular indicator: the retreat animation and the visible track -->
+    <style name="CircularProgress" parent="@style/Widget.Material3Expressive.CircularProgressIndicator">
     </style>
-</resources> 
+</resources>

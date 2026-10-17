@@ -4,6 +4,8 @@ import { applyMixins } from '@nativescript-community/ui-core';
 @CSSType('ActivityIndicator')
 export class ActivityIndicatorBase extends NSActivityIndicator {
     public indeterminate: boolean;
+    /** Android (Material 3 Expressive): a wavy indicator */
+    public wavy: boolean;
     public maxValue: number;
     public value: number;
     public startAnimating() {
@@ -62,3 +64,10 @@ export const maxValueProperty = new Property<ActivityIndicatorBase, number>({
     valueConverter: (v) => parseInt(v, 10)
 });
 maxValueProperty.register(ActivityIndicatorBase);
+
+export const wavyProperty = new Property<ActivityIndicatorBase, boolean>({
+    name: 'wavy',
+    defaultValue: false,
+    valueConverter: booleanConverter
+});
+wavyProperty.register(ActivityIndicatorBase);
