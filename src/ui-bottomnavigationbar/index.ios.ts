@@ -31,13 +31,43 @@ class TabBarDelegate extends NSObject {
     }
 }
 
+/**
+ * The items are created while the bar has no size yet (width 0): UIKit lays their labels out for that size (squashed, lower than they should)
+ * and only lays an item out again when its state changes (the selected one is fine, the others stay wrong).
+ * When the bar gets its width, the items are set again, which lays all of them out for the real size.
+ */
+@NativeClass
+class TabBarImpl extends UITabBar {
+    private mLaidOutWidth = 0;
+    private mRelayouting = false;
+
+    layoutSubviews() {
+        super.layoutSubviews();
+        const width = this.bounds.size.width;
+        if (width > 0 && width !== this.mLaidOutWidth && !this.mRelayouting) {
+            this.mLaidOutWidth = width;
+            const items = this.items;
+            if (items && items.count) {
+                this.mRelayouting = true;
+                const selected = this.selectedItem;
+                // a selection change is what makes UIKit lay an item out for the real size
+                for (let i = 0; i < items.count; i++) {
+                    this.selectedItem = items.objectAtIndex(i);
+                }
+                this.selectedItem = selected;
+                this.mRelayouting = false;
+            }
+        }
+    }
+}
+
 export class BottomNavigationBar extends BottomNavigationBarBase {
     nativeViewProtected: UITabBar;
     _items: BottomNavigationTab[];
     private _delegate: TabBarDelegate;
 
     createNativeView(): Object {
-        return UITabBar.new();
+        return TabBarImpl.new();
     }
 
     initNativeView(): void {
@@ -61,13 +91,14 @@ export class BottomNavigationBar extends BottomNavigationBarBase {
             return;
         }
         const viewSize: CGSize = CGSizeMake(Screen.mainScreen.widthDIPs, Screen.mainScreen.heightDIPs);
+        const bar = this.nativeViewProtected;
         // sizeThatFits includes the bottom safe area once the bar is in a window, the system bar height otherwise
-        let height = this.nativeViewProtected.sizeThatFits(viewSize).height;
-        if (!this.nativeViewProtected.window) {
+        let height = bar.sizeThatFits(viewSize).height;
+        if (!bar.window) {
             height += Application.ios.window?.safeAreaInsets?.bottom || 0;
         }
         const frame = CGRectMake(0, Utils.layout.toDeviceIndependentPixels(top), viewSize.width, height);
-        (this as any)._setNativeViewFrame(this.nativeViewProtected, frame);
+        (this as any)._setNativeViewFrame(bar, frame);
     }
 
     showBadge(index: number, value?: number): void {
@@ -167,9 +198,10 @@ export class BottomNavigationBar extends BottomNavigationBarBase {
             this._addView(item);
             return item.nativeViewProtected;
         });
-        this.nativeViewProtected.items = NSArray.arrayWithArray(nativeItems as any);
+        // The titles and the icons are set on the items first: UIKit lays out the items with what they hold when the bar gets them
         this.updateAppearance();
         this.updateTitles();
+        this.nativeViewProtected.setItemsAnimated(NSArray.arrayWithArray(nativeItems as any), false);
         const index = Math.max(0, this.selectedTabIndex);
         if (this._items[index]) {
             // UITabBar has no selected item by default
