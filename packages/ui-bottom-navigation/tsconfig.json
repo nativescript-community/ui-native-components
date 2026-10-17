@@ -11,7 +11,7 @@
                 "packages/ui-core/*"
             ],
             "@nativescript-community/ui-core-tabs": [
-                "packages/ui-core-tabs/tab-navigation-base/index"
+                "packages/ui-core-tabs/index"
             ],
             "@nativescript-community/ui-core-tabs/*": [
                 "packages/ui-core-tabs/*"

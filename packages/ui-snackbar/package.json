@@ -2,16 +2,15 @@
     "name": "@nativescript-community/ui-snackbar",
     "version": "7.3.4",
     "description": "SnackBar. Android only (Material): no-op on iOS.",
-    "main": "./snackbar",
+    "main": "./index",
     "sideEffects": false,
-    "typings": "./snackbar.d.ts",
+    "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-snackbar' --parents --cwd=../../src/ui-snackbar && tsc  --build",
-        "build": "npm run tsc && npm run readme",
+        "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
-        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react",
-        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {
@@ -30,13 +29,14 @@
         "email": "martin@akylas.fr"
     },
     "bugs": {
-        "url": "https://github.com/nativescript-community/ui-material-components/issues"
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/nativescript-community/ui-material-components",
+    "homepage": "https://github.com/nativescript-community/ui-native-components/tree/master/packages/ui-snackbar#readme",
     "repository": {
         "type": "git",
-        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-snackbar"
+        "url": "https://github.com/nativescript-community/ui-native-components.git",
+        "directory": "packages/ui-snackbar"
     },
     "readmeFilename": "README.md",
     "dependencies": {

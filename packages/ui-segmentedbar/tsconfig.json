@@ -11,7 +11,7 @@
                 "packages/ui-core/*"
             ],
             "@nativescript-community/ui-button": [
-                "packages/ui-button/button"
+                "packages/ui-button/index"
             ],
             "@nativescript-community/ui-button/*": [
                 "packages/ui-button/*"

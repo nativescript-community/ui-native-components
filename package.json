@@ -11,8 +11,7 @@
         "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'node_modules'",
         "commitmsg": "commitlint -e $GIT_PARAMS",
         "postinstall": "npm run setup",
-        "publish": "npm run setup && npm run clean && npm run build.all && npm run readme && npm run doc && lerna publish",
-        "readme": "lerna run readme && node ./tools/readme.js",
+        "publish": "npm run setup && npm run clean && npm run build.all && npm run doc && lerna publish",
         "setup": "ts-patch install",
         "sync": "node ./tools/sync.mjs",
         "update": "node ./tools/update.js",
@@ -53,5 +52,13 @@
         "pnpm": ">=7.0.0",
         "node": "^14.20.0 || ^16.13.0 || >=18.10.0"
     },
-    "packageManager": "yarn@4.10.2"
+    "packageManager": "yarn@4.10.2",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-native-components.git"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
+    },
+    "homepage": "https://github.com/nativescript-community/ui-native-components#readme"
 }

@@ -2,16 +2,15 @@
     "name": "@nativescript-community/ui-segmentedbar",
     "version": "7.3.4",
     "description": "Segmented control: MaterialButtonToggleGroup on Android, native UISegmentedControl on iOS, with icon items.",
-    "main": "./segmentedbar",
+    "main": "./index",
     "sideEffects": false,
-    "typings": "./segmentedbar.d.ts",
+    "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-segmentedbar' --parents --cwd=../../src/ui-segmentedbar && tsc  --build",
-        "build": "npm run tsc && npm run readme",
+        "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
-        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react",
-        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {
@@ -30,13 +29,14 @@
         "email": "martin@akylas.fr"
     },
     "bugs": {
-        "url": "https://github.com/nativescript-community/ui-material-components/issues"
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/nativescript-community/ui-material-components",
+    "homepage": "https://github.com/nativescript-community/ui-native-components/tree/master/packages/ui-segmentedbar#readme",
     "repository": {
         "type": "git",
-        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-segmentedbar"
+        "url": "https://github.com/nativescript-community/ui-native-components.git",
+        "directory": "packages/ui-segmentedbar"
     },
     "readmeFilename": "README.md",
     "dependencies": {

@@ -7,11 +7,10 @@
     "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-tabs' --parents --cwd=../../src/ui-tabs && tsc  --build",
-        "build": "npm run tsc && npm run readme",
+        "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
-        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react",
-        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {
@@ -30,13 +29,14 @@
         "email": "martin@akylas.fr"
     },
     "bugs": {
-        "url": "https://github.com/nativescript-community/ui-material-components/issues"
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/nativescript-community/ui-material-components",
+    "homepage": "https://github.com/nativescript-community/ui-native-components/tree/master/packages/ui-tabs#readme",
     "repository": {
         "type": "git",
-        "url": "https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-tabs"
+        "url": "https://github.com/nativescript-community/ui-native-components.git",
+        "directory": "packages/ui-tabs"
     },
     "readmeFilename": "README.md",
     "dependencies": {

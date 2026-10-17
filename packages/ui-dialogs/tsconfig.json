@@ -11,7 +11,7 @@
                 "packages/ui-core/*"
             ],
             "@nativescript-community/ui-textfield": [
-                "packages/ui-textfield/textfield"
+                "packages/ui-textfield/index"
             ],
             "@nativescript-community/ui-textfield/*": [
                 "packages/ui-textfield/*"

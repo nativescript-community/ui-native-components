@@ -1,22 +1,24 @@
 import { install as installBottomSheet } from '@nativescript-community/ui-bottomsheet';
 import { installMixins } from '@nativescript-community/ui-core';
 
-import ActivityIndicatorPlugin from '@nativescript-community/ui-activityindicator/svelte';
-import BottomNavigationPlugin from '@nativescript-community/ui-bottom-navigation/svelte';
-import BottomNavigationBarPlugin from '@nativescript-community/ui-bottomnavigationbar/svelte';
-import CheckBoxPlugin from '@nativescript-community/ui-checkbox/svelte';
-import ButtonPlugin from '@nativescript-community/ui-button/svelte';
 import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
-import FloatingActionButtonPlugin from '@nativescript-community/ui-floatingactionbutton/svelte';
-import ProgressPlugin from '@nativescript-community/ui-progress/svelte';
-import RefreshLayoutPlugin from '@nativescript-community/ui-refreshlayout/svelte';
-import SearchBarPlugin from '@nativescript-community/ui-searchbar/svelte';
-import SegmentedBarPlugin from '@nativescript-community/ui-segmentedbar/svelte';
-import SliderPlugin from '@nativescript-community/ui-slider/svelte';
-import SwitchPlugin from '@nativescript-community/ui-switch/svelte';
-import TabsPlugin from '@nativescript-community/ui-tabs/svelte';
-import TextFieldPlugin from '@nativescript-community/ui-textfield/svelte';
-import TextViewPlugin from '@nativescript-community/ui-textview/svelte';
+import { registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
+import { ActivityIndicator } from '@nativescript-community/ui-activityindicator';
+import { BottomNavigation as NativeBottomNavigation } from '@nativescript-community/ui-bottom-navigation';
+import { BottomNavigationBar as NativeBottomNavigationBar, BottomNavigationTab } from '@nativescript-community/ui-bottomnavigationbar';
+import { Button } from '@nativescript-community/ui-button';
+import { CheckBox } from '@nativescript-community/ui-checkbox';
+import { TabContentItem, TabStrip, TabStripItem } from '@nativescript-community/ui-core-tabs';
+import { FloatingActionButton } from '@nativescript-community/ui-floatingactionbutton';
+import { Progress } from '@nativescript-community/ui-progress';
+import { RefreshLayout as NativeRefreshLayout } from '@nativescript-community/ui-refreshlayout';
+import { SearchBar } from '@nativescript-community/ui-searchbar';
+import { SegmentedBar as NativeSegmentedBar, SegmentedBarItem } from '@nativescript-community/ui-segmentedbar';
+import { Slider } from '@nativescript-community/ui-slider';
+import { Switch } from '@nativescript-community/ui-switch';
+import { Tabs as NativeTabs } from '@nativescript-community/ui-tabs';
+import { TextField } from '@nativescript-community/ui-textfield';
+import { TextView } from '@nativescript-community/ui-textview';
 
 import BottomNavigation from './BottomNavigation.svelte';
 import BottomNavigationBar from './BottomNavigationBar.svelte';
@@ -40,22 +42,28 @@ import '../app.scss';
 installMixins();
 installBottomSheet();
 export function installPlugin() {
-    ActivityIndicatorPlugin.register();
-    BottomNavigationBarPlugin.register();
-    BottomNavigationPlugin.register();
-    ButtonPlugin.register();
-    CheckBoxPlugin.register();
+    // each component is a NativeScript view: registering it for svelte-native is one line
     CollectionViewPlugin.register();
-    FloatingActionButtonPlugin.register();
-    ProgressPlugin.register();
-    RefreshLayoutPlugin.register();
-    SearchBarPlugin.register();
-    SegmentedBarPlugin.register();
-    SliderPlugin.register();
-    SwitchPlugin.register();
-    TabsPlugin.register();
-    TextFieldPlugin.register();
-    TextViewPlugin.register();
+    registerNativeViewElement('uiactivityindicator', () => ActivityIndicator);
+    registerNativeViewElement('uibottomnavigation', () => NativeBottomNavigation);
+    registerNativeViewElement('uibottomnavigationbar', () => NativeBottomNavigationBar);
+    registerNativeViewElement('uibottomnavigationtab', () => BottomNavigationTab);
+    registerNativeViewElement('uibutton', () => Button);
+    registerNativeViewElement('uicheckbox', () => CheckBox);
+    registerNativeViewElement('uifloatingactionbutton', () => FloatingActionButton);
+    registerNativeViewElement('uiprogress', () => Progress);
+    registerNativeViewElement('uirefreshlayout', () => NativeRefreshLayout);
+    registerNativeViewElement('uisearchbar', () => SearchBar);
+    registerNativeViewElement('uisegmentedbar', () => NativeSegmentedBar);
+    registerNativeViewElement('uisegmentedbaritem', () => SegmentedBarItem as any);
+    registerNativeViewElement('uislider', () => Slider);
+    registerNativeViewElement('uiswitch', () => Switch);
+    registerNativeViewElement('uitabs', () => NativeTabs);
+    registerNativeViewElement('uitabstrip', () => TabStrip);
+    registerNativeViewElement('uitabstripitem', () => TabStripItem);
+    registerNativeViewElement('uitabcontentitem', () => TabContentItem);
+    registerNativeViewElement('uitextfield', () => TextField);
+    registerNativeViewElement('uitextview', () => TextView);
 }
 
 export const demos = [

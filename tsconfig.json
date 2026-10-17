@@ -9,13 +9,13 @@
                 "src/ui-activityindicator/*"
             ],
             "@nativescript-community/ui-bottomsheet": [
-                "src/ui-bottomsheet/bottomsheet"
+                "src/ui-bottomsheet/index"
             ],
             "@nativescript-community/ui-bottomsheet/*": [
                 "src/ui-bottomsheet/*"
             ],
             "@nativescript-community/ui-button": [
-                "src/ui-button/button"
+                "src/ui-button/index"
             ],
             "@nativescript-community/ui-button/*": [
                 "src/ui-button/*"
@@ -27,31 +27,31 @@
                 "src/ui-core/*"
             ],
             "@nativescript-community/ui-dialogs": [
-                "src/ui-dialogs/dialogs"
+                "src/ui-dialogs/index"
             ],
             "@nativescript-community/ui-dialogs/*": [
                 "src/ui-dialogs/*"
             ],
             "@nativescript-community/ui-floatingactionbutton": [
-                "src/ui-floatingactionbutton/floatingactionbutton"
+                "src/ui-floatingactionbutton/index"
             ],
             "@nativescript-community/ui-floatingactionbutton/*": [
                 "src/ui-floatingactionbutton/*"
             ],
             "@nativescript-community/ui-progress": [
-                "src/ui-progress/progress"
+                "src/ui-progress/index"
             ],
             "@nativescript-community/ui-progress/*": [
                 "src/ui-progress/*"
             ],
             "@nativescript-community/ui-slider": [
-                "src/ui-slider/slider"
+                "src/ui-slider/index"
             ],
             "@nativescript-community/ui-slider/*": [
                 "src/ui-slider/*"
             ],
             "@nativescript-community/ui-snackbar": [
-                "src/ui-snackbar/snackbar"
+                "src/ui-snackbar/index"
             ],
             "@nativescript-community/ui-snackbar/*": [
                 "src/ui-snackbar/*"
@@ -63,25 +63,25 @@
                 "src/ui-switch/*"
             ],
             "@nativescript-community/ui-textfield": [
-                "src/ui-textfield/textfield"
+                "src/ui-textfield/index"
             ],
             "@nativescript-community/ui-textfield/*": [
                 "src/ui-textfield/*"
             ],
             "@nativescript-community/ui-textview": [
-                "src/ui-textview/textview"
+                "src/ui-textview/index"
             ],
             "@nativescript-community/ui-textview/*": [
                 "src/ui-textview/*"
             ],
             "@nativescript-community/ui-bottomnavigationbar": [
-                "src/ui-bottomnavigationbar/bottomnavigationbar"
+                "src/ui-bottomnavigationbar/index"
             ],
             "@nativescript-community/ui-bottomnavigationbar/*": [
                 "src/ui-bottomnavigationbar/*"
             ],
             "@nativescript-community/ui-core-tabs": [
-                "src/ui-core-tabs/tab-navigation-base/index"
+                "src/ui-core-tabs/index"
             ],
             "@nativescript-community/ui-core-tabs/*": [
                 "src/ui-core-tabs/*"
@@ -99,37 +99,37 @@
                 "src/ui-tabs/*"
             ],
             "@nativescript-community/ui-segmentedbar": [
-                "src/ui-segmentedbar/segmentedbar"
+                "src/ui-segmentedbar/index"
             ],
             "@nativescript-community/ui-segmentedbar/*": [
                 "src/ui-segmentedbar/*"
             ],
             "@nativescript-community/ui-menu": [
-                "src/ui-menu/menu"
+                "src/ui-menu/index"
             ],
             "@nativescript-community/ui-menu/*": [
                 "src/ui-menu/*"
             ],
             "@nativescript-community/ui-datetimepicker": [
-                "src/ui-datetimepicker/datetimepicker"
+                "src/ui-datetimepicker/index"
             ],
             "@nativescript-community/ui-datetimepicker/*": [
                 "src/ui-datetimepicker/*"
             ],
             "@nativescript-community/ui-refreshlayout": [
-                "src/ui-refreshlayout/refreshlayout"
+                "src/ui-refreshlayout/index"
             ],
             "@nativescript-community/ui-refreshlayout/*": [
                 "src/ui-refreshlayout/*"
             ],
             "@nativescript-community/ui-searchbar": [
-                "src/ui-searchbar/searchbar"
+                "src/ui-searchbar/index"
             ],
             "@nativescript-community/ui-searchbar/*": [
                 "src/ui-searchbar/*"
             ],
             "@nativescript-community/ui-checkbox": [
-                "src/ui-checkbox/checkbox"
+                "src/ui-checkbox/index"
             ],
             "@nativescript-community/ui-checkbox/*": [
                 "src/ui-checkbox/*"

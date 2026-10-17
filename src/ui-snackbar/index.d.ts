@@ -1,0 +1,95 @@
+/**
+ * SnackBar component. Android only (Material): on iOS nothing is shown and the promise resolves immediately.
+ * @module @nativescript-community/ui-snackbar
+ */
+
+import { Color, View } from '@nativescript/core';
+export { SnackBarAction, DismissReasons } from './index-common';
+
+export declare class SnackBar {
+    /**
+     * Shows a simple SnackBar.
+     * @param {string} - The SnackBar text.
+     * @param {string} - The color of the snackbar text.backgroundColor
+     * @param {string} - The background color of the snackbar.
+     * @param {number} - The max lines for the text of the snackbar. * Android Only *
+     * @param {boolean} - Set RTL for the textview of the snackbar. * Android Only *
+     */
+    simple(message: string, textColor?: string, backgroundColor?: string, maxLines?: number, isRTL?: boolean): Promise<any>;
+
+    /**
+     * Show a SnackBar with Action
+     */
+    action(options: SnackBarOptions): Promise<any>;
+
+    /**
+     * Manually Dismiss an active SnackBar.
+     */
+    dismiss(): Promise<any>;
+
+    showSnack(options: SnackBarOptions): Promise<{
+        action: SnackBarAction;
+        reason: DismissReasons;
+    }>;
+}
+
+export function showSnack(options: SnackBarOptions);
+
+export interface SnackBarOptions {
+    /**
+     * The action button text of the snackbar.
+     */
+    actionText?: string;
+
+    /**
+     * The text of the snackbar.
+     */
+    message: string;
+
+    /**
+     * Delay in ms to hide the snackbar.
+     * Note: iOS only allows a maximum of 10s. If the value is more than that for iOS, the hideDelay will be set to 10s
+     */
+    hideDelay?: number;
+
+    /**
+     * Action Text Color of the snackbar.
+     */
+    actionTextColor?: string | Color;
+
+    /**
+     * Text Color of the snackbar.
+     */
+    textColor?: string | Color;
+
+    /**
+     * Background Color of the snackbar.
+     */
+    backgroundColor?: string | Color;
+    /**
+     * *Android Only*
+     * Set the maxLines if you are displaying a long string of text and it will wrap.
+     */
+    maxLines?: number;
+
+    /**
+     * *Android Only*
+     * Use RTL for textview of snackbar.
+     */
+    isRTL?: boolean;
+    /**
+     * optional View to attach the snack to
+     */
+    view?: View;
+    /**
+     * The view you want to "anchor the snack above".
+     * The snackbar will appear above that view
+     */
+    anchorView?: View;
+    /**
+     * iOS function to ignore special case of presentedViewController
+     * like not wanting to show a snack inside a Popover
+     */
+    iosIgnorePresentedViewController?: (controller) => boolean;
+}
+

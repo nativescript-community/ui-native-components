@@ -1,4 +1,4 @@
-import { BottomSheetOptions } from '../bottomsheet';
+import { BottomSheetOptions } from '../index';
 import { Frame, View } from '@nativescript/core';
 import { NativeViewElementNode, createElement } from '@nativescript-community/svelte-native/dom';
 import { PageSpec } from '@nativescript-community/svelte-native/dom/navigation';
