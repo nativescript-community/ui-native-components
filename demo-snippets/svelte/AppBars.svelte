@@ -28,7 +28,7 @@
         // the button hides when the list scrolls down
         fab.nativeView.hideOnScroll = list.nativeView;
     });
-    let log = 'swipe the green area (gesturehandler pan)';
+    let log = 'size / behavior / translucent: use the buttons';
 
     const formatted = new FormattedString();
     const first = new Span();
@@ -51,15 +51,21 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle={size === "small" ? `${size} / ${behavior}` : null} {size} scrollBehavior={behavior} {translucent} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
+    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
         <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
         <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
     </appBar>
-    <gridLayout rows="auto,*">
-        <stackLayout>
-            <label text={log} backgroundColor="#c8e6c9" padding="16" on:loaded={attachPan} />
-            <wrapLayout padding="4 8">
+    <collectionview bind:this={list} {items} rowHeight="56">
+        <Template let:item>
+            <label text={item.title} padding="0 16" verticalAlignment="center" backgroundColor={item.title.length % 2 ? '#f3edf7' : '#ffffff'} />
+        </Template>
+    </collectionview>
+    <appPageOverlay>
+        <uifloatingactionbutton bind:this={fab} horizontalAlignment="right" verticalAlignment="bottom" marginBottom="170" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
+        <stackLayout verticalAlignment="bottom" backgroundColor="rgba(255,255,255,0.92)" padding="8 8 24 8">
+            <label text={log} on:loaded={attachPan} padding="8" backgroundColor="#c8e6c9" />
+            <wrapLayout>
                 <uibutton text="small" on:tap={() => (size = 'small')} />
                 <uibutton text="medium" on:tap={() => (size = 'medium')} />
                 <uibutton text="large" on:tap={() => (size = 'large')} />
@@ -70,11 +76,5 @@
                 <uibutton text="spans" on:tap={() => (spans = !spans)} />
             </wrapLayout>
         </stackLayout>
-        <collectionview bind:this={list} row="1" {items} rowHeight="48">
-            <Template let:item>
-                <label text={item.title} padding="0 16" verticalAlignment="center" />
-            </Template>
-        </collectionview>
-        <uifloatingactionbutton bind:this={fab} row="1" horizontalAlignment="right" verticalAlignment="bottom" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
-    </gridLayout>
+    </appPageOverlay>
 </appPage>

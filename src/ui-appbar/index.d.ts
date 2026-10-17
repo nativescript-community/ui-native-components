@@ -5,7 +5,7 @@
  * @module @nativescript-community/ui-appbar
  */
 
-import { ActionBar, ActionItem, FormattedString, Page, View } from '@nativescript/core';
+import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
 import { AppBarScrollBehavior, AppBarSize } from './index-common';
 export { AppBarScrollBehavior, AppBarSize };
@@ -46,4 +46,9 @@ export class AppBarItem extends ActionItem {
 export class AppPage extends Page {
     /** Android: the behavior used when the page `actionBar` is not an AppBar */
     scrollBehavior: AppBarScrollBehavior;
+    /** views anchored to the page (a FAB, a bottom bar...): Android: not part of the scrolling content, which is taller than the screen while the bar is expanded */
+    overlay: View;
 }
+
+/** the layout to use as the `overlay` of an AppPage */
+export class AppPageOverlay extends GridLayout {}

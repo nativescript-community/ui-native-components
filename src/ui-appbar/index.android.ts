@@ -1,7 +1,7 @@
 import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
-import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarItem, AppBarScrollBehavior, AppBarSize };
+import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay } from './index-common';
+export { AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -144,6 +144,8 @@ export class AppPage extends Page {
     private _coordinator: any;
     private _appBarLayout: any;
     private _nativeContent: any;
+    private _nativeOverlay: any;
+    private _overlay: View;
     private _collapsing: any;
     private _collapsingSize: AppBarSize;
     private _scrollBehavior: AppBarScrollBehavior = 'none';
@@ -162,6 +164,38 @@ export class AppPage extends Page {
         this.syncAppBar();
     }
 
+    /** views anchored to the page (a FAB, a bottom bar...) instead of the scrolling content */
+    get overlay() {
+        return this._overlay;
+    }
+    set overlay(value: View) {
+        if (this._overlay === value) {
+            return;
+        }
+        if (this._overlay) {
+            this._removeView(this._overlay);
+        }
+        this._overlay = value;
+        if (value) {
+            this._addView(value);
+        }
+    }
+
+    _addChildFromBuilder(name: string, value: any) {
+        if (value instanceof AppPageOverlay) {
+            this.overlay = value;
+        } else {
+            super._addChildFromBuilder(name, value);
+        }
+    }
+
+    eachChildView(callback: (child: View) => boolean) {
+        super.eachChildView(callback);
+        if (this._overlay) {
+            callback(this._overlay);
+        }
+    }
+
     createNativeView() {
         // the root can be replaced by another library (gesturehandler): never create it ourselves
         const root = super.createNativeView() as org.nativescript.widgets.GridLayout;
@@ -176,6 +210,10 @@ export class AppPage extends Page {
         const contentParams = new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         contentParams.setBehavior(new AppBarLayout.ScrollingViewBehavior());
         coordinator.addView(content, contentParams);
+        // above the content and the bar, no behavior: it does not move with them
+        const overlay = new org.nativescript.widgets.ContentLayout(context);
+        coordinator.addView(overlay, new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        this._nativeOverlay = overlay;
 
         const params = new org.nativescript.widgets.CommonLayoutParams();
         params.width = MATCH_PARENT;
@@ -195,6 +233,8 @@ export class AppPage extends Page {
         this.androidOverflowEdge = 'top';
         // the root does not pad itself with the status bar inset anymore: the AppBarLayout (and its background) does
         this._appBarLayout?.setPadding(0, this.getStatusBarHeight(), 0, 0);
+        // the bar scrolls away under the status bar area: its content must not draw in the padding
+        this._appBarLayout?.setClipToPadding(true);
         this.syncAppBar();
     }
 
@@ -202,6 +242,7 @@ export class AppPage extends Page {
         this._coordinator = null;
         this._appBarLayout = null;
         this._nativeContent = null;
+        this._nativeOverlay = null;
         this._collapsing = null;
         super.disposeNativeView();
     }
@@ -271,13 +312,12 @@ export class AppPage extends Page {
         const child = this._collapsing || toolbar;
         const params = child.getLayoutParams() as any;
         let flags = 0;
-        if (size !== 'small') {
-            flags = AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED;
-            if (behavior === 'hide') {
-                flags |= AppBarLayoutParams.SCROLL_FLAG_ENTER_ALWAYS | AppBarLayoutParams.SCROLL_FLAG_SNAP;
-            }
-        } else if (behavior === 'hide') {
+        if (behavior === 'hide') {
+            // the whole bar leaves the screen (also the pinned toolbar of a medium / large bar) and comes back as soon as the content scrolls up
             flags = AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_ENTER_ALWAYS | AppBarLayoutParams.SCROLL_FLAG_SNAP;
+        } else if (size !== 'small') {
+            // the title collapses into the pinned toolbar
+            flags = AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED;
         }
         if (params.getScrollFlags() !== flags) {
             params.setScrollFlags(flags);
@@ -288,8 +328,17 @@ export class AppPage extends Page {
         // 3. colors: the collapsing area is not the Toolbar
         const toColor = (value: string | Color) => (value instanceof Color ? value : value ? new Color(value) : null);
         const backgroundColor = toColor(bar.backgroundColor);
-        if (backgroundColor && !translucent) {
-            appBarLayout.setBackgroundColor(backgroundColor.android);
+        if (backgroundColor) {
+            // translucent: the content scrolls under the bar, which stays slightly see through
+            appBarLayout.setBackgroundColor(translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android);
+        } else if (translucent) {
+            appBarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        }
+        if (this._collapsing && backgroundColor) {
+            // the scrim drawn once the bar is collapsed: the color of the bar (the M3 default is the surface color)
+            const scrim = translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android;
+            this._collapsing.setContentScrimColor(scrim);
+            this._collapsing.setStatusBarScrimColor(scrim);
         }
         const color = toColor(bar.color as any);
         if (color) {
@@ -304,7 +353,7 @@ export class AppPage extends Page {
             c.setExpandedSubtitleColor?.(color.android);
         }
 
-        // 4. translucent: the content goes under the bar
+        // 4. translucent: the content goes under the bar. The behavior of the content places it below the bar: without it the content fills the page
         const contentParams = this._nativeContent.getLayoutParams() as any;
         const hasBehavior = !!contentParams.getBehavior();
         if (translucent === hasBehavior) {
@@ -312,12 +361,51 @@ export class AppPage extends Page {
             contentParams.setBehavior(translucent ? null : new AppBarLayout.ScrollingViewBehavior());
             this._nativeContent.setLayoutParams(contentParams);
             if (translucent) {
-                appBarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-                appBarLayout.setStateListAnimator(null);
-                appBarLayout.setElevation(0);
                 appBarLayout.bringToFront();
             }
         }
+        appBarLayout.setElevation(translucent ? 0 : appBarLayout.getElevation());
+        this.syncTranslucentInset(appBar, translucent);
+    }
+
+    private _insetListener: any;
+    /** translucent: the first items of the scrolling view must start below the bar: its top padding follows the height of the bar */
+    private syncTranslucentInset(appBar: AppBar, translucent: boolean) {
+        const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
+        const target = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        if (this._insetListener) {
+            appBarLayout.removeOnLayoutChangeListener(this._insetListener);
+            this._insetListener = null;
+        }
+        if (!target) {
+            return;
+        }
+        if (!translucent) {
+            if (target['__appBarPadding'] !== undefined) {
+                target.setPadding(target.getPaddingLeft(), target['__appBarPadding'], target.getPaddingRight(), target.getPaddingBottom());
+                target['__appBarPadding'] = undefined;
+            }
+            return;
+        }
+        const apply = () => {
+            if (target['__appBarPadding'] === undefined) {
+                target['__appBarPadding'] = target.getPaddingTop();
+            }
+            if (target instanceof android.view.ViewGroup) {
+                target.setClipToPadding(false);
+            }
+            // only the part of the bar that does not scroll away: the height of the expanded bar
+            target.setPadding(target.getPaddingLeft(), appBarLayout.getHeight(), target.getPaddingRight(), target.getPaddingBottom());
+        };
+        this._insetListener = new android.view.View.OnLayoutChangeListener({
+            onLayoutChange: () => {
+                if (target.getPaddingTop() !== appBarLayout.getHeight() && this._insetListener) {
+                    apply();
+                }
+            }
+        });
+        appBarLayout.addOnLayoutChangeListener(this._insetListener);
+        apply();
     }
 
     _addViewToNativeVisualTree(child: View, atIndex = Number.MAX_SAFE_INTEGER): boolean {
@@ -329,6 +417,8 @@ export class AppPage extends Page {
             const AppBarLayout = com.google.android.material.appbar.AppBarLayout as any;
             this._appBarLayout.addView(nativeChild, new AppBarLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
             this.syncAppBar();
+        } else if (child === this._overlay) {
+            this._nativeOverlay.addView(nativeChild, atIndex);
         } else {
             this._nativeContent.addView(nativeChild, atIndex);
         }

@@ -19,9 +19,9 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | property | |
 |---|---|
 | `size` | `small` (default), `medium`, `large`: title that collapses with the scroll |
-| `scrollBehavior` | `none`, `lift` (elevation / separator only when content scrolls under the bar), `hide` (leaves the screen when scrolling) |
+| `scrollBehavior` | `none`, `lift` (elevation / separator only when content scrolls under the bar), `hide` (the whole bar, also a large one, leaves the screen when scrolling down and comes back when scrolling up) |
 | `subtitle`, `formattedTitle` | subtitle, title with spans |
-| `translucent` | the content goes under the bar |
+| `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
 | `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
 
@@ -43,4 +43,17 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 
 `hideOnScroll` (the scrolling view) of `@nativescript-community/ui-floatingactionbutton` and `@nativescript-community/ui-bottomnavigationbar`: hidden when the content scrolls down, shown when it scrolls up.
 
-Android known limit: while a medium / large bar is expanded the page content is taller than the screen (`ScrollingViewBehavior`): a view anchored to the bottom of the page content (a FAB) is off screen until the bar collapses.
+## Overlay
+
+Views anchored to the page itself (a FAB, a bottom bar) go in `<appPageOverlay>`, not in the page content: on Android the content of an `AppPage` is taller than the screen while a medium / large bar is expanded, so a bottom anchored view would be off screen.
+On iOS the overlay is laid out over the content, inside the safe area; its empty areas let the touches go through.
+
+```svelte
+<appPage>
+  <appBar ... />
+  <collectionview ... />
+  <appPageOverlay>
+    <uifloatingactionbutton verticalAlignment="bottom" horizontalAlignment="right" />
+  </appPageOverlay>
+</appPage>
+```

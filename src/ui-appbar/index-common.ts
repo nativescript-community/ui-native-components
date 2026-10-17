@@ -1,4 +1,4 @@
-import { ActionBar, ActionItem, EventData, FormattedString, Property, View, isAndroid } from '@nativescript/core';
+import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, Property, View, isAndroid } from '@nativescript/core';
 import { MenuItem, showMenu } from '@nativescript-community/ui-menu';
 
 /** small: standard bar, medium / large: a title that collapses on scroll (M3 collapsing app bar on Android, large title on iOS) */
@@ -88,3 +88,9 @@ translucentProperty.register(AppBarBase);
 scrollTargetProperty.register(AppBarBase);
 searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
+
+/**
+ * Layout for the views anchored to the page itself (a floating action button, a bottom bar...), not to the scrolling content: use it as the `overlay` of an AppPage.
+ * Android: the content of an AppPage is taller than the screen while the bar is expanded (the content moves up when the bar collapses), so a view anchored to the bottom of the content would be off screen.
+ */
+export class AppPageOverlay extends GridLayout {}

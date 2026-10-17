@@ -1,4 +1,4 @@
-import { Color, Page, View } from '@nativescript/core';
+import { Color, GridLayout, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
 import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize } from './index-common';
@@ -13,6 +13,26 @@ function findScrollView(view: View): UIScrollView {
         return native;
     }
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
+}
+
+/** a view which lets the touches go through its empty areas */
+@NativeClass
+class PassthroughView extends UIView {
+    // @ts-ignore
+    hitTestWithEvent(point: CGPoint, event: any): UIView {
+        const hit = super.hitTestWithEvent(point, event) as any;
+        return hit === (this as any) ? null : hit;
+    }
+}
+
+/**
+ * Layout for the views anchored to the page (a floating action button, a bottom bar...): use it as the `overlay` of an AppPage.
+ * Its empty areas let the touches go through to the content.
+ */
+export class AppPageOverlay extends GridLayout {
+    createNativeView() {
+        return PassthroughView.new();
+    }
 }
 
 @NativeClass
@@ -109,10 +129,13 @@ export class AppBar extends AppBarBase {
         const standard = base.copy() as UINavigationBarAppearance;
         const edge = base.copy() as UINavigationBarAppearance;
         if (this.translucent) {
-            standard.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemChromeMaterial);
-            standard.backgroundColor = null;
-            edge.backgroundEffect = null;
-            edge.backgroundColor = UIColor.clearColor;
+            // the content scrolls under the bar: a blur tinted with the color of the bar, at the top too
+            const barColor = standard.backgroundColor;
+            const tinted = barColor ? barColor.colorWithAlphaComponent(0.7) : null;
+            for (const appearance of [standard, edge]) {
+                appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemChromeMaterial);
+                appearance.backgroundColor = tinted;
+            }
             edge.shadowColor = UIColor.clearColor;
         } else if (behavior === 'lift') {
             edge.shadowColor = UIColor.clearColor;
@@ -167,8 +190,27 @@ export class AppBar extends AppBarBase {
             (navigationItem as any).subtitle = this.subtitle ?? null;
         }
 
+        this.applyOverflowSafeArea();
         this.applySearch(navigationItem, behavior);
         this.applyScrollTarget(viewController);
+    }
+
+    private _ignoredSafeArea = false;
+    /**
+     * translucent: the page does not shrink its content to the safe area (the NativeScript Page places its content below the bar):
+     * the scrolling view starts at the top of the page, under the bar. UIKit adds the safe area to its content inset,
+     * so the first rows start below the bar and the next ones scroll under the blur.
+     * Works when the scrolling view is the content of the page.
+     */
+    private applyOverflowSafeArea() {
+        const page = this.page;
+        const wanted = this.translucent;
+        if (wanted !== this._ignoredSafeArea) {
+            this._ignoredSafeArea = wanted;
+            page.iosIgnoreSafeArea = wanted;
+            page.requestLayout();
+            (page.ios as UIViewController).view.setNeedsLayout();
+        }
     }
 
     private applySearch(navigationItem: UINavigationItem, behavior: AppBarScrollBehavior) {
@@ -232,4 +274,56 @@ export class AppBar extends AppBarBase {
  */
 export class AppPage extends Page {
     scrollBehavior: AppBarScrollBehavior = 'none';
+    private _overlay: View;
+
+    /** views anchored to the page (a FAB, a bottom bar...) instead of the scrolling content: they are laid out over the content */
+    get overlay() {
+        return this._overlay;
+    }
+    set overlay(value: View) {
+        if (this._overlay === value) {
+            return;
+        }
+        if (this._overlay) {
+            this._removeView(this._overlay);
+        }
+        this._overlay = value;
+        if (value) {
+            this._addView(value);
+        }
+    }
+
+    _addChildFromBuilder(name: string, value: any) {
+        if (value instanceof AppPageOverlay) {
+            this.overlay = value;
+        } else {
+            super._addChildFromBuilder(name, value);
+        }
+    }
+
+    eachChildView(callback: (child: View) => boolean) {
+        super.eachChildView(callback);
+        if (this._overlay) {
+            callback(this._overlay);
+        }
+    }
+
+    onMeasure(widthMeasureSpec: number, heightMeasureSpec: number) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (this._overlay) {
+            const width = Utils.layout.getMeasureSpecSize(widthMeasureSpec);
+            const height = Utils.layout.getMeasureSpecSize(heightMeasureSpec);
+            View.measureChild(this, this._overlay, Utils.layout.makeMeasureSpec(width, Utils.layout.EXACTLY), Utils.layout.makeMeasureSpec(height, Utils.layout.EXACTLY));
+        }
+    }
+
+    onLayout(left: number, top: number, right: number, bottom: number) {
+        super.onLayout(left, top, right, bottom);
+        if (this._overlay) {
+            // inside the safe area (also when the content ignores it)
+            const safeArea = (this.nativeViewProtected as UIView).safeAreaInsets;
+            const insets = { left: Utils.layout.toDevicePixels(safeArea.left), top: Utils.layout.toDevicePixels(safeArea.top), right: Utils.layout.toDevicePixels(safeArea.right), bottom: Utils.layout.toDevicePixels(safeArea.bottom) };
+            View.layoutChild(this, this._overlay, insets.left, insets.top, right - insets.right, bottom - insets.bottom);
+        }
+    }
 }
