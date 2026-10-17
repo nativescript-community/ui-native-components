@@ -1,3 +1,4 @@
+import { BottomAccessory } from './bottom-accessory';
 import { TabContentItem } from '@nativescript-community/ui-core-tabs/tab-content-item';
 import { TabNavigation } from '@nativescript-community/ui-core-tabs/tab-navigation/index.android';
 import { TabStrip } from '@nativescript-community/ui-core-tabs/tab-strip';
@@ -157,3 +158,6 @@ export class BottomNavigation extends TabNavigation<com.nativescript.material.co
         this._setItemsColors(this.tabStrip.items);
     }
 }
+
+// iOS 26 only: the minimize behavior and the accessory of the tab bar are ignored on Android
+export { BottomAccessory };

@@ -3,6 +3,7 @@
  * @module @nativescript-community/ui-bottom-navigation
  */
 
+import { BottomAccessory } from './bottom-accessory';
 import { TabContentItem } from '@nativescript-community/ui-core-tabs/tab-content-item';
 import { TabNavigationBase } from '@nativescript-community/ui-core-tabs/tab-navigation-base';
 import { TabStrip } from '@nativescript-community/ui-core-tabs/tab-strip';
@@ -10,6 +11,10 @@ import { CoercibleProperty, EventData, Property } from '@nativescript/core';
 import { TabStripItem } from '@nativescript-community/ui-core-tabs/tab-strip-item';
 
 export { TabContentItem, TabStrip, TabStripItem };
+export { BottomAccessory } from './bottom-accessory';
+
+/** iOS 26: how the tab bar minimizes when the content is scrolled */
+export type MinimizeBehavior = 'automatic' | 'never' | 'onScrollDown' | 'onScrollUp';
 /**
  * Defines the data for the TabView.selectedIndexChanged event.
  */
@@ -33,6 +38,16 @@ export class BottomNavigation extends TabNavigationBase {
      * Gets or sets the items of the BottomNavigation.
      */
     items: TabContentItem[];
+
+    /**
+     * iOS 26: how the tab bar minimizes when the content is scrolled (the content must scroll). Ignored on Android.
+     */
+    minimizeBehavior: MinimizeBehavior;
+
+    /**
+     * iOS 26: a view above the tab bar, inline with it when the bar is minimized. Ignored on Android and on older iOS versions.
+     */
+    accessory: BottomAccessory;
 
     /**
      * Gets or sets the tab strip of the BottomNavigation.

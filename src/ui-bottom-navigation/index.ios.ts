@@ -1,4 +1,5 @@
 // Types
+import { BottomAccessory } from './bottom-accessory';
 import { TabContentItem } from '@nativescript-community/ui-core-tabs/tab-content-item';
 import { TabNavigationBase, getIconSpecSize, itemsProperty, selectedIndexProperty, tabStripProperty } from '@nativescript-community/ui-core-tabs/tab-navigation-base';
 import { TabsPosition } from '@nativescript-community/ui-core-tabs/tab-navigation/index-common';
@@ -6,7 +7,7 @@ import { TabStrip } from '@nativescript-community/ui-core-tabs/tab-strip';
 import { TabStripItem } from '@nativescript-community/ui-core-tabs/tab-strip-item';
 // Types
 // Requires
-import { CSSType, Color, CoreTypes, Device, Font, Frame, IOSHelper, ImageAsset, ImageSource, Property, Utils, View, booleanConverter } from '@nativescript/core';
+import { CSSType, Color, CoreTypes, Device, Font, Frame, IOSHelper, ImageAsset, ImageSource, Property, Utils, View, ViewBase, booleanConverter } from '@nativescript/core';
 import { getTransformedText } from '@nativescript/core/ui/text-base';
 import { SDK_VERSION } from '@nativescript/core/utils';
 export { TabContentItem, TabStrip, TabStripItem };
@@ -283,8 +284,35 @@ export const iosCustomPositioningProperty = new Property<BottomNavigation, boole
     valueConverter: booleanConverter
 });
 
+export { BottomAccessory };
+
+/**
+ * iOS 26: how the tab bar minimizes when the content is scrolled. `automatic` is the system choice.
+ */
+export type MinimizeBehavior = 'automatic' | 'never' | 'onScrollDown' | 'onScrollUp';
+const MINIMIZE_BEHAVIORS: { [key in MinimizeBehavior]: number } = { automatic: 0, never: 1, onScrollDown: 2, onScrollUp: 3 };
+
+export const minimizeBehaviorProperty = new Property<BottomNavigation, MinimizeBehavior>({ name: 'minimizeBehavior', defaultValue: 'automatic' });
+export const accessoryProperty = new Property<BottomNavigation, BottomAccessory>({
+    name: 'accessory',
+    valueChanged: (target, oldValue, newValue) => {
+        if (oldValue) {
+            target._removeView(oldValue);
+        }
+        if (newValue) {
+            target._addView(newValue);
+        }
+        target.updateAccessory();
+    }
+});
+
 @CSSType('BottomNavigation')
 export class BottomNavigation extends TabNavigationBase {
+    /** iOS 26: how the tab bar minimizes on scroll (the content must scroll: a ScrollView, a ListView, a CollectionView...) */
+    public minimizeBehavior: MinimizeBehavior;
+    /** iOS 26: a view above the tab bar, inline with it when the bar is minimized. Ignored on older iOS versions */
+    public accessory: BottomAccessory;
+
     tabsPosition = TabsPosition.Bottom;
     public viewController: MDTabBarControllerImpl;
     public items: TabContentItem[];
@@ -321,6 +349,7 @@ export class BottomNavigation extends TabNavigationBase {
     public onLoaded() {
         super.onLoaded();
         this.setViewControllers(this.items);
+        this.updateAccessory();
         const selectedIndex = this.selectedIndex;
         const selectedView = this.items && this.items[selectedIndex] && this.items[selectedIndex].content;
         if (selectedView instanceof Frame) {
@@ -329,6 +358,59 @@ export class BottomNavigation extends TabNavigationBase {
 
         this.viewController.delegate = this.mDelegate;
         this.onSelectedIndexChanged(selectedIndex, selectedIndex);
+    }
+
+    // the accessory is a child of the view, but it is not in the native tree of the controller
+    public _addChildFromBuilder(name: string, value: any): void {
+        if (value instanceof BottomAccessory) {
+            this.accessory = value;
+            return;
+        }
+        super._addChildFromBuilder(name, value);
+    }
+    public eachChild(callback: (child: ViewBase) => boolean) {
+        super.eachChild(callback);
+        if (this.accessory) {
+            callback(this.accessory);
+        }
+    }
+    public eachChildView(callback: (child: View) => boolean) {
+        super.eachChildView(callback);
+        if (this.accessory) {
+            callback(this.accessory);
+        }
+    }
+    public _addViewToNativeVisualTree(child: ViewBase, atIndex?: number): boolean {
+        if (child === this.accessory) {
+            return true;
+        }
+        return super._addViewToNativeVisualTree(child, atIndex);
+    }
+    public _removeViewFromNativeVisualTree(child: ViewBase): void {
+        if (child === this.accessory) {
+            return;
+        }
+        super._removeViewFromNativeVisualTree(child);
+    }
+
+    /**
+     * iOS 26: the UITabAccessory of the tab bar controller
+     */
+    updateAccessory() {
+        const controller = this.viewController as any;
+        const UITabAccessory = (global as any).UITabAccessory;
+        if (!controller || !UITabAccessory || !('bottomAccessory' in controller)) {
+            return;
+        }
+        const content = this.accessory?.nativeViewProtected;
+        controller.bottomAccessory = content ? UITabAccessory.alloc().initWithContentView(content) : null;
+    }
+
+    [minimizeBehaviorProperty.setNative](value: MinimizeBehavior) {
+        const controller = this.viewController as any;
+        if ('tabBarMinimizeBehavior' in controller) {
+            controller.tabBarMinimizeBehavior = MINIMIZE_BEHAVIORS[value] ?? 0;
+        }
     }
 
     public onUnloaded() {
@@ -874,3 +956,5 @@ export class BottomNavigation extends TabNavigationBase {
     }
 }
 iosCustomPositioningProperty.register(BottomNavigation);
+minimizeBehaviorProperty.register(BottomNavigation);
+accessoryProperty.register(BottomNavigation);
