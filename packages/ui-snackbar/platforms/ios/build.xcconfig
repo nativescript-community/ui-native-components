@@ -1,0 +1,3 @@
+// liquid-toasts (SwiftUI) needs iOS 17 and the bridge uses Swift 5 concurrency APIs
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+SWIFT_VERSION = 5.0

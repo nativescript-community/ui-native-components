@@ -1,5 +1,5 @@
 /**
- * SnackBar component. Android only (Material): on iOS nothing is shown and the promise resolves immediately.
+ * SnackBar component. Material Snackbar on Android, liquid-toasts (SwiftUI, Liquid Glass on iOS 26) on iOS.
  * @module @nativescript-community/ui-snackbar
  */
 

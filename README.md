@@ -35,7 +35,7 @@ Each package is independent: install only what you use.
 | [`@nativescript-community/ui-searchbar`](packages/ui-searchbar) | Search bar |
 | [`@nativescript-community/ui-segmentedbar`](packages/ui-segmentedbar) | Segmented control with icons and spans |
 | [`@nativescript-community/ui-slider`](packages/ui-slider) | Slider |
-| [`@nativescript-community/ui-snackbar`](packages/ui-snackbar) | Snackbar (Android) |
+| [`@nativescript-community/ui-snackbar`](packages/ui-snackbar) | Snackbar: Material (Android), [liquid-toasts](https://github.com/SimplifyJobs/liquid-toasts) (iOS) |
 | [`@nativescript-community/ui-surface`](packages/ui-surface) | Floating surface for toolbars and action groups (Liquid Glass) |
 | [`@nativescript-community/ui-switch`](packages/ui-switch) | Switch |
 | [`@nativescript-community/ui-tabs`](packages/ui-tabs) | Top tabs |
@@ -51,7 +51,8 @@ npm install @nativescript-community/ui-button   # any package of the list
 
 ### Android
 The components use **Material 3**. Your Android theme must inherit from a `Theme.Material3` theme: in `App_Resources/Android/src/main/res/values/styles.xml` replace `Theme.AppCompat` / `Theme.MaterialComponents` with `Theme.Material3.DayNight.NoActionBar` (see `demo-svelte`).
-The Material Components version is `1.12.0` by default, set the `androidXMaterial` gradle property to change it.
+The Material Components version is `1.14.0` by default (Material 3 Expressive: wavy progress, retreat animation...), set the `androidXMaterial` gradle property to change it.
+Material 1.14 requires **`minSdkVersion 23`**. For the Expressive look use `Theme.Material3Expressive.DayNight.NoActionBar` (the plain `Theme.Material3` themes work too).
 
 ### iOS
 Nothing to install: the components use UIKit. No CocoaPods.

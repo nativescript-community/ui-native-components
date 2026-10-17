@@ -1,10 +1,10 @@
 # @nativescript-community/ui-snackbar
 
-Snackbars. Material 3 `Snackbar` on Android. A no-op on iOS (the HIG has no snackbar: use an alert or a banner of your own).
+Snackbars. Material 3 `Snackbar` on Android, [liquid-toasts](https://github.com/SimplifyJobs/liquid-toasts) on iOS (SwiftUI toast, real Liquid Glass on iOS 26, frosted material on iOS 17+).
 
 | Android | iOS |
 |---|---|
-| `Snackbar` | no-op |
+| `Snackbar` | liquid-toasts `LiquidToast` (bottom, with optional action button) |
 
 ## Installation
 
@@ -13,6 +13,8 @@ npm install @nativescript-community/ui-snackbar
 ```
 
 The Android components use **Material 3**: see the [repository README](https://github.com/nativescript-community/ui-native-components#installation) for the theme.
+
+The iOS Swift package is declared by this plugin `nativescript.config.ts` (`ios.SPMPackages`) and bridged to JS by `platforms/ios/src/NSCLiquidToast.swift`: nothing to configure, but it needs a NativeScript CLI with plugin Swift Package Manager support, and it raises the app iOS deployment target to 17 and `SWIFT_VERSION` to 5 (`platforms/ios/build.xcconfig`). The liquid-toasts repository currently has no license file: check it fits your needs. On iOS `isRTL`, `view` and `anchorView` are ignored.
 
 ## Usage
 
