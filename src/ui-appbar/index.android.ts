@@ -240,6 +240,12 @@ export class AppPage extends Page {
         const overlay = new org.nativescript.widgets.ContentLayout(context);
         coordinator.addView(overlay, new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         this._nativeOverlay = overlay;
+        // the status bar area: the bar scrolls away under it, what it draws there (a faded title) is covered
+        const scrim = new android.view.View(context);
+        coordinator.addView(scrim, new CoordinatorLayout.LayoutParams(MATCH_PARENT, 0));
+        // the AppBarLayout is elevated (lift on scroll): a sibling is drawn below it unless it is elevated more
+        scrim.setElevation(Math.round(12 * Utils.layout.getDisplayDensity()));
+        this._statusScrim = scrim;
         // the full screen search of the M3 SearchBar: on top of everything, hidden until the bar is tapped
         const searchView = new com.google.android.material.search.SearchView(context);
         coordinator.addView(searchView, new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
@@ -262,7 +268,11 @@ export class AppPage extends Page {
         // the bar draws under the status bar: the AppBarLayout pads itself with the inset
         this.androidOverflowEdge = 'top';
         // the root does not pad itself with the status bar inset anymore: the AppBarLayout (and its background) does
-        this._appBarLayout?.setPadding(0, this.getStatusBarHeight(), 0, 0);
+        const statusBarHeight = this.getStatusBarHeight();
+        this._appBarLayout?.setPadding(0, statusBarHeight, 0, 0);
+        const scrimParams = this._statusScrim.getLayoutParams();
+        scrimParams.height = statusBarHeight;
+        this._statusScrim.setLayoutParams(scrimParams);
         // the bar scrolls away under the status bar area: its content must not draw in the padding
         this._appBarLayout?.setClipToPadding(true);
         this.syncAppBar();
@@ -274,6 +284,7 @@ export class AppPage extends Page {
         this._nativeContent = null;
         this._nativeOverlay = null;
         this._bottomBar = null;
+        this._statusScrim = null;
         this._searchBar = null;
         this._searchView = null;
         this._collapsing = null;
@@ -363,7 +374,9 @@ export class AppPage extends Page {
         const backgroundColor = toColor(bar.backgroundColor);
         if (backgroundColor) {
             // translucent: the content scrolls under the bar, which stays slightly see through
-            appBarLayout.setBackgroundColor(translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android);
+            const barColor = translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android;
+            appBarLayout.setBackgroundColor(barColor);
+            this._statusScrim?.setBackgroundColor(barColor);
         } else if (translucent) {
             appBarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
         }
@@ -403,6 +416,7 @@ export class AppPage extends Page {
         this.syncSearchBar(appBar);
     }
 
+    private _statusScrim: android.view.View;
     private _searchBarSetup = false;
     /** `searchMode="bar"`: a Material 3 SearchBar under the toolbar that opens the full screen SearchView */
     private syncSearchBar(appBar: AppBar) {
