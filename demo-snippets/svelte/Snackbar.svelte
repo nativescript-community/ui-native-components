@@ -18,6 +18,7 @@
             <label text="Material Snackbar on Android, liquid-toasts (Liquid Glass) on iOS" textWrap="true" />
             <uibutton text="simple" on:tap={() => show(() => snackbar.simple('A simple snackbar'))} />
             <uibutton text="with action" on:tap={() => show(() => snackbar.action({ message: 'Message deleted', actionText: 'UNDO', hideDelay: 5000 }))} />
+            <uibutton text="top (iOS)" on:tap={() => show(() => snackbar.showSnack({ message: 'From the top', position: 'top', hideDelay: 8000 }))} />
             <uibutton text="custom colors" on:tap={() => show(() => snackbar.showSnack({ message: 'Colors', textColor: 'white', backgroundColor: '#6750a4', actionText: 'OK', actionTextColor: '#ffd8e4' }))} />
             <label text={`result: ${result}`} margin="12" textWrap="true" />
         </stackLayout>

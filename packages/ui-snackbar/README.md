@@ -14,7 +14,7 @@ npm install @nativescript-community/ui-snackbar
 
 The Android components use **Material 3**: see the [repository README](https://github.com/nativescript-community/ui-native-components#installation) for the theme.
 
-The iOS Swift package is declared by this plugin `nativescript.config.ts` (`ios.SPMPackages`) and bridged to JS by `platforms/ios/src/NSCLiquidToast.swift`: nothing to configure, but it needs a NativeScript CLI with plugin Swift Package Manager support, and it raises the app iOS deployment target to 17 and `SWIFT_VERSION` to 5 (`platforms/ios/build.xcconfig`). The liquid-toasts repository currently has no license file: check it fits your needs. On iOS `isRTL`, `view` and `anchorView` are ignored.
+The iOS Swift package is declared by this plugin `nativescript.config.ts` (`ios.SPMPackages`) and bridged to JS by `platforms/ios/src/NSCLiquidToast.swift`: nothing to configure, but it needs a NativeScript CLI with plugin Swift Package Manager support, and it raises the app iOS deployment target to 17 and `SWIFT_VERSION` to 5 (`platforms/ios/build.xcconfig`). The liquid-toasts repository currently has no license file: check it fits your needs. On iOS `isRTL`, `view` and `anchorView` are ignored, and `position: 'top'` shows the toast at the top of the screen (below the status bar / Dynamic Island) instead of the bottom.
 
 ## Usage
 

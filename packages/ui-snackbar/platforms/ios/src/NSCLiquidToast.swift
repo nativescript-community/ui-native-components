@@ -11,6 +11,7 @@ public class NSCLiquidToast: NSObject {
 
     /// - Parameters:
     ///   - duration: seconds; `<= 0` keeps the toast until it is dismissed
+    ///   - top: shows the toast at the top of the screen instead of the bottom
     ///   - onDismiss: called once with the dismiss reason raw value (`timeout`, `manual`, `swipe`, `action`, `tap`, ...)
     public class func show(
         message: String,
@@ -20,6 +21,7 @@ public class NSCLiquidToast: NSObject {
         backgroundColor: UIColor?,
         actionColor: UIColor?,
         maxLines: Int,
+        top: Bool,
         onAction: (() -> Void)?,
         onDismiss: ((String) -> Void)?
     ) -> NSCLiquidToast {
@@ -42,10 +44,19 @@ public class NSCLiquidToast: NSObject {
                     onAction?()
                 }
             }
+            if top {
+                // the overlay is hosted in the NativeScript root controller whose safe area is empty: SwiftUI adds no top
+                // padding, so ask for the device inset (plus a gap) as extra padding to clear the status bar / Dynamic Island
+                let safeArea = LiquidToast.geometrySnapshot()["safeArea"] as? [String: Any]
+                let deviceTop = CGFloat((safeArea?["top"] as? NSNumber)?.doubleValue ?? 0)
+                var configuration = LiquidToast.configuration
+                configuration.safeArea.top = deviceTop * 2 + 8
+                LiquidToast.configure(configuration)
+            }
             let handle = LiquidToast.show(
                 message,
                 style: style,
-                position: .bottomCenter,
+                position: top ? .topCenter : .bottomCenter,
                 duration: duration > 0 ? .seconds(duration) : .persistent,
                 action: action,
                 maxLines: maxLines > 0 ? maxLines : nil

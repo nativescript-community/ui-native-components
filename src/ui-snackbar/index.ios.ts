@@ -4,7 +4,7 @@ export { DismissReasons, SnackBarAction };
 
 // Swift bridge in platforms/ios/src/NSCLiquidToast.swift
 declare class NSCLiquidToast extends NSObject {
-    static showWithMessageActionTextDurationTextColorBackgroundColorActionColorMaxLinesOnActionOnDismiss(
+    static showWithMessageActionTextDurationTextColorBackgroundColorActionColorMaxLinesTopOnActionOnDismiss(
         message: string,
         actionText: string,
         duration: number,
@@ -12,6 +12,7 @@ declare class NSCLiquidToast extends NSObject {
         backgroundColor: UIColor,
         actionColor: UIColor,
         maxLines: number,
+        top: boolean,
         onAction: () => void,
         onDismiss: (reason: string) => void
     ): NSCLiquidToast;
@@ -44,7 +45,7 @@ function toUIColor(color?: string | Color) {
 /**
  * iOS: toasts are drawn with liquid-toasts (https://github.com/SimplifyJobs/liquid-toasts, SwiftUI): Liquid Glass on iOS 26,
  * frosted material before. The Swift package is declared in this plugin `nativescript.config.ts` and bridged by `NSCLiquidToast`.
- * `maxLines` is applied; `isRTL`, `view` and `anchorView` are Android only.
+ * `maxLines` and `position` are applied; `isRTL`, `view` and `anchorView` are Android only.
  */
 export class SnackBar extends SnackBarBase {
     private _toast: NSCLiquidToast;
@@ -72,7 +73,7 @@ export class SnackBar extends SnackBarBase {
     initSnack(options: SnackBarOptions, resolve?: Function) {
         this._resolve = resolve;
         const hideDelay = options.hideDelay ?? 3000;
-        this._toast = NSCLiquidToast.showWithMessageActionTextDurationTextColorBackgroundColorActionColorMaxLinesOnActionOnDismiss(
+        this._toast = NSCLiquidToast.showWithMessageActionTextDurationTextColorBackgroundColorActionColorMaxLinesTopOnActionOnDismiss(
             options.message,
             options.actionText || null,
             hideDelay / 1000,
@@ -80,6 +81,7 @@ export class SnackBar extends SnackBarBase {
             toUIColor(options.backgroundColor),
             toUIColor(options.actionTextColor),
             options.maxLines || 0,
+            options.position === 'top',
             null,
             (reason) => {
                 this._toast = null;

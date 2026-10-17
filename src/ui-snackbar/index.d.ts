@@ -78,6 +78,11 @@ export interface SnackBarOptions {
      */
     isRTL?: boolean;
     /**
+     * *iOS Only*
+     * Where the snackbar is shown. Defaults to 'bottom'. The Android Material Snackbar is always at the bottom.
+     */
+    position?: 'top' | 'bottom';
+    /**
      * optional View to attach the snack to
      */
     view?: View;
