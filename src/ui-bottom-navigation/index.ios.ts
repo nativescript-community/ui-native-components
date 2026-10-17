@@ -342,7 +342,7 @@ export const searchContentProperty = new Property<BottomNavigation, View>({
         if (newValue) {
             target._addView(newValue);
         }
-        target.scheduleSearchTab();
+        target.updateSearchTab();
     }
 });
 export const accessoryProperty = new Property<BottomNavigation, BottomAccessory>({
@@ -419,7 +419,7 @@ export class BottomNavigation extends TabNavigationBase {
         super.onLoaded();
         this.setViewControllers(this.items);
         this.updateAccessory();
-        this.scheduleSearchTab();
+        this.updateSearchTab();
         const selectedIndex = this.selectedIndex;
         const selectedView = this.items && this.items[selectedIndex] && this.items[selectedIndex].content;
         if (selectedView instanceof Frame) {
@@ -483,24 +483,20 @@ export class BottomNavigation extends TabNavigationBase {
     /**
      * iOS 18+: the UISearchTab at the end of the tab bar. The regular tabs stay view controllers, the search tab is added with the `tabs` API.
      */
-    private mSearchTabTimer: any;
-    /**
-     * The tabs copy the title and the icon of the bar items: it is done once the strip items are loaded and have their native values.
-     */
-    scheduleSearchTab() {
-        if (this.mSearchTabTimer) {
-            clearTimeout(this.mSearchTabTimer);
-        }
-        this.mSearchTabTimer = setTimeout(() => {
-            this.mSearchTabTimer = null;
-            this.updateSearchTab();
-        }, 50);
+    private stripItemsLoaded() {
+        const items = this.tabStrip?.items;
+        return !items || items.every((item) => item.isLoaded);
     }
 
     updateSearchTab() {
         const controller = this.viewController as any;
         const UISearchTab = (global as any).UISearchTab;
         if (!controller || !UISearchTab || !('tabs' in controller) || !this.isLoaded) {
+            return;
+        }
+        // The tabs copy the title and the icons of the bar items. The property setters of the native init call us before the strip items are loaded
+        // (empty bar items): the pass of `onLoaded` has them.
+        if (this.searchTab && !this.stripItemsLoaded()) {
             return;
         }
         if (!this.searchTab) {
@@ -593,7 +589,7 @@ export class BottomNavigation extends TabNavigationBase {
     }
 
     [searchTabProperty.setNative](value: boolean) {
-        this.scheduleSearchTab();
+        this.updateSearchTab();
     }
     [searchHintProperty.setNative](value: string) {
         this.updateSearchController();
@@ -686,16 +682,10 @@ export class BottomNavigation extends TabNavigationBase {
     /**
      * With a search tab, every tab is a UITab: they follow the title, the icons and the badge of the bar items
      */
-    private mSyncTimer: any;
     syncSearchTabs() {
-        if (!this.mSearchTab || this.mSyncTimer) {
-            return;
-        }
-        // grouped: the title and the icons of an item are set one after the other
-        this.mSyncTimer = setTimeout(() => {
-            this.mSyncTimer = null;
+        if (this.mSearchTab) {
             this.getRegularTabs();
-        }, 0);
+        }
     }
 
     public setTabBarItemBackgroundColor(tabStripItem: TabStripItem, value: UIColor | Color): void {
@@ -930,7 +920,7 @@ export class BottomNavigation extends TabNavigationBase {
         this.viewController.moreNavigationController.delegate = this.mMoreNavigationControllerDelegate;
         // `viewControllers` replaced the tabs: the search tab is added again
         this.mSearchTab = null;
-        this.scheduleSearchTab();
+        this.updateSearchTab();
     }
 
     private setItemImages() {
