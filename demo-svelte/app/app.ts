@@ -5,6 +5,7 @@ purpose of the file is to pass control to the app’s first module.
 */
 
 import { Page, Utils, isAndroid } from '@nativescript/core';
+import { AppPage } from '@nativescript-community/ui-appbar';
 import { svelteNative } from '@nativescript-community/svelte-native';
 import Menu from './Menu.svelte';
 
@@ -24,8 +25,12 @@ if (isAndroid) {
         const resources = Utils.android.getApplicationContext().getResources();
         const id = resources.getIdentifier('status_bar_height', 'dimen', 'android');
         const statusBarHeight = id > 0 ? resources.getDimensionPixelSize(id) / resources.getDisplayMetrics().density : 24;
-        this.androidOverflowEdge = 'top';
         this.statusBarStyle = 'light';
+        if (this instanceof AppPage) {
+            // the AppPage / AppBarLayout handles the status bar inset itself
+            return;
+        }
+        this.androidOverflowEdge = 'top';
         if (this.actionBar) {
             const actionBar = this.actionBar;
             actionBar.height = 56 + statusBarHeight;

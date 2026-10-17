@@ -1,8 +1,7 @@
 import { install as installBottomSheet } from '@nativescript-community/ui-bottomsheet';
 import { installMixins } from '@nativescript-community/ui-core';
 import { install as installGestureHandler } from '@nativescript-community/gesturehandler';
-import { AppPage } from '@nativescript-community/ui-appbar';
-import { PageElement, registerElement } from '@nativescript-community/svelte-native/dom';
+import { register as registerAppBar } from '@nativescript-community/ui-appbar/svelte';
 
 import CollectionViewPlugin from '@nativescript-community/ui-collectionview/svelte';
 import { registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
@@ -51,16 +50,7 @@ import '../app.scss';
 installMixins();
 installGestureHandler();
 
-// svelte-native `navigate` needs a PageElement: this one wraps an AppPage instead of the core Page
-class AppPageElement extends PageElement {
-    constructor() {
-        super();
-        const page = new AppPage();
-        (page as any).__SvelteNativeElement__ = this;
-        (this as any)._nativeElement = page;
-    }
-}
-registerElement('AppPage', () => new AppPageElement());
+registerAppBar();
 installBottomSheet();
 export function installPlugin() {
     // each component is a NativeScript view: registering it for svelte-native is one line

@@ -144,6 +144,13 @@ Consumers:
 4. **Hide on scroll for FAB / bottom nav bar**, bottom items (`UIToolbar` / `BottomAppBar`).
 5. Demo pages (large title list, search, custom title, custom buttons), READMEs, move the demo patch out; list upstream candidates for core (`ActionBar` insets on Android, per item appearance and `contentScrollView` on iOS, spans / subtitle).
 
+## 8b. Status
+
+Done (Android and iOS, checked on the emulator / simulator): `AppPage`, `AppBar` (`size`, `scrollBehavior` lift / hide, `subtitle`, `formattedTitle`, `translucent`, `scrollTarget`), M3 collapsing medium / large bar, edge to edge on Android,
+iOS large title + per item appearances, svelte registration, demo page.
+Not done yet: search integration, items with menus / badges / `prominent`, bottom items (`UIToolbar` / `BottomAppBar`), `ScrollSource` and hide on scroll for FAB / bottom nav bar, Vue / Angular registration, README / docs.
+Known: iOS pushed large title has no inline title once collapsed; Android collapsed bar shows the status bar scrim color.
+
 ## 9. Risks
 
 * Page / ActionBar internals: core `Page.onLoaded` and `ActionBar.update()` run on every navigation and can overwrite our iOS settings: ordering has to be tested with push / pop / modal / tabs.
