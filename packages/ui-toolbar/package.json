@@ -1,0 +1,45 @@
+{
+    "name": "@nativescript-community/ui-toolbar",
+    "version": "7.3.4",
+    "description": "Toolbar with a title, a navigation icon, action items and an overflow menu: Material 3 MaterialToolbar on Android, UINavigationBar (glass bar buttons on iOS 26) on iOS.",
+    "main": "./index",
+    "sideEffects": false,
+    "typings": "./index.d.ts",
+    "scripts": {
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-toolbar' --parents --cwd=../../src/ui-toolbar && tsc  --build",
+        "build": "npm run tsc",
+        "build.watch": "npm run tsc -- -w",
+        "build.all": "npm run build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.2.0",
+            "ios": "6.2.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/ui-native-components/tree/master/packages/ui-toolbar#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-native-components.git",
+        "directory": "packages/ui-toolbar"
+    },
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/ui-core": "^7.3.4"
+    }
+}

@@ -46,6 +46,7 @@
         "@nativescript-community/ui-tabs": "*",
         "@nativescript-community/ui-textfield": "*",
         "@nativescript-community/ui-textview": "*",
+        "@nativescript-community/ui-toolbar": "*",
         "@nativescript/hook": "~2.0.0",
         "copy-webpack-plugin": "^11.0.0",
         "scss-symbols-parser": "^2.0.1",

@@ -1734,6 +1734,7 @@ __metadata:
     "@nativescript-community/ui-tabs": "npm:*"
     "@nativescript-community/ui-textfield": "npm:*"
     "@nativescript-community/ui-textview": "npm:*"
+    "@nativescript-community/ui-toolbar": "npm:*"
     "@nativescript/hook": "npm:~2.0.0"
     copy-webpack-plugin: "npm:^11.0.0"
     scss-symbols-parser: "npm:^2.0.1"
@@ -1972,6 +1973,14 @@ __metadata:
   resolution: "@nativescript-community/ui-textview@workspace:packages/ui-textview"
   dependencies:
     "@nativescript-community/text": "npm:^1.5.33"
+    "@nativescript-community/ui-core": "npm:^7.3.4"
+  languageName: unknown
+  linkType: soft
+
+"@nativescript-community/ui-toolbar@npm:*, @nativescript-community/ui-toolbar@workspace:packages/ui-toolbar":
+  version: 0.0.0-use.local
+  resolution: "@nativescript-community/ui-toolbar@workspace:packages/ui-toolbar"
+  dependencies:
     "@nativescript-community/ui-core": "npm:^7.3.4"
   languageName: unknown
   linkType: soft

@@ -19,6 +19,7 @@ import { SegmentedBar as NativeSegmentedBar, SegmentedBarItem } from '@nativescr
 import { Slider } from '@nativescript-community/ui-slider';
 import { Switch } from '@nativescript-community/ui-switch';
 import { Tabs as NativeTabs } from '@nativescript-community/ui-tabs';
+import { Toolbar } from '@nativescript-community/ui-toolbar';
 import { TextField } from '@nativescript-community/ui-textfield';
 import { TextView } from '@nativescript-community/ui-textview';
 
@@ -38,6 +39,7 @@ import RefreshLayout from './RefreshLayout.svelte';
 import SearchBars from './SearchBars.svelte';
 import Styling from './Styling.svelte';
 import Snackbar from './Snackbar.svelte';
+import Toolbars from './Toolbars.svelte';
 import Tabs from './Tabs.svelte';
 import TextFields from './TextFields.svelte';
 import '../app.scss';
@@ -67,6 +69,7 @@ export function installPlugin() {
     registerNativeViewElement('uitabstrip', () => TabStrip);
     registerNativeViewElement('uitabstripitem', () => TabStripItem);
     registerNativeViewElement('uitabcontentitem', () => TabContentItem);
+    registerNativeViewElement('uitoolbar', () => Toolbar);
     registerNativeViewElement('uitextfield', () => TextField);
     registerNativeViewElement('uitextview', () => TextView);
 }
@@ -75,6 +78,7 @@ export const demos = [
     { name: 'Buttons', path: 'Buttons', component: Buttons },
     { name: 'Floating action buttons', path: 'FloatingActionButtons', component: FloatingActionButtons },
     { name: 'Text fields', path: 'TextFields', component: TextFields },
+    { name: 'Toolbar', path: 'Toolbars', component: Toolbars },
     { name: 'Cards and surfaces', path: 'CardsSurfaces', component: CardsSurfaces },
     { name: 'Checkbox', path: 'CheckBoxes', component: CheckBoxes },
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },

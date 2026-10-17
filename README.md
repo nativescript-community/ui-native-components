@@ -39,6 +39,7 @@ Each package is independent: install only what you use.
 | [`@nativescript-community/ui-surface`](packages/ui-surface) | Floating surface for toolbars and action groups (Liquid Glass) |
 | [`@nativescript-community/ui-switch`](packages/ui-switch) | Switch |
 | [`@nativescript-community/ui-tabs`](packages/ui-tabs) | Top tabs |
+| [`@nativescript-community/ui-toolbar`](packages/ui-toolbar) | Toolbar: title, navigation icon, actions, overflow (glass on iOS 26) |
 | [`@nativescript-community/ui-textfield`](packages/ui-textfield) | Text field |
 | [`@nativescript-community/ui-textview`](packages/ui-textview) | Text view |
 
