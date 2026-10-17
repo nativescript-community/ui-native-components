@@ -19,6 +19,7 @@
     let behavior: AppBarScrollBehavior = 'lift';
     let translucent = false;
     let spans = false;
+    let searchMode: 'collapsible' | 'bar' = 'collapsible';
     let bar;
     let list;
     let fab;
@@ -56,7 +57,7 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
+    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
         <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
         <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
@@ -66,6 +67,9 @@
             <label text={item.title} padding="0 16" verticalAlignment="center" backgroundColor={item.title.length % 2 ? '#f3edf7' : '#ffffff'} />
         </Template>
     </collectionview>
+    <appPageSearchContent>
+        <label text="{items.length} rows match '{query}'" padding="16" />
+    </appPageSearchContent>
     <appPageOverlay>
         <uifloatingactionbutton bind:this={fab} horizontalAlignment="right" verticalAlignment="bottom" marginBottom="260" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
         <stackLayout verticalAlignment="bottom" marginBottom="90" backgroundColor="rgba(255,255,255,0.92)" padding="8 8 8 8">
@@ -79,6 +83,7 @@
                 <uibutton text="hide" on:tap={() => (behavior = 'hide')} />
                 <uibutton text="translucent" on:tap={() => (translucent = !translucent)} />
                 <uibutton text="spans" on:tap={() => (spans = !spans)} />
+                <uibutton text="search bar" on:tap={() => (searchMode = searchMode === 'bar' ? 'collapsible' : 'bar')} />
             </wrapLayout>
         </stackLayout>
     </appPageOverlay>

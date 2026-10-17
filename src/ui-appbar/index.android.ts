@@ -1,8 +1,8 @@
 import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay, notifyBottomItemTap } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, AppPageOverlay };
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageOverlay, AppPageSearchContent, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageOverlay, AppPageSearchContent };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -40,7 +40,7 @@ export class AppBar extends AppBarBase {
     _addActionItems() {
         // @ts-ignore
         super._addActionItems();
-        if (this.searchable) {
+        if (this.searchable && this.searchMode !== 'bar') {
             this.addSearchItem();
         }
     }
@@ -147,6 +147,9 @@ export class AppPage extends Page {
     private _nativeContent: any;
     private _nativeOverlay: any;
     private _overlay: View;
+    private _searchContent: View;
+    private _searchBar: com.google.android.material.search.SearchBar;
+    private _searchView: com.google.android.material.search.SearchView;
     private _collapsing: any;
     private _collapsingSize: AppBarSize;
     private _scrollBehavior: AppBarScrollBehavior = 'none';
@@ -185,8 +188,27 @@ export class AppPage extends Page {
     _addChildFromBuilder(name: string, value: any) {
         if (value instanceof AppPageOverlay) {
             this.overlay = value;
+        } else if (value instanceof AppPageSearchContent) {
+            this.searchContent = value;
         } else {
             super._addChildFromBuilder(name, value);
+        }
+    }
+
+    /** `searchMode="bar"`: the content of the full screen search (suggestions, results) */
+    get searchContent() {
+        return this._searchContent;
+    }
+    set searchContent(value: View) {
+        if (this._searchContent === value) {
+            return;
+        }
+        if (this._searchContent) {
+            this._removeView(this._searchContent);
+        }
+        this._searchContent = value;
+        if (value) {
+            this._addView(value);
         }
     }
 
@@ -194,6 +216,9 @@ export class AppPage extends Page {
         super.eachChildView(callback);
         if (this._overlay) {
             callback(this._overlay);
+        }
+        if (this._searchContent) {
+            callback(this._searchContent);
         }
     }
 
@@ -215,6 +240,10 @@ export class AppPage extends Page {
         const overlay = new org.nativescript.widgets.ContentLayout(context);
         coordinator.addView(overlay, new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         this._nativeOverlay = overlay;
+        // the full screen search of the M3 SearchBar: on top of everything, hidden until the bar is tapped
+        const searchView = new com.google.android.material.search.SearchView(context);
+        coordinator.addView(searchView, new CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        this._searchView = searchView;
 
         const params = new org.nativescript.widgets.CommonLayoutParams();
         params.width = MATCH_PARENT;
@@ -245,6 +274,8 @@ export class AppPage extends Page {
         this._nativeContent = null;
         this._nativeOverlay = null;
         this._bottomBar = null;
+        this._searchBar = null;
+        this._searchView = null;
         this._collapsing = null;
         super.disposeNativeView();
     }
@@ -369,6 +400,82 @@ export class AppPage extends Page {
         appBarLayout.setElevation(translucent ? 0 : appBarLayout.getElevation());
         this.syncTranslucentInset(appBar, translucent);
         this.syncBottomBar(appBar, behavior);
+        this.syncSearchBar(appBar);
+    }
+
+    private _searchBarSetup = false;
+    /** `searchMode="bar"`: a Material 3 SearchBar under the toolbar that opens the full screen SearchView */
+    private syncSearchBar(appBar: AppBar) {
+        const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
+        const wanted = !!appBar?.searchable && appBar.searchMode === 'bar';
+        if (!wanted) {
+            if (this._searchBar) {
+                this._searchBar.setVisibility(android.view.View.GONE);
+            }
+            return;
+        }
+        const AppBarLayoutParams = com.google.android.material.appbar.AppBarLayout.LayoutParams as any;
+        if (!this._searchBar) {
+            const searchBar = new com.google.android.material.search.SearchBar(this._context);
+            const density = Utils.layout.getDisplayDensity();
+            const params = new AppBarLayoutParams(MATCH_PARENT, WRAP_CONTENT);
+            params.setMargins(Math.round(16 * density), Math.round(8 * density), Math.round(16 * density), Math.round(8 * density));
+            params.setScrollFlags(AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+            appBarLayout.addView(searchBar, params);
+            this._searchBar = searchBar;
+        }
+        const searchBar = this._searchBar;
+        searchBar.setVisibility(android.view.View.VISIBLE);
+        // below the toolbar / collapsing bar
+        const last = appBarLayout.getChildCount() - 1;
+        if (appBarLayout.indexOfChild(searchBar) !== last) {
+            appBarLayout.removeView(searchBar);
+            appBarLayout.addView(searchBar);
+        }
+        searchBar.setHint(appBar.searchHint ?? null);
+        const searchView = this._searchView;
+        searchView.setHint(appBar.searchHint ?? null);
+        if (!this._searchBarSetup) {
+            this._searchBarSetup = true;
+            searchView.setupWithSearchBar(searchBar);
+            const owner = new WeakRef(appBar);
+            searchView.getEditText().addTextChangedListener(
+                new android.text.TextWatcher({
+                    beforeTextChanged: () => null,
+                    onTextChanged: () => null,
+                    afterTextChanged: (editable: android.text.Editable) => {
+                        const bar = owner.get();
+                        const text = editable.toString();
+                        if (bar && bar.searchText !== text) {
+                            bar.searchText = text;
+                            bar.notify({ eventName: AppBarBase.searchChangeEvent, object: bar, text });
+                        }
+                    }
+                })
+            );
+            searchView.getEditText().setOnEditorActionListener(
+                new android.widget.TextView.OnEditorActionListener({
+                    onEditorAction: () => {
+                        const bar = owner.get();
+                        bar?.notify({ eventName: AppBarBase.searchSubmitEvent, object: bar, text: searchView.getText().toString() });
+                        return false;
+                    }
+                })
+            );
+            searchView.addTransitionListener(
+                new com.google.android.material.search.SearchView.TransitionListener({
+                    onStateChanged: (view: any, previousState: any, newState: any) => {
+                        if (String(newState) === 'HIDDEN') {
+                            const bar = owner.get();
+                            if (bar) {
+                                bar.searchText = '';
+                                bar.notify({ eventName: AppBarBase.searchCancelEvent, object: bar, text: '' });
+                            }
+                        }
+                    }
+                })
+            );
+        }
     }
 
     private _bottomBar: com.google.android.material.bottomappbar.BottomAppBar;
@@ -512,6 +619,8 @@ export class AppPage extends Page {
             this.syncAppBar();
         } else if (child === this._overlay) {
             this._nativeOverlay.addView(nativeChild, atIndex);
+        } else if (child === this._searchContent) {
+            this._searchView.addView(nativeChild);
         } else {
             this._nativeContent.addView(nativeChild, atIndex);
         }

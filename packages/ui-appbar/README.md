@@ -23,6 +23,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `subtitle`, `formattedTitle` | subtitle, title with spans |
 | `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
+| `searchMode` | Android: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) |
 | `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
 
 Status and limits: see [APPBAR_PLAN.md](../../APPBAR_PLAN.md). On iOS a large title on a pushed page uses the UIKit `Always` mode, which never shows the inline title: a title view is shown while the bar is collapsed (the height of the bar tells). On the root page of the Frame UIKit does it.
@@ -42,6 +43,15 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 ## Hide on scroll
 
 `hideOnScroll` (the scrolling view) of `@nativescript-community/ui-floatingactionbutton` and `@nativescript-community/ui-bottomnavigationbar`: hidden when the content scrolls down, shown when it scrolls up.
+
+```svelte
+<appPage>
+  <appBar searchable searchMode="bar" on:searchChange={(e) => (query = e.text)} />
+  <collectionview ... />
+  <appPageSearchContent><label text="results for {query}" /></appPageSearchContent>
+</appPage>
+```
+On iOS `searchMode` and `searchContent` are ignored: the `UISearchController` is used, filter the main content from `searchChange`.
 
 ## Bottom items
 

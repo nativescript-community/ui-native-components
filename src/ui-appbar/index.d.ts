@@ -7,8 +7,8 @@
 
 import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
-import { AppBarBottomItem, AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarBottomItem, AppBarScrollBehavior, AppBarSize };
+import { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize } from './index-common';
+export { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize };
 
 /**
  * An ActionBar with scroll behaviors. Use it as the `actionBar` of an `AppPage` (Android needs the AppPage: it hosts the AppBarLayout).
@@ -24,6 +24,8 @@ export class AppBar extends ActionBar {
     formattedTitle: FormattedString;
     /** the content goes under the bar: it is see through until the content scrolls (blur on iOS) */
     translucent: boolean;
+    /** Android search style: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) */
+    searchMode: AppBarSearchMode;
     /** actions of a bar at the bottom of the page: iOS the bottom toolbar (Liquid Glass on iOS 26), Android a Material `BottomAppBar` (`scrollBehavior="hide"` hides it on scroll too) */
     bottomItems: AppBarBottomItem[];
     /** raised when a bottom item is tapped (`item`) */
@@ -52,7 +54,12 @@ export class AppPage extends Page {
     scrollBehavior: AppBarScrollBehavior;
     /** views anchored to the page (a FAB, a bottom bar...): Android: not part of the scrolling content, which is taller than the screen while the bar is expanded */
     overlay: View;
+    /** Android `searchMode="bar"`: the content of the full screen search (suggestions, results). Ignored on iOS */
+    searchContent: View;
 }
+
+/** the layout to use as the `searchContent` of an AppPage */
+export class AppPageSearchContent extends GridLayout {}
 
 /** the layout to use as the `overlay` of an AppPage */
 export class AppPageOverlay extends GridLayout {}

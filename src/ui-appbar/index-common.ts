@@ -67,6 +67,10 @@ export interface AppBarBottomItem {
     [key: string]: any;
 }
 
+/** collapsible: a search icon in the bar that expands (Android SearchView action). bar: Android Material 3 `SearchBar` under the title that opens a full screen `SearchView`. iOS: always the `UISearchController` */
+export type AppBarSearchMode = 'collapsible' | 'bar';
+export const searchModeProperty = new Property<AppBarBase, AppBarSearchMode>({ name: 'searchMode', defaultValue: 'collapsible', valueChanged: changed });
+
 export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
 
 export class AppBarBase extends ActionBar {
@@ -83,6 +87,7 @@ export class AppBarBase extends ActionBar {
     /** adds a search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action */
     searchable: boolean;
     searchHint: string;
+    searchMode: AppBarSearchMode;
     /** the current text of the search (read only) */
     searchText = '';
 
@@ -109,6 +114,7 @@ scrollTargetProperty.register(AppBarBase);
 searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
 bottomItemsProperty.register(AppBarBase);
+searchModeProperty.register(AppBarBase);
 
 /**
  * Layout for the views anchored to the page itself (a floating action button, a bottom bar...), not to the scrolling content: use it as the `overlay` of an AppPage.
@@ -121,3 +127,8 @@ export function notifyBottomItemTap(bar: AppBarBase, item: AppBarBottomItem) {
     item.onTap?.(item);
     bar.notify({ eventName: AppBarBase.bottomItemTapEvent, object: bar, item } as any);
 }
+
+/**
+ * Android `searchMode="bar"`: the content of the full screen search (suggestions, results): use it as the `searchContent` of an AppPage. Ignored on iOS.
+ */
+export class AppPageSearchContent extends GridLayout {}

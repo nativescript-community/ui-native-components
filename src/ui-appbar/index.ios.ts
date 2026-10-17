@@ -1,8 +1,8 @@
 import { Color, GridLayout, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize, notifyBottomItemTap } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSize };
+import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageSearchContent, notifyBottomItemTap } from './index-common';
+export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSize, AppPageSearchContent };
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected as any;
@@ -402,6 +402,8 @@ export class AppPage extends Page {
     _addChildFromBuilder(name: string, value: any) {
         if (value instanceof AppPageOverlay) {
             this.overlay = value;
+        } else if (value instanceof AppPageSearchContent) {
+            // Android only (full screen search)
         } else {
             super._addChildFromBuilder(name, value);
         }
