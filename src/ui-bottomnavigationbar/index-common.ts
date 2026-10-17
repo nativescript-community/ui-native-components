@@ -1,5 +1,6 @@
 import { CSSType, CoercibleProperty, Color, CssProperty, EventData, ImageSource, Property, Style, View, booleanConverter } from '@nativescript/core';
 import { cssProperty } from '@nativescript-community/ui-core';
+import { observeScrollDirection } from '@nativescript-community/ui-core/scroll-hide';
 
 /**
  * Event interface for tab pressed event
@@ -87,6 +88,24 @@ export abstract class BottomNavigationBarBase extends View {
     selectedTabIndex: number;
     titleVisibility: TitleVisibility = TitleVisibility.always;
     autoClearBadge: boolean;
+    /** the scrolling view (collectionview, scrollview...): the bar slides out when the content scrolls down and comes back when it scrolls up */
+    hideOnScroll: View;
+    private _stopObservingScroll: () => void;
+    private _hidden = false;
+
+    /** @internal */
+    observeScroll(target: View) {
+        this._stopObservingScroll?.();
+        this._stopObservingScroll = target
+            ? observeScrollDirection(target, (direction) => {
+                  const hidden = direction === 'down';
+                  if (hidden !== this._hidden) {
+                      this._hidden = hidden;
+                      this.animate({ translate: { x: 0, y: hidden ? this.getActualSize().height + 64 : 0 }, duration: 200 }).catch(() => null);
+                  }
+              })
+            : null;
+    }
 
     protected _items: BottomNavigationTabBase[] = [];
 
@@ -94,8 +113,17 @@ export abstract class BottomNavigationBarBase extends View {
         return this._items;
     }
 
+    onUnloaded() {
+        this._stopObservingScroll?.();
+        this._stopObservingScroll = null;
+        super.onUnloaded();
+    }
+
     onLoaded() {
         super.onLoaded();
+        if (this.hideOnScroll && !this._stopObservingScroll) {
+            this.observeScroll(this.hideOnScroll);
+        }
         this._items.forEach((child) => {
             this.loadView(child);
             return true;
@@ -175,12 +203,17 @@ export abstract class BottomNavigationBarBase extends View {
     }
 }
 
+export const hideOnScrollProperty = new Property<BottomNavigationBarBase, View>({
+    name: 'hideOnScroll',
+    valueChanged: (target, oldValue, newValue) => target.observeScroll(newValue)
+});
 export const tabsProperty = new Property<BottomNavigationBarBase, BottomNavigationTabBase[]>({
     name: 'tabs',
     affectsLayout: true
 });
 
 tabsProperty.register(BottomNavigationBarBase);
+hideOnScrollProperty.register(BottomNavigationBarBase);
 
 export const titleVisibilityProperty = new Property<BottomNavigationBarBase, TitleVisibility>({
     name: 'titleVisibility',

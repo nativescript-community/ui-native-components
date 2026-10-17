@@ -21,9 +21,12 @@
     let spans = false;
     let bar;
     let list;
+    let fab;
     // the bar follows the scrolling list (iOS: large title collapse)
     onMount(() => {
         bar.nativeView.scrollTarget = list.nativeView;
+        // the button hides when the list scrolls down
+        fab.nativeView.hideOnScroll = list.nativeView;
     });
     let log = 'swipe the green area (gesturehandler pan)';
 
@@ -72,5 +75,6 @@
                 <label text={item.title} padding="0 16" verticalAlignment="center" />
             </Template>
         </collectionview>
+        <uifloatingactionbutton bind:this={fab} row="1" horizontalAlignment="right" verticalAlignment="bottom" src={icon('plus', 'ic_add')} on:tap={() => (log = 'fab tapped')} />
     </gridLayout>
 </appPage>

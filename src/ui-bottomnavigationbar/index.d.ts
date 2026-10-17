@@ -3,7 +3,7 @@
  * @module @nativescript-community/ui-bottomnavigationbar
  */
 
-import { Color, EventData, ImageSource } from '@nativescript/core';
+import { Color, EventData, ImageSource, View } from '@nativescript/core';
 import { BottomNavigationBarBase, BottomNavigationTabBase, TabPressedEventData, TabReselectedEventData, TabSelectedEventData, TitleVisibility } from './index-common';
 
 export { TabPressedEventData, TabReselectedEventData, TabSelectedEventData, TitleVisibility };
@@ -17,6 +17,8 @@ export declare class BottomNavigationBar extends BottomNavigationBarBase {
     //@ts-ignore
     readonly items: BottomNavigationTab[];
     selectedTabIndex: number;
+    /** the scrolling view (collectionview, scrollview...): the bar slides out when the content scrolls down and comes back when it scrolls up */
+    hideOnScroll: View;
     titleVisibility: TitleVisibility;
     activeColor: Color;
     inactiveColor: Color;
