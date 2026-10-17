@@ -7,6 +7,8 @@ import { ActivityIndicator } from '@nativescript-community/ui-activityindicator'
 import { BottomNavigation as NativeBottomNavigation } from '@nativescript-community/ui-bottom-navigation';
 import { BottomNavigationBar as NativeBottomNavigationBar, BottomNavigationTab } from '@nativescript-community/ui-bottomnavigationbar';
 import { Button } from '@nativescript-community/ui-button';
+import { Card } from '@nativescript-community/ui-card';
+import { Surface } from '@nativescript-community/ui-surface';
 import { CheckBox } from '@nativescript-community/ui-checkbox';
 import { TabContentItem, TabStrip, TabStripItem } from '@nativescript-community/ui-core-tabs';
 import { FloatingActionButton } from '@nativescript-community/ui-floatingactionbutton';
@@ -25,6 +27,7 @@ import BottomNavigationBar from './BottomNavigationBar.svelte';
 import BottomSheet from './BottomSheet.svelte';
 import Buttons from './Buttons.svelte';
 import CheckBoxes from './CheckBoxes.svelte';
+import CardsSurfaces from './CardsSurfaces.svelte';
 import Controls from './Controls.svelte';
 import DateTimePickers from './DateTimePickers.svelte';
 import Dialogs from './Dialogs.svelte';
@@ -49,6 +52,8 @@ export function installPlugin() {
     registerNativeViewElement('uibottomnavigationbar', () => NativeBottomNavigationBar);
     registerNativeViewElement('uibottomnavigationtab', () => BottomNavigationTab);
     registerNativeViewElement('uibutton', () => Button);
+    registerNativeViewElement('uicard', () => Card);
+    registerNativeViewElement('uisurface', () => Surface);
     registerNativeViewElement('uicheckbox', () => CheckBox);
     registerNativeViewElement('uifloatingactionbutton', () => FloatingActionButton);
     registerNativeViewElement('uiprogress', () => Progress);
@@ -70,6 +75,7 @@ export const demos = [
     { name: 'Buttons', path: 'Buttons', component: Buttons },
     { name: 'Floating action buttons', path: 'FloatingActionButtons', component: FloatingActionButtons },
     { name: 'Text fields', path: 'TextFields', component: TextFields },
+    { name: 'Cards and surfaces', path: 'CardsSurfaces', component: CardsSurfaces },
     { name: 'Checkbox', path: 'CheckBoxes', component: CheckBoxes },
     { name: 'Switch, slider, progress', path: 'Controls', component: Controls },
     { name: 'Segmented bar', path: 'SegmentedBar', component: SegmentedBar },

@@ -1,0 +1,45 @@
+{
+    "name": "@nativescript-community/ui-surface",
+    "version": "7.3.4",
+    "description": "Floating surface for toolbars and action groups: Material 3 surface on Android, Liquid Glass (blur before iOS 26) on iOS.",
+    "main": "./index",
+    "sideEffects": false,
+    "typings": "./index.d.ts",
+    "scripts": {
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-surface' --parents --cwd=../../src/ui-surface && tsc  --build",
+        "build": "npm run tsc",
+        "build.watch": "npm run tsc -- -w",
+        "build.all": "npm run build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.2.0",
+            "ios": "6.2.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-native-components/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/ui-native-components/tree/master/packages/ui-surface#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-native-components.git",
+        "directory": "packages/ui-surface"
+    },
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/ui-core": "^7.3.4"
+    }
+}

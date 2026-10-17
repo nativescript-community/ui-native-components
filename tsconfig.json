@@ -133,6 +133,18 @@
             ],
             "@nativescript-community/ui-checkbox/*": [
                 "src/ui-checkbox/*"
+            ],
+            "@nativescript-community/ui-card": [
+                "src/ui-card/index"
+            ],
+            "@nativescript-community/ui-card/*": [
+                "src/ui-card/*"
+            ],
+            "@nativescript-community/ui-surface": [
+                "src/ui-surface/index"
+            ],
+            "@nativescript-community/ui-surface/*": [
+                "src/ui-surface/*"
             ]
         }
     }

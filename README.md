@@ -22,6 +22,7 @@ Each package is independent: install only what you use.
 | [`@nativescript-community/ui-bottomnavigationbar`](packages/ui-bottomnavigationbar) | Bottom navigation bar (no content) |
 | [`@nativescript-community/ui-bottomsheet`](packages/ui-bottomsheet) | Bottom sheets with detents |
 | [`@nativescript-community/ui-button`](packages/ui-button) | Button: variants (Material and Liquid Glass), role, icon, busy |
+| [`@nativescript-community/ui-card`](packages/ui-card) | Card for content (no glass on iOS) |
 | [`@nativescript-community/ui-checkbox`](packages/ui-checkbox) | Checkbox with indeterminate state |
 | [`@nativescript-community/ui-core`](packages/ui-core) | Shared theming, CSS properties and helpers |
 | [`@nativescript-community/ui-core-tabs`](packages/ui-core-tabs) | Tab strip elements shared by Tabs and BottomNavigation |
@@ -35,6 +36,7 @@ Each package is independent: install only what you use.
 | [`@nativescript-community/ui-segmentedbar`](packages/ui-segmentedbar) | Segmented control with icons and spans |
 | [`@nativescript-community/ui-slider`](packages/ui-slider) | Slider |
 | [`@nativescript-community/ui-snackbar`](packages/ui-snackbar) | Snackbar (Android) |
+| [`@nativescript-community/ui-surface`](packages/ui-surface) | Floating surface for toolbars and action groups (Liquid Glass) |
 | [`@nativescript-community/ui-switch`](packages/ui-switch) | Switch |
 | [`@nativescript-community/ui-tabs`](packages/ui-tabs) | Top tabs |
 | [`@nativescript-community/ui-textfield`](packages/ui-textfield) | Text field |
