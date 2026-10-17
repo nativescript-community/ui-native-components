@@ -38,7 +38,21 @@ export class AppBarItem extends ActionItem {
     menu: MenuItem[];
     prominent: boolean;
 
+    // a view inside the item is its `actionView`: <appBarItem><uibutton .../></appBarItem>
+    _addChildFromBuilder(name: string, value: any) {
+        if (value instanceof View) {
+            this.actionView = value;
+        } else {
+            // @ts-ignore
+            super._addChildFromBuilder?.(name, value);
+        }
+    }
+
     _raiseTap() {
+        if (this.actionView) {
+            // the core takes the touches of the action view (Android click listener, iOS tap recognizer) for the tap of the item: the view gets its own `tap` event
+            this.actionView.notify({ eventName: 'tap', object: this.actionView });
+        }
         if (isAndroid && this.menu?.length && this.actionBar) {
             showMenu({ anchor: this.actionBar, items: this.menu, placement: { horizontal: 'end', vertical: 'below' } });
             return;

@@ -150,7 +150,8 @@ Done (Android and iOS, checked on the emulator / simulator): `AppPage`, `AppBar`
 iOS large title + per item appearances, svelte registration, demo page.
 Also done: search (iOS `UISearchController`, Android collapsible `SearchView`), items with `menu` / `prominent`, `observeScrollDirection` (`ui-core/scroll-hide`) and `hideOnScroll` on the FAB and the bottom navigation bar.
 Also done: Android `searchMode="bar"` (M3 SearchBar + SearchView with `searchContent`), `bottomItems` (UIToolbar / BottomAppBar), inline title of a collapsed pushed large title on iOS.
-Not done yet: badges, our `uibutton` as an item view in svelte, iOS 26 integrated search placement, Vue / Angular registration.
+Also done: a view (`uibutton`...) inside an `<appBarItem>` is its `actionView`.
+Not done yet: badges, iOS 26 integrated search placement, Vue / Angular registration.
 Done since: `AppPage.overlay` (`<appPageOverlay>`) for bottom anchored views, `hide` for medium / large bars, translucent bar with content under it on both platforms.
 Known: Android the faded collapsed title of a hidden large bar can show in the status bar area; iOS pushed large title has no inline title once collapsed; Android collapsed bar shows the status bar scrim color.
 

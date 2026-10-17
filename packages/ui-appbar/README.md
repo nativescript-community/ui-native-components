@@ -53,6 +53,15 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 ```
 On iOS `searchMode` and `searchContent` are ignored: the `UISearchController` is used, filter the main content from `searchChange`.
 
+A view inside the item is its `actionView`: use our components in the bar. The view gets its own `tap` event.
+On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text variant of the button.
+
+```svelte
+<appBarItem ios.position="right" android.position="actionBar">
+  <uibutton text="Go" variant="text" on:tap={go} />
+</appBarItem>
+```
+
 ## Bottom items
 
 `bottomItems` (`{ text, icon, spacer, onTap }`, event `bottomItemTap`): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).

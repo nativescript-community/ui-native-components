@@ -60,6 +60,9 @@
     <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
         <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
+        <appBarItem ios.position="right" android.position="actionBar">
+            <uibutton text="Go" variant="text" on:tap={() => (log = 'custom button tapped')} />
+        </appBarItem>
         <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
     </appBar>
     <collectionview bind:this={list} {items} rowHeight="56">
