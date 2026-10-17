@@ -1,7 +1,8 @@
-import { Page, View } from '@nativescript/core';
+import { Color, Page, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
-import { AppBarBase, AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarScrollBehavior, AppBarSize };
+import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
+import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize } from './index-common';
+export { AppBarItem, AppBarScrollBehavior, AppBarSize };
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected as any;
@@ -12,6 +13,36 @@ function findScrollView(view: View): UIScrollView {
         return native;
     }
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
+}
+
+@NativeClass
+class SearchDelegate extends NSObject implements UISearchResultsUpdating, UISearchBarDelegate {
+    static ObjCProtocols = [UISearchResultsUpdating, UISearchBarDelegate];
+    owner: WeakRef<AppBar>;
+    static initWithOwner(owner: AppBar) {
+        const delegate = SearchDelegate.new() as SearchDelegate;
+        delegate.owner = new WeakRef(owner);
+        return delegate;
+    }
+    updateSearchResultsForSearchController(searchController: UISearchController) {
+        const bar = this.owner?.deref();
+        const text = searchController.searchBar.text ?? '';
+        if (bar && bar.searchText !== text) {
+            bar.searchText = text;
+            bar.notify({ eventName: AppBar.searchChangeEvent, object: bar, text });
+        }
+    }
+    searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        const bar = this.owner?.deref();
+        bar?.notify({ eventName: AppBar.searchSubmitEvent, object: bar, text: searchBar.text ?? '' });
+    }
+    searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        const bar = this.owner?.deref();
+        if (bar) {
+            bar.searchText = '';
+            bar.notify({ eventName: AppBar.searchCancelEvent, object: bar, text: '' });
+        }
+    }
 }
 
 /**
@@ -26,10 +57,31 @@ function findScrollView(view: View): UIScrollView {
 export class AppBar extends AppBarBase {
     private _scrollTargetLoadedHandler: () => void;
     private _hadFormattedTitle = false;
+    private _searchController: UISearchController;
+    private _searchDelegate: SearchDelegate;
 
     update() {
         super.update();
         this.applyAppBar();
+    }
+
+    createBarButtonItem(item: AppBarItem): UIBarButtonItem {
+        let barButtonItem: UIBarButtonItem;
+        if (item instanceof AppBarItem && item.menu?.length && !item.actionView) {
+            // the bar button shows a native menu when tapped
+            const menu = createNativeMenu(item.menu);
+            const image = item.icon ? getNativeIcon(item.icon) : null;
+            barButtonItem = image ? UIBarButtonItem.alloc().initWithImageMenu(image, menu) : UIBarButtonItem.alloc().initWithTitleMenu(item.text + '', menu);
+            barButtonItem.accessibilityLabel = item.text;
+        } else {
+            // @ts-ignore
+            barButtonItem = super.createBarButtonItem(item);
+        }
+        if (item instanceof AppBarItem && item.prominent && barButtonItem && 'style' in barButtonItem) {
+            // UIBarButtonItemStylePlain = 0, Done / prominent = 2
+            barButtonItem.style = 2 as UIBarButtonItemStyle;
+        }
+        return barButtonItem;
     }
 
     private applyAppBar() {
@@ -115,7 +167,44 @@ export class AppBar extends AppBarBase {
             (navigationItem as any).subtitle = this.subtitle ?? null;
         }
 
+        this.applySearch(navigationItem, behavior);
         this.applyScrollTarget(viewController);
+    }
+
+    private applySearch(navigationItem: UINavigationItem, behavior: AppBarScrollBehavior) {
+        if (!this.searchable) {
+            navigationItem.searchController = null;
+            return;
+        }
+        if (!this._searchController) {
+            const controller = UISearchController.alloc().initWithSearchResultsController(null);
+            this._searchDelegate = SearchDelegate.initWithOwner(this);
+            controller.searchResultsUpdater = this._searchDelegate;
+            controller.searchBar.delegate = this._searchDelegate;
+            controller.obscuresBackgroundDuringPresentation = false;
+            this._searchController = controller;
+        }
+        const searchBar = this._searchController.searchBar;
+        searchBar.placeholder = this.searchHint ?? null;
+        // the field follows the color of the bar
+        const color = this.color instanceof Color ? this.color : this.color ? new Color(this.color as any) : null;
+        const field = searchBar.searchTextField;
+        if (color && field) {
+            field.textColor = color.ios;
+            field.tintColor = color.ios;
+            field.leftView && (field.leftView.tintColor = color.ios);
+            if (this.searchHint) {
+                field.attributedPlaceholder = NSAttributedString.alloc().initWithStringAttributes(this.searchHint, { [NSForegroundColorAttributeName]: new Color(150, color.r, color.g, color.b).ios } as any);
+            }
+        }
+        // the search bar stays visible unless the bar scrolls away
+        navigationItem.hidesSearchBarWhenScrolling = behavior === 'hide';
+        if ('preferredSearchBarPlacement' in navigationItem) {
+            // iOS 16+: the search bar under the title, as with large titles
+            (navigationItem as any).preferredSearchBarPlacement = 2; /* UINavigationItemSearchBarPlacementStacked */
+        }
+        navigationItem.searchController = this._searchController;
+        (this.page.ios as UIViewController).definesPresentationContext = true;
     }
 
     private applyScrollTarget(viewController: UIViewController) {

@@ -1,5 +1,5 @@
-import { ActionBarElement, PageElement, registerElement } from '@nativescript-community/svelte-native/dom';
-import { AppBar, AppPage } from '../index';
+import { ActionBarElement, PageElement, registerElement, registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
+import { AppBar, AppBarItem, AppPage } from '../index';
 
 /** svelte-native `navigate` needs a PageElement: this one wraps an AppPage instead of the core Page */
 class AppPageElement extends PageElement {
@@ -25,4 +25,5 @@ class AppBarElement extends ActionBarElement {
 export function register() {
     registerElement('AppPage', () => new AppPageElement());
     registerElement('AppBar', () => new AppBarElement());
+    registerNativeViewElement('AppBarItem', () => AppBarItem as any, 'actionItems');
 }

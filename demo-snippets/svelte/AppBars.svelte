@@ -5,7 +5,16 @@
     import { GestureHandlerStateEvent, GestureState, HandlerType, Manager } from '@nativescript-community/gesturehandler';
     import type { AppBarScrollBehavior, AppBarSize } from '@nativescript-community/ui-appbar';
 
-    const items = Array.from({ length: 80 }, (_, i) => ({ title: `row ${i + 1}` }));
+    const all = Array.from({ length: 80 }, (_, i) => ({ title: `row ${i + 1}` }));
+    let query = '';
+    $: items = all.filter((i) => i.title.toLowerCase().includes(query.toLowerCase()));
+    const icon = (ios: string, android: string) => (__IOS__ ? `sys://${ios}` : `res://${android}`);
+    const menu = [
+        { title: 'Share', icon: icon('square.and.arrow.up', 'ic_star'), onSelect: () => (log = 'menu: share') },
+        { title: 'Favorite', checked: true, onSelect: () => (log = 'menu: favorite') },
+        { separator: true },
+        { title: 'Delete', destructive: true, icon: icon('trash', 'ic_add'), onSelect: () => (log = 'menu: delete') }
+    ];
     let size: AppBarSize = 'large';
     let behavior: AppBarScrollBehavior = 'lift';
     let translucent = false;
@@ -39,8 +48,10 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle={size === "small" ? `${size} / ${behavior}` : null} {size} scrollBehavior={behavior} {translucent} formattedTitle={spans ? formatted : null}>
+    <appBar bind:this={bar} title="App bar" subtitle={size === "small" ? `${size} / ${behavior}` : null} {size} scrollBehavior={behavior} {translucent} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
+        <appBarItem text="More" icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
+        <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
     </appBar>
     <gridLayout rows="auto,*">
         <stackLayout>

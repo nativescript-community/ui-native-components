@@ -205,3 +205,18 @@ export function setContextMenu(view: View, options: ContextMenuOptions): () => v
         detach();
     };
 }
+
+/**
+ * Builds a native UIMenu from the items, for a UIBarButtonItem / UIButton `menu`. `onSelect` is called with the picked item (its `onSelect` too).
+ */
+export function createNativeMenu(items: MenuItem[], title?: string, onSelect?: (item: MenuItem) => void): UIMenu {
+    return buildMenu(title, items, (item) => {
+        onSelect?.(item);
+        item.onSelect?.(item);
+    });
+}
+
+/** icon of a menu / bar item: `sys://`, `res://`, a file, an ImageSource or a FormattedString */
+export function getNativeIcon(icon: string | ImageSource | FormattedString): UIImage {
+    return getIcon(icon);
+}

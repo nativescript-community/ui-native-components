@@ -9,6 +9,12 @@
             ],
             "@nativescript-community/ui-core/*": [
                 "packages/ui-core/*"
+            ],
+            "@nativescript-community/ui-menu": [
+                "packages/ui-menu/index"
+            ],
+            "@nativescript-community/ui-menu/*": [
+                "packages/ui-menu/*"
             ]
         }
     },

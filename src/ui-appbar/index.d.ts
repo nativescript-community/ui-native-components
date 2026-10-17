@@ -5,7 +5,8 @@
  * @module @nativescript-community/ui-appbar
  */
 
-import { ActionBar, FormattedString, Page, View } from '@nativescript/core';
+import { ActionBar, ActionItem, FormattedString, Page, View } from '@nativescript/core';
+import { MenuItem } from '@nativescript-community/ui-menu';
 import { AppBarScrollBehavior, AppBarSize } from './index-common';
 export { AppBarScrollBehavior, AppBarSize };
 
@@ -25,6 +26,16 @@ export class AppBar extends ActionBar {
     translucent: boolean;
     /** the scrolling view the bar follows. iOS: `setContentScrollView`. By default the first scrolling view found */
     scrollTarget: View;
+}
+
+/**
+ * An action of the bar: the core `ActionItem` plus a menu and the prominent style.
+ */
+export class AppBarItem extends ActionItem {
+    /** items of a menu shown when the action is tapped (iOS: the native menu of the bar button, Android: popup menu) */
+    menu: MenuItem[];
+    /** iOS 26: tinted Liquid Glass button */
+    prominent: boolean;
 }
 
 /**

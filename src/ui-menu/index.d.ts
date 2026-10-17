@@ -4,7 +4,7 @@
  * @module @nativescript-community/ui-menu
  */
 
-import { View } from '@nativescript/core';
+import { FormattedString, ImageSource, View } from '@nativescript/core';
 import { ContextMenuOptions, MenuItem, ShowMenuOptions } from './index-common';
 export * from './index-common';
 
@@ -19,3 +19,11 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
  * @returns a function removing the menu
  */
 export function setContextMenu(view: View, options: ContextMenuOptions): () => void;
+
+/**
+ * iOS only: builds a native UIMenu from the items (UIBarButtonItem / UIButton `menu`).
+ */
+export function createNativeMenu(items: MenuItem[], title?: string, onSelect?: (item: MenuItem) => void): any;
+
+/** iOS only: the UIImage of an icon (`sys://`, `res://`, file, ImageSource, FormattedString) */
+export function getNativeIcon(icon: string | ImageSource | FormattedString): any;

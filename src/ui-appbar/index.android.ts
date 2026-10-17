@@ -1,7 +1,7 @@
 import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
-import { AppBarBase, AppBarScrollBehavior, AppBarSize } from './index-common';
-export { AppBarScrollBehavior, AppBarSize };
+import { AppBarBase, AppBarItem, AppBarScrollBehavior, AppBarSize } from './index-common';
+export { AppBarItem, AppBarScrollBehavior, AppBarSize };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -34,6 +34,74 @@ export class AppBar extends AppBarBase {
         if (page instanceof AppPage) {
             page.syncAppBar();
         }
+    }
+
+    _addActionItems() {
+        // @ts-ignore
+        super._addActionItems();
+        if (this.searchable) {
+            this.addSearchItem();
+        }
+    }
+
+    /** a collapsible SearchView as the first action */
+    private addSearchItem() {
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        const menu = toolbar.getMenu();
+        const item = menu.add(0, 0x7f0a5ea1, 0, this.searchHint || 'Search');
+        const context = toolbar.getContext();
+        item.setIcon(android.R.drawable.ic_menu_search);
+        const color = this.color instanceof Color ? this.color : this.color ? new Color(this.color as any) : null;
+        if (color) {
+            androidx.core.view.MenuItemCompat.setIconTintList(item, android.content.res.ColorStateList.valueOf(color.android));
+        }
+        item.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS | android.view.MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        const searchView = new androidx.appcompat.widget.SearchView(context);
+        searchView.setQueryHint(this.searchHint ?? null);
+        searchView.setMaxWidth(java.lang.Integer.MAX_VALUE);
+        const owner = new WeakRef(this);
+        searchView.setOnQueryTextListener(
+            new androidx.appcompat.widget.SearchView.OnQueryTextListener({
+                onQueryTextChange: (text: string) => {
+                    const bar = owner.get();
+                    if (bar) {
+                        bar.searchText = text;
+                        bar.notify({ eventName: AppBarBase.searchChangeEvent, object: bar, text });
+                    }
+                    return true;
+                },
+                onQueryTextSubmit: (text: string) => {
+                    const bar = owner.get();
+                    bar?.notify({ eventName: AppBarBase.searchSubmitEvent, object: bar, text });
+                    return false;
+                }
+            })
+        );
+        item.setOnActionExpandListener(
+            new android.view.MenuItem.OnActionExpandListener({
+                onMenuItemActionExpand: () => true,
+                onMenuItemActionCollapse: () => {
+                    const bar = owner.get();
+                    if (bar) {
+                        bar.searchText = '';
+                        bar.notify({ eventName: AppBarBase.searchCancelEvent, object: bar, text: '' });
+                    }
+                    return true;
+                }
+            })
+        );
+        if (color) {
+            // the SearchView follows the colors of the bar
+            const R = (androidx.appcompat as any).R.id;
+            const edit = searchView.findViewById(R.search_src_text) as android.widget.EditText;
+            edit?.setTextColor(color.android);
+            edit?.setHintTextColor(new Color(150, color.r, color.g, color.b).android);
+            for (const id of [R.search_close_btn, R.search_mag_icon, R.search_button]) {
+                const icon = searchView.findViewById(id) as android.widget.ImageView;
+                icon?.setColorFilter(color.android);
+            }
+        }
+        item.setActionView(searchView);
     }
 
     _updateTitleAndTitleView() {
