@@ -8,7 +8,7 @@ export class ActivityIndicator extends ActivityIndicatorBase {
     // The indicator draws at its own size (40dp, 48dp when wavy), whatever the size of the view: it follows the size of the view
     // (width/height of the view, the smallest side) in onLayout.
     createNativeView() {
-        return inflateLayout(this._context, 'ns_material_circular_progress') as com.google.android.material.progressindicator.CircularProgressIndicator;
+        return inflateLayout(this._context, 'ns_ui_circular_progress') as com.google.android.material.progressindicator.CircularProgressIndicator;
     }
 
     onLayout(left: number, top: number, right: number, bottom: number) {

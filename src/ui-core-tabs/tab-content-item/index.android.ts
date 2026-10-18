@@ -7,7 +7,7 @@ export * from './tab-content-item-common';
 
 export class TabContentItem extends TabContentItemBase {
     public nativeViewProtected: org.nativescript.widgets.GridLayout;
-    public tabItemSpec: com.nativescript.material.core.TabItemSpec;
+    public tabItemSpec: com.nativescript.ui.core.TabItemSpec;
 
     get _hasFragments(): boolean {
         return true;

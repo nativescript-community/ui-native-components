@@ -2,13 +2,13 @@ import { RefreshLayoutBase, bottomEnabledProperty, bottomRefreshingProperty, ind
 
 export * from './index-common';
 
-type NativeLayout = com.nativescript.material.refreshlayout.RefreshLayout & { refreshListener?: any; bottomListener?: any };
+type NativeLayout = com.nativescript.ui.refreshlayout.RefreshLayout & { refreshListener?: any; bottomListener?: any };
 
 export class RefreshLayout extends RefreshLayoutBase {
     nativeViewProtected: NativeLayout;
 
     public createNativeView() {
-        return new com.nativescript.material.refreshlayout.RefreshLayout(this._context);
+        return new com.nativescript.ui.refreshlayout.RefreshLayout(this._context);
     }
 
     public initNativeView() {

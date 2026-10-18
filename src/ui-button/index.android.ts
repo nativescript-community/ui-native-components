@@ -38,16 +38,16 @@ export class Button extends ButtonBase {
     public createNativeView() {
         // let layoutId;
         const variant = toMaterialVariant(this.variant);
-        // let layoutIdName = 'ns_material_button';
+        // let layoutIdName = 'ns_ui_button';
         let layoutStringId: string;
         if (variant === 'text') {
-            layoutStringId = 'ns_material_button_text';
+            layoutStringId = 'ns_ui_button_text';
         } else if (variant === 'flat') {
-            layoutStringId = 'ns_material_button_flat';
+            layoutStringId = 'ns_ui_button_flat';
         } else if (variant === 'outline') {
-            layoutStringId = 'ns_material_button_outline';
+            layoutStringId = 'ns_ui_button_outline';
         } else {
-            layoutStringId = 'ns_material_button';
+            layoutStringId = 'ns_ui_button';
             // contained
             // we need to set the default through css or user would not be able to overload it through css...
             this.style['css:margin-left'] = 10;

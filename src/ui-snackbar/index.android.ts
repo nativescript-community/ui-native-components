@@ -153,8 +153,8 @@ export class SnackBar extends SnackBarBase {
             // set the action text, click listener
             this._snackbar.setAction(options.actionText, listener);
         }
-        const cb = (this._snackbarCallback = new com.nativescript.material.snackbar.SnackCallback());
-        const callbackListener = new com.nativescript.material.snackbar.SnackCallback.SnackCallbackListener({
+        const cb = (this._snackbarCallback = new com.nativescript.ui.snackbar.SnackCallback());
+        const callbackListener = new com.nativescript.ui.snackbar.SnackCallback.SnackCallbackListener({
             onDismissed(snackbar: com.google.android.material.snackbar.Snackbar, event: number) {
                 // if the dismiss was not caused by the action button click listener
                 const resolve = (cb as any).resolve;

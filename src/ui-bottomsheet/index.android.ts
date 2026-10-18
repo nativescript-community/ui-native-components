@@ -78,7 +78,7 @@ const DRAG_HANDLE_MARGIN = 28;
  * Android: the detents are the stops of BottomSheetBehavior (collapsed, half expanded, expanded).
  */
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
-    _bottomSheetFragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment;
+    _bottomSheetFragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment;
     _bottomSheetOptions: BottomSheetOptions;
     _bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<android.view.View>;
     _detentCount = 0;
@@ -227,7 +227,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         sheet.requestLayout();
     }
 
-    applyGrabber(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment, sheet: android.view.View) {
+    applyGrabber(fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment, sheet: android.view.View) {
         const handle = new com.google.android.material.bottomsheet.BottomSheetDragHandleView(fragment.getActivity());
         (sheet as android.view.ViewGroup).addView(handle, new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.Gravity.TOP));
         // the content starts below the handle
@@ -271,15 +271,15 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             },
             dismissCallback: () => this._onDismissBottomSheetCallback?.()
         };
-        const dfListener = new com.nativescript.material.bottomsheet.BottomSheetDialogFragment.BottomSheetDialogFragmentListener({
-            onCreateDialog(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment, savedInstanceState: android.os.Bundle): android.app.Dialog {
+        const dfListener = new com.nativescript.ui.bottomsheet.BottomSheetDialogFragment.BottomSheetDialogFragmentListener({
+            onCreateDialog(fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment, savedInstanceState: android.os.Bundle): android.app.Dialog {
                 const theme = fragment.getTheme();
-                const dialogListener = new com.nativescript.material.bottomsheet.BottomSheetDialog.BottomSheetDialogListener({
-                    onDetachedFromWindow(dialog: com.nativescript.material.bottomsheet.BottomSheetDialog) {
+                const dialogListener = new com.nativescript.ui.bottomsheet.BottomSheetDialog.BottomSheetDialogListener({
+                    onDetachedFromWindow(dialog: com.nativescript.ui.bottomsheet.BottomSheetDialog) {
                         (dialog as any).nListener = null;
                     },
 
-                    onBackPressed(dialog: com.nativescript.material.bottomsheet.BottomSheetDialog) {
+                    onBackPressed(dialog: com.nativescript.ui.bottomsheet.BottomSheetDialog) {
                         const sheetOptions = bottomSheetOptions.options;
                         if (sheetOptions?.dismissOnBackButton === false) {
                             sheetOptions.onDismissAttempt?.();
@@ -313,7 +313,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                         return args.cancel;
                     }
                 });
-                const dialog = new com.nativescript.material.bottomsheet.BottomSheetDialog(fragment.getActivity(), theme);
+                const dialog = new com.nativescript.ui.bottomsheet.BottomSheetDialog(fragment.getActivity(), theme);
                 dialog.setListener(dialogListener);
                 (dialog as any).nListener = dialogListener;
                 if (bottomSheetOptions.options) {
@@ -329,7 +329,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             },
 
             onCreateView(
-                fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment,
+                fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment,
                 inflater: android.view.LayoutInflater,
                 container: android.view.ViewGroup,
                 savedInstanceState: android.os.Bundle
@@ -353,7 +353,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 return null;
             },
 
-            onStart(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment): void {
+            onStart(fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment): void {
                 const owner = that?.get();
                 if (!owner) {
                     return;
@@ -477,7 +477,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 bottomSheetOptions.shownCallback();
             },
 
-            onDismiss(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment, dialog: android.content.DialogInterface): void {
+            onDismiss(fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment, dialog: android.content.DialogInterface): void {
                 const owner = that?.get();
                 if (owner) {
                     owner._bottomSheetCloseIgnore = true;
@@ -485,7 +485,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 bottomSheetOptions.dismissCallback();
             },
 
-            onDestroy(fragment: com.nativescript.material.bottomsheet.BottomSheetDialogFragment): void {
+            onDestroy(fragment: com.nativescript.ui.bottomsheet.BottomSheetDialogFragment): void {
                 (df as any).nListener = null;
                 const owner = that?.get();
                 if (owner) {
@@ -494,7 +494,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 }
             }
         });
-        const df = new com.nativescript.material.bottomsheet.BottomSheetDialogFragment();
+        const df = new com.nativescript.ui.bottomsheet.BottomSheetDialogFragment();
         df.setListener(dfListener);
         (df as any).nListener = dfListener;
         this._bottomSheetFragment = df;

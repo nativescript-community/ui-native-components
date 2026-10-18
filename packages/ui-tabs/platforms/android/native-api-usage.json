@@ -2,7 +2,7 @@
     "uses": [
         "android.content:Context",
         "android.view:View",
-        "com.nativescript.material.core:MaterialTabs",
-        "com.nativescript.material.core:TabItemSpec"
+        "com.nativescript.ui.core:MaterialTabs",
+        "com.nativescript.ui.core:TabItemSpec"
     ]
 }

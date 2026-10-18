@@ -17,6 +17,6 @@
         "androidx.viewpager2.adapter:FragmentStateAdapter",
         "androidx.viewpager2.widget:ViewPager2",
         "androidx.viewpager2.widget:ViewPager2.OnPageChangeCallback",
-        "com.nativescript.material.core:TabItemSpec"
+        "com.nativescript.ui.core:TabItemSpec"
     ]
 }

@@ -40,7 +40,7 @@ export class TextView extends TextViewBase {
     //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
     [key: symbol]: (...args: any[]) => any | void;
 
-    editText: com.nativescript.material.textview.TextViewInputEditText;
+    editText: com.nativescript.ui.textview.TextViewInputEditText;
     layoutView: com.google.android.material.textfield.TextInputLayout;
 
     constructor() {
@@ -61,26 +61,26 @@ export class TextView extends TextViewBase {
     }
 
     public createNativeView() {
-        let layoutIdString = 'ns_material_text_view';
+        let layoutIdString = 'ns_ui_text_view';
         const variant = this.variant;
         let needsTransparent = false;
         if (variant === 'filled') {
-            layoutIdString = 'ns_material_text_view_filled';
+            layoutIdString = 'ns_ui_text_view_filled';
         } else if (variant === 'outline') {
-            layoutIdString = 'ns_material_text_view_outline';
+            layoutIdString = 'ns_ui_text_view_outline';
         } else {
             needsTransparent = true;
         }
 
         let layoutView: com.google.android.material.textfield.TextInputLayout;
-        let editText: com.nativescript.material.textview.TextViewInputEditText;
+        let editText: com.nativescript.ui.textview.TextViewInputEditText;
 
         if (layoutIdString) {
             layoutView = this.layoutView = inflateLayout(this._context, layoutIdString) as com.google.android.material.textfield.TextInputLayout;
-            editText = this.editText = layoutView.getEditText() as com.nativescript.material.textview.TextViewInputEditText;
+            editText = this.editText = layoutView.getEditText() as com.nativescript.ui.textview.TextViewInputEditText;
         } else {
             layoutView = this.layoutView = new com.google.android.material.textfield.TextInputLayout(this._context);
-            editText = this.editText = new com.nativescript.material.textview.TextViewInputEditText(layoutView.getContext());
+            editText = this.editText = new com.nativescript.ui.textview.TextViewInputEditText(layoutView.getContext());
             if (!FrameLayoutLayoutParams) {
                 FrameLayoutLayoutParams = android.widget.FrameLayout.LayoutParams;
             }

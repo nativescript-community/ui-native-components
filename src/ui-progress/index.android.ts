@@ -12,7 +12,7 @@ export class Progress extends ProgressBase {
     nativeViewProtected: com.google.android.material.progressindicator.LinearProgressIndicator;
 
     createNativeView() {
-        return inflateLayout(this._context, 'ns_material_linear_progress') as com.google.android.material.progressindicator.LinearProgressIndicator;
+        return inflateLayout(this._context, 'ns_ui_linear_progress') as com.google.android.material.progressindicator.LinearProgressIndicator;
     }
 
     [wavyProperty.setNative](value: boolean) {

@@ -26,9 +26,9 @@
         "com.google.android.material.bottomsheet:BottomSheetDialogFragment",
         "com.google.android.material.bottomsheet:BottomSheetDragHandleView",
         "com.google.android.material.shape:MaterialShapeDrawable",
-        "com.nativescript.material.bottomsheet:BottomSheetDialog",
-        "com.nativescript.material.bottomsheet:BottomSheetDialog.BottomSheetDialogListener",
-        "com.nativescript.material.bottomsheet:BottomSheetDialogFragment",
-        "com.nativescript.material.bottomsheet:BottomSheetDialogFragment.BottomSheetDialogFragmentListener"
+        "com.nativescript.ui.bottomsheet:BottomSheetDialog",
+        "com.nativescript.ui.bottomsheet:BottomSheetDialog.BottomSheetDialogListener",
+        "com.nativescript.ui.bottomsheet:BottomSheetDialogFragment",
+        "com.nativescript.ui.bottomsheet:BottomSheetDialogFragment.BottomSheetDialogFragmentListener"
     ]
 }

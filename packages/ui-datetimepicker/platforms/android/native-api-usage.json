@@ -5,8 +5,21 @@
         "android.view:View.OnClickListener",
         "androidx.appcompat.app:AppCompatActivity",
         "androidx.core.util:Pair",
+        "androidx.fragment.app:DialogFragment",
         "androidx.fragment.app:FragmentManager",
+        "com.google.android.material.datepicker:CalendarConstraints",
+        "com.google.android.material.datepicker:CalendarConstraints.Builder",
+        "com.google.android.material.datepicker:CalendarConstraints.DateValidator",
+        "com.google.android.material.datepicker:CompositeDateValidator",
+        "com.google.android.material.datepicker:DateValidatorPointBackward",
+        "com.google.android.material.datepicker:DateValidatorPointForward",
+        "com.google.android.material.datepicker:MaterialDatePicker",
         "com.google.android.material.datepicker:MaterialDatePicker.Builder",
+        "com.google.android.material.datepicker:MaterialPickerOnPositiveButtonClickListener",
+        "com.google.android.material.timepicker:MaterialTimePicker",
+        "com.google.android.material.timepicker:MaterialTimePicker.Builder",
+        "com.google.android.material.timepicker:TimeFormat",
+        "java.lang:Long",
         "java.util:ArrayList"
     ]
 }

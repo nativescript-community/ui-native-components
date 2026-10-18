@@ -6,7 +6,7 @@ import { CSSType, Color } from '@nativescript/core';
 
 export { TabContentItem, TabStrip, TabStripItem };
 
-interface TabsBar extends com.nativescript.material.core.MaterialTabs {
+interface TabsBar extends com.nativescript.ui.core.MaterialTabs {
     // tslint:disable-next-line:no-misused-new
     new (context: android.content.Context, owner: Tabs): TabsBar;
     onSelectedPositionChange(position: number, prevPosition: number): void;
@@ -19,7 +19,7 @@ function initializeNativeClasses() {
         return;
     }
     @NativeClass
-    class MaterialTabsImplementation extends com.nativescript.material.core.MaterialTabs implements PositionChanger {
+    class MaterialTabsImplementation extends com.nativescript.ui.core.MaterialTabs implements PositionChanger {
         constructor(context: android.content.Context, public owner: Tabs) {
             super(context);
 
@@ -55,7 +55,7 @@ export class Tabs extends TabNavigation<TabsBar> {
         }
         return view;
     }
-    protected override updateTabsBarItemAt(position: number, itemSpec: com.nativescript.material.core.TabItemSpec) {
+    protected override updateTabsBarItemAt(position: number, itemSpec: com.nativescript.ui.core.TabItemSpec) {
         this.mTabsBar.updateItemAt(position, itemSpec);
     }
     protected override setTabsBarSelectedIndicatorColors(colors: number[]) {
@@ -95,7 +95,7 @@ export class Tabs extends TabNavigation<TabsBar> {
         return tabsBar;
     }
 
-    protected override setTabBarItems(tabItems: com.nativescript.material.core.TabItemSpec[]) {
+    protected override setTabBarItems(tabItems: com.nativescript.ui.core.TabItemSpec[]) {
         this.mTabsBar.setItems(tabItems);
         this._setItemsColors(null);
         // The setTimeout below is necessary to ensure the scrollToTab is executed only after

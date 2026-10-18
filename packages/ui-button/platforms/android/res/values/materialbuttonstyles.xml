@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="UnelevatedButton.Custom" parent="@style/Widget.Material3.Button.UnelevatedButton">
+    <style name="NSUiUnelevatedButton_Custom" parent="@style/Widget.Material3.Button.UnelevatedButton">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -10,7 +10,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="UnelevatedButton.Custom.Icon" parent="@style/Widget.Material3.Button.UnelevatedButton">
+    <style name="NSUiUnelevatedButton_Custom_Icon" parent="@style/Widget.Material3.Button.UnelevatedButton">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -19,7 +19,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="TextButton.Custom.Icon" parent="@style/Widget.Material3.Button.TextButton.Icon">
+    <style name="NSUiTextButton_Custom_Icon" parent="@style/Widget.Material3.Button.TextButton.Icon">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -28,7 +28,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="TextButton.Custom" parent="@style/Widget.Material3.Button.TextButton">
+    <style name="NSUiTextButton_Custom" parent="@style/Widget.Material3.Button.TextButton">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -37,7 +37,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="OutlinedButton.Custom" parent="@style/Widget.Material3.Button.OutlinedButton">
+    <style name="NSUiOutlinedButton_Custom" parent="@style/Widget.Material3.Button.OutlinedButton">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -46,7 +46,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="OutlinedButton.Custom.Icon" parent="@style/Widget.Material3.Button.OutlinedButton.Icon">
+    <style name="NSUiOutlinedButton_Custom_Icon" parent="@style/Widget.Material3.Button.OutlinedButton.Icon">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -55,7 +55,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="Button.Custom" parent="@style/Widget.Material3.Button">
+    <style name="NSUiButton_Custom" parent="@style/Widget.Material3.Button">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>
@@ -64,7 +64,7 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
-    <style name="Button.Custom.Icon" parent="@style/Widget.Material3.Button.Icon">
+    <style name="NSUiButton_Custom_Icon" parent="@style/Widget.Material3.Button.Icon">
         <item name="android:padding">0dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:minHeight">40dp</item>

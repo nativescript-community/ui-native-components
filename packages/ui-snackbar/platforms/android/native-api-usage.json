@@ -10,7 +10,7 @@
         "androidx.coordinatorlayout.widget:CoordinatorLayout",
         "com.google.android.material.snackbar:BaseTransientBottomBar.BaseCallback",
         "com.google.android.material.snackbar:Snackbar",
-        "com.nativescript.material.snackbar:SnackCallback",
-        "com.nativescript.material.snackbar:SnackCallback.SnackCallbackListener"
+        "com.nativescript.ui.snackbar:SnackCallback",
+        "com.nativescript.ui.snackbar:SnackCallback.SnackCallbackListener"
     ]
 }

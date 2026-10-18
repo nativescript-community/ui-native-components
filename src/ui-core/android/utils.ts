@@ -144,7 +144,7 @@ export function getFullColorStateList(activeColor: number, inactiveColor = 16273
         return null;
     }
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.getFullColorStateList(activeColor, inactiveColor, disabledColor);
 }
@@ -153,7 +153,7 @@ export function getEnabledColorStateList(color: number, disabledColor: number) {
         return null;
     }
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.getEnabledColorStateList(color, disabledColor);
 }
@@ -172,7 +172,7 @@ export const createStateListAnimator = profile('createStateListAnimator', functi
     }
     pressedZ = Utils.layout.toDevicePixels(pressedZ);
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     NUtils.createStateListAnimator(view._context, nativeView, elevation, pressedZ);
 });
@@ -186,20 +186,20 @@ export function getAttrColor(context: android.content.Context, name: string) {
 
 function createForegroundShape(radius) {
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.createForegroundShape(radius);
 }
 export function createRippleDrawable(rippleColor: number, topLeftRadius = 0, topRightRadius = 0, bottomRightRadius = 0, bottomLeftRadius = 0) {
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.createRippleDrawable(rippleColor, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
 }
 
 export function handleClearFocus(view: android.view.View) {
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.handleClearFocus(view);
 }
@@ -259,7 +259,7 @@ export function getVerticalGravity(textAlignment: VerticalTextAlignment) {
 
 export function inflateLayout(context: android.content.Context, layoutId: string) {
     if (!NUtils) {
-        NUtils = (com as any).nativescript.material.core.Utils;
+        NUtils = (com as any).nativescript.ui.core.Utils;
     }
     return NUtils.inflateLayout(context, layoutId);
 }

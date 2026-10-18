@@ -9,6 +9,6 @@
         "android.widget:LinearLayout.LayoutParams",
         "com.google.android.material.shape:MaterialShapeDrawable",
         "com.google.android.material.textfield:TextInputLayout",
-        "com.nativescript.material.textview:TextViewInputEditText"
+        "com.nativescript.ui.textview:TextViewInputEditText"
     ]
 }

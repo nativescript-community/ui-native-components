@@ -3,7 +3,7 @@
         "android.content:Context",
         "android.graphics.drawable:Drawable",
         "android.view:View",
-        "com.nativescript.material.core:NavigationBar",
-        "com.nativescript.material.core:TabItemSpec"
+        "com.nativescript.ui.core:NavigationBar",
+        "com.nativescript.ui.core:TabItemSpec"
     ]
 }

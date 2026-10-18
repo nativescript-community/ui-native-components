@@ -250,7 +250,7 @@ export abstract class TabNavigation<T extends android.view.ViewGroup = any> exte
     }
 
     protected abstract createNativeTabBar(context: android.content.Context): T;
-    protected abstract setTabBarItems(tabItems: com.nativescript.material.core.TabItemSpec[]);
+    protected abstract setTabBarItems(tabItems: com.nativescript.ui.core.TabItemSpec[]);
     protected abstract getTabBarItemView(index: number);
     protected abstract getTabBarItemTextView(index: number);
     protected abstract selectTabBar(oldIndex: number, newIndex: number);
@@ -400,7 +400,7 @@ export abstract class TabNavigation<T extends android.view.ViewGroup = any> exte
             return;
         }
 
-        const tabItems = new Array<com.nativescript.material.core.TabItemSpec>();
+        const tabItems = new Array<com.nativescript.ui.core.TabItemSpec>();
         items.forEach((tabStripItem: TabStripItem, i, arr) => {
             tabStripItem.index = i;
             const tabItemSpec = this.createTabItemSpec(tabStripItem);
@@ -418,8 +418,8 @@ export abstract class TabNavigation<T extends android.view.ViewGroup = any> exte
         });
     }
 
-    protected createTabItemSpec(tabStripItem: TabStripItem): com.nativescript.material.core.TabItemSpec {
-        const tabItemSpec = new com.nativescript.material.core.TabItemSpec();
+    protected createTabItemSpec(tabStripItem: TabStripItem): com.nativescript.ui.core.TabItemSpec {
+        const tabItemSpec = new com.nativescript.ui.core.TabItemSpec();
 
         if (tabStripItem.isLoaded) {
             const nestedLabel = tabStripItem.label;
@@ -536,9 +536,9 @@ export abstract class TabNavigation<T extends android.view.ViewGroup = any> exte
         return scaledImage;
     }
 
-    protected abstract updateTabsBarItemAt(index: number, spec: com.nativescript.material.core.TabItemSpec);
+    protected abstract updateTabsBarItemAt(index: number, spec: com.nativescript.ui.core.TabItemSpec);
     protected abstract setTabsBarSelectedIndicatorColors(colors: number[]);
-    public updateAndroidItemAt(index: number, spec: com.nativescript.material.core.TabItemSpec) {
+    public updateAndroidItemAt(index: number, spec: com.nativescript.ui.core.TabItemSpec) {
         // that try catch is fix for an android NPE error on css change which navigated in (not the current fragment)
         try {
             if (this.mTabsBar) {

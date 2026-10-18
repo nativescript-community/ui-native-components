@@ -1,6 +1,6 @@
 declare namespace com {
     export namespace nativescript {
-        export namespace material {
+        export namespace ui {
             export namespace core {
                 export class TabLayout extends globalAndroid.widget.HorizontalScrollView {
                     constructor(context: globalAndroid.content.Context);

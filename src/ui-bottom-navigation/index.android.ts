@@ -8,7 +8,7 @@ import { CSSType, Color, Utils } from '@nativescript/core';
 
 export { TabContentItem, TabStrip, TabStripItem };
 
-interface BottomNavigationBar extends com.nativescript.material.core.NavigationBar {
+interface BottomNavigationBar extends com.nativescript.ui.core.NavigationBar {
     // tslint:disable-next-line:no-misused-new
     new (context: android.content.Context, owner: BottomNavigation): BottomNavigationBar;
 }
@@ -21,7 +21,7 @@ function initializeNativeClasses() {
     }
 
     @NativeClass
-    class NavigationBarImplementation extends com.nativescript.material.core.NavigationBar {
+    class NavigationBarImplementation extends com.nativescript.ui.core.NavigationBar {
         constructor(context: android.content.Context, public owner: BottomNavigation) {
             super(context);
 
@@ -49,11 +49,11 @@ function initializeNativeClasses() {
 }
 
 @CSSType('BottomNavigation')
-export class BottomNavigation extends TabNavigation<com.nativescript.material.core.NavigationBar> {
+export class BottomNavigation extends TabNavigation<com.nativescript.ui.core.NavigationBar> {
     tabsPosition = TabsPosition.Bottom;
     animationEnabled = false;
     swipeEnabled = false;
-    protected override updateTabsBarItemAt(position: number, itemSpec: com.nativescript.material.core.TabItemSpec) {
+    protected override updateTabsBarItemAt(position: number, itemSpec: com.nativescript.ui.core.TabItemSpec) {
         this.mTabsBar.updateItemAt(position, itemSpec);
     }
     protected override setTabsBarSelectedIndicatorColors(colors: number[]) {
@@ -74,7 +74,7 @@ export class BottomNavigation extends TabNavigation<com.nativescript.material.co
         return tabsBar;
     }
 
-    protected override setTabBarItems(tabItems: com.nativescript.material.core.TabItemSpec[]) {
+    protected override setTabBarItems(tabItems: com.nativescript.ui.core.TabItemSpec[]) {
         this.mTabsBar.setItems(tabItems);
         this._setItemsColors(null);
     }
@@ -105,7 +105,7 @@ export class BottomNavigation extends TabNavigation<com.nativescript.material.co
     //     // this.changeTab(this.selectedIndex);
     // }
 
-    public override updateAndroidItemAt(index: number, spec: com.nativescript.material.core.TabItemSpec) {
+    public override updateAndroidItemAt(index: number, spec: com.nativescript.ui.core.TabItemSpec) {
         // that try catch is fix for an android NPE error on css change which navigated in (not the current fragment)
         try {
             if (this.mTabsBar) {
