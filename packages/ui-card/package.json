@@ -8,7 +8,7 @@
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-card' --parents --cwd=../../src/ui-card && tsc  --build",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
-        "build": "npm run tsc",
+        "build": "npm run tsc && npm run readme",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
         "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
