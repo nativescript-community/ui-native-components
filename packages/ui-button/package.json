@@ -7,6 +7,7 @@
     "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-button' --parents --cwd=../../src/ui-button && tsc  --build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
         "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",

@@ -1,12 +1,13 @@
 {
     "name": "@nativescript-community/ui-snackbar",
     "version": "7.3.4",
-    "description": "SnackBar. Android only (Material): no-op on iOS.",
+    "description": "SnackBar: Material 3 Snackbar on Android, liquid-toasts toast on iOS.",
     "main": "./index",
     "sideEffects": false,
     "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-snackbar' --parents --cwd=../../src/ui-snackbar && tsc  --build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
         "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",

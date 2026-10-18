@@ -7,6 +7,7 @@
     "typings": "./index.d.ts",
     "scripts": {
         "tsc": "cpy '**/*.d.ts' '../../packages/ui-core-tabs' --parents --cwd=../../src/ui-core-tabs && tsc  --build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
         "build": "npm run tsc",
         "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build",
