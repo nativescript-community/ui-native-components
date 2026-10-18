@@ -6,19 +6,20 @@
     "scripts": {
         "build": "lerna run build",
         "build.watch": "lerna run build.watch",
-        "build.all": "lerna run build.all",
-        "clean": "rimraf -g 'packages/**/*.d.ts' 'packages/**/*.tsbuildinfo' 'packages/**/*.js' 'packages/**/*.mjs' 'packages/**/*.js.map' 'packages/**/*.mjs.map' 'packages/**/*.metada'",
-        "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'node_modules'",
+        "build.all": "npm run build",
+        "clean": "rimraf -g 'packages/**/*.d.ts' 'packages/**/*.tsbuildinfo' 'packages/**/*.js' 'packages/**/*.mjs' 'packages/**/*.js.map' 'packages/**/*.mjs.map' 'packages/**/*.metada' 'packages/**/angular/ng-package.json'",
+        "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'demo-*/hooks' 'demo-*/node_modules' 'package-lock.json' 'pnpm-lock.yaml' 'node_modules'",
         "commitmsg": "commitlint -e $GIT_PARAMS",
         "postinstall": "npm run setup",
-        "publish": "npm run setup && npm run clean && npm run build.all && npm run doc && lerna publish",
-        "setup": "ts-patch install",
+        "publish": "npm run setup && npm run clean && npm run build.all && npm run readme && npm run doc && npm run commit_readme_doc_changes && lerna publish",
+        "setup": "npm run submodules && ts-patch install",
         "sync": "node ./tools/sync.mjs",
         "update": "node ./tools/update.js",
         "doc": "node tools/builddoc.mjs",
-        "demo.svelte.android": "cd ./demo-svelte && ns run android --no-hmr --env.watchNodeModules",
-        "demo.svelte.ios": "cd ./demo-svelte && ns run ios --no-hmr --env.watchNodeModules",
-        "demo.svelte.clean": "cd ./demo-svelte && ns clean"
+        "commit_readme_doc_changes": "git add docs/** *.md ; git commit -m \"readme/doc\" ; echo \"commit readme doc done\"",
+        "readme": "lerna run readme && node ./tools/readme.js",
+        "start": "./node_modules/.bin/ntl -A -s 15 -o",
+        "submodules": "git submodule update --init"
     },
     "keywords": [
         "NativeScript",
@@ -43,8 +44,7 @@
     },
     "workspaces": [
         "packages/*",
-        "demo-snippets",
-        "demo-svelte"
+        "demo*"
     ],
     "engines": {
         "npm": "please use yarn or pnpm",
@@ -60,5 +60,13 @@
     "bugs": {
         "url": "https://github.com/nativescript-community/ui-native-components/issues"
     },
-    "homepage": "https://github.com/nativescript-community/ui-native-components#readme"
+    "homepage": "https://github.com/nativescript-community/ui-native-components#readme",
+    "ntl": {
+        "descriptions": {
+            "build": "Build the plugin",
+            "build.all": "Build the plugin for all platforms",
+            "clean": "Clean the local environment.",
+            "watch": "Watch for changes in the plugin source and re-build."
+        }
+    }
 }

@@ -8,4 +8,4 @@ tsconfig.json
 !*.d.ts
 *.aar
 *.jar
-blueprint.md!nativescript.config.ts
+blueprint.md
