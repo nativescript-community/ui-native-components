@@ -19,7 +19,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | property | |
 |---|---|
 | `size` | `small` (default), `medium`, `large`: title that collapses with the scroll |
-| `scrollBehavior` | `none`, `lift` (elevation / separator only when content scrolls under the bar), `hide` (the whole bar, also a large one, leaves the screen when scrolling down and comes back when scrolling up) |
+| `scrollBehavior` (Android notes: the surface of the bar is the AppBarLayout, the toolbar is flat and transparent; the icons follow the css `color`, the surface the css `background-color`, else the theme colors; `lift` changes the surface color and the status bar area follows) | `none`, `lift` (elevation / separator only when content scrolls under the bar), `hide` (the whole bar, also a large one, leaves the screen when scrolling down and comes back when scrolling up) |
 | `subtitle`, `formattedTitle` | subtitle, title with spans |
 | `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |

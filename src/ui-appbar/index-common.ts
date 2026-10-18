@@ -1,4 +1,4 @@
-import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, ImageSource, Property, View, isAndroid } from '@nativescript/core';
+import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, ImageSource, ItemSpec, Property, View, isAndroid } from '@nativescript/core';
 import { MenuItem, showMenu } from '@nativescript-community/ui-menu';
 
 /** small: standard bar, medium / large: a title that collapses on scroll (M3 collapsing app bar on Android, large title on iOS) */
@@ -146,7 +146,14 @@ searchPlacementProperty.register(AppBarBase);
  * Layout for the views anchored to the page itself (a floating action button, a bottom bar...), not to the scrolling content: use it as the `overlay` of an AppPage.
  * Android: the content of an AppPage is taller than the screen while the bar is expanded (the content moves up when the bar collapses), so a view anchored to the bottom of the content would be off screen.
  */
-export class AppPageOverlay extends GridLayout {}
+export class AppPageOverlay extends GridLayout {
+    constructor() {
+        super();
+        // explicit star row and column: the children are aligned in the whole page, also when the keyboard changes its size
+        this.addRow(new ItemSpec(1, 'star'));
+        this.addColumn(new ItemSpec(1, 'star'));
+    }
+}
 
 /** raises the tap of a bottom item: the `onTap` of the item and the `bottomItemTap` event of the bar */
 export function notifyBottomItemTap(bar: AppBarBase, item: AppBarBottomItem) {

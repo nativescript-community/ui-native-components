@@ -1,4 +1,4 @@
-import { Color, GridLayout, Page, Utils, View } from '@nativescript/core';
+import { Color, GridLayout, ItemSpec, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
 import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent, notifyBottomItemTap } from './index-common';
@@ -72,6 +72,11 @@ class PassthroughView extends UIView {
  * Its empty areas let the touches go through to the content.
  */
 export class AppPageOverlay extends GridLayout {
+    constructor() {
+        super();
+        this.addRow(new ItemSpec(1, 'star'));
+        this.addColumn(new ItemSpec(1, 'star'));
+    }
     createNativeView() {
         return PassthroughView.new();
     }

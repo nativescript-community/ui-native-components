@@ -1,4 +1,4 @@
-import { ActionBar, Color, Page, Utils, View } from '@nativescript/core';
+import { ActionBar, Application, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon } from '@nativescript-community/ui-menu';
 import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent, notifyBottomItemTap } from './index-common';
@@ -14,6 +14,22 @@ function getActionBarSize(context: android.content.Context) {
         return android.util.TypedValue.complexToDimensionPixelSize(value.data, context.getResources().getDisplayMetrics());
     }
     return Math.round(56 * Utils.layout.getDisplayDensity());
+}
+
+function getMaterialAttr(name: string): number {
+    return +java.lang.Class.forName('com.google.android.material.R$attr').getDeclaredField(name).get(null);
+}
+
+/** a color of the Material theme (colorSurface, colorOnSurface...) */
+function getThemeColor(view: android.view.View, name: string, fallback: number) {
+    return com.google.android.material.color.MaterialColors.getColor(view, getMaterialAttr(name), fallback);
+}
+
+function toNativeColor(value: any): number {
+    if (!value) {
+        return null;
+    }
+    return (value instanceof Color ? value : new Color(value)).android;
 }
 
 /**
@@ -51,6 +67,69 @@ function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.
  * `scrollBehavior` the scroll flags / lift on scroll of the AppBarLayout.
  */
 export class AppBar extends AppBarBase {
+    // a Material 3 toolbar: tinted navigation icon, centered title...
+    createNativeView() {
+        return new com.google.android.material.appbar.MaterialToolbar(this._context);
+    }
+
+    // in an AppPage the surface of the bar is the AppBarLayout (lift, translucent, collapsing area): the toolbar is transparent
+    // @ts-ignore
+    _redrawNativeBackground(value: any) {
+        if (this.page instanceof AppPage) {
+            return;
+        }
+        // @ts-ignore
+        super._redrawNativeBackground(value);
+    }
+
+    /** the color of the bar: the css `background-color`, else the surface color of the theme */
+    getBarColor(): number {
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        return toNativeColor(this.backgroundColor) ?? getThemeColor(toolbar, 'colorSurface', android.graphics.Color.WHITE);
+    }
+
+    /** the color of the title and the icons: the css `color`, else the on surface color of the theme */
+    getOnBarColor(): number {
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        return toNativeColor(this.color) ?? getThemeColor(toolbar, 'colorOnSurface', android.graphics.Color.BLACK);
+    }
+
+    /** tints the navigation icon, the actions and the overflow icon with the color of the content of the bar */
+    applyTints() {
+        const toolbar = this.nativeViewProtected as com.google.android.material.appbar.MaterialToolbar;
+        if (!toolbar) {
+            return;
+        }
+        const tint = this.getOnBarColor();
+        toolbar.setNavigationIconTint(tint);
+        const list = android.content.res.ColorStateList.valueOf(tint);
+        const menu = toolbar.getMenu();
+        for (let i = 0; i < menu.size(); i++) {
+            androidx.core.view.MenuItemCompat.setIconTintList(menu.getItem(i), list);
+        }
+        const overflow = toolbar.getOverflowIcon();
+        if (overflow) {
+            const wrapped = androidx.core.graphics.drawable.DrawableCompat.wrap(overflow.mutate());
+            androidx.core.graphics.drawable.DrawableCompat.setTint(wrapped, tint);
+            toolbar.setOverflowIcon(wrapped);
+        }
+    }
+
+    // the back arrow of the core is the old holo one: use the Material arrow
+    _updateNavigationButton() {
+        // @ts-ignore
+        super._updateNavigationButton();
+        const nav = this.navigationButton;
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        if (nav && nav.visibility === 'visible' && nav.android?.systemIcon === 'ic_menu_back') {
+            const context = this._context;
+            const id = context.getResources().getIdentifier('abc_ic_ab_back_material', 'drawable', context.getPackageName());
+            if (id) {
+                toolbar.setNavigationIcon(androidx.core.content.ContextCompat.getDrawable(context, id));
+            }
+        }
+    }
+
     onAppBarPropertyChanged() {
         super.onAppBarPropertyChanged();
         const page = this.page;
@@ -74,6 +153,7 @@ export class AppBar extends AppBarBase {
         if (this.searchable && this.searchMode !== 'bar') {
             this.addSearchItem();
         }
+        this.applyTints();
     }
 
     private _badges: com.google.android.material.badge.BadgeDrawable[] = [];
@@ -92,11 +172,9 @@ export class AppBar extends AppBarBase {
         const menu = toolbar.getMenu();
         const item = menu.add(0, 0x7f0a5ea1, 0, this.searchHint || 'Search');
         const context = toolbar.getContext();
-        item.setIcon(android.R.drawable.ic_menu_search);
-        const color = this.color instanceof Color ? this.color : this.color ? new Color(this.color as any) : null;
-        if (color) {
-            androidx.core.view.MenuItemCompat.setIconTintList(item, android.content.res.ColorStateList.valueOf(color.android));
-        }
+        const iconId = context.getResources().getIdentifier('abc_ic_search_api_material', 'drawable', context.getPackageName());
+        item.setIcon(iconId ? androidx.core.content.ContextCompat.getDrawable(context, iconId) : null);
+        const onBar = this.getOnBarColor();
         item.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS | android.view.MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
         const searchView = new androidx.appcompat.widget.SearchView(context);
         searchView.setQueryHint(this.searchHint ?? null);
@@ -132,15 +210,15 @@ export class AppBar extends AppBarBase {
                 }
             })
         );
-        if (color) {
+        {
             // the SearchView follows the colors of the bar
             const R = (androidx.appcompat as any).R.id;
             const edit = searchView.findViewById(R.search_src_text) as android.widget.EditText;
-            edit?.setTextColor(color.android);
-            edit?.setHintTextColor(new Color(150, color.r, color.g, color.b).android);
-            for (const id of [R.search_close_btn, R.search_mag_icon, R.search_button]) {
+            edit?.setTextColor(onBar);
+            edit?.setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(onBar, 150));
+            for (const id of [R.search_close_btn, R.search_mag_icon, R.search_button, R.search_go_btn, R.search_voice_btn]) {
                 const icon = searchView.findViewById(id) as android.widget.ImageView;
-                icon?.setColorFilter(color.android);
+                icon?.setColorFilter(onBar);
             }
         }
         item.setActionView(searchView);
@@ -270,6 +348,14 @@ export class AppPage extends Page {
         const CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout as any;
         const AppBarLayout = com.google.android.material.appbar.AppBarLayout as any;
         const coordinator = new CoordinatorLayout(context);
+        // The root of the page applies the insets (status bar aside, handled by the AppBarLayout): the NativeScript layouts inside would apply them again
+        // (the overlay would be shifted by the height of the keyboard). The coordinator consumes them.
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(
+            coordinator,
+            new androidx.core.view.OnApplyWindowInsetsListener({
+                onApplyWindowInsets: () => androidx.core.view.WindowInsetsCompat.CONSUMED
+            })
+        );
         const appBarLayout = new AppBarLayout(context);
         const content = new org.nativescript.widgets.ContentLayout(context);
 
@@ -304,8 +390,28 @@ export class AppPage extends Page {
         return root;
     }
 
+    private _softInputMode: number;
+
+    onUnloaded() {
+        // the activity gets its soft input mode back
+        const activity = Application.android.foregroundActivity || Application.android.startActivity;
+        if (this._softInputMode !== undefined && activity) {
+            activity.getWindow().setSoftInputMode(this._softInputMode);
+        }
+        this._softInputMode = undefined;
+        super.onUnloaded();
+    }
+
     onLoaded() {
         super.onLoaded();
+        // The root of the page pads itself with the keyboard (edge to edge): when the window also resizes for the keyboard (adjustResize)
+        // the page area is reduced twice: the bar, the content and the overlay get squeezed. The root handles the keyboard alone.
+        const activity = Application.android.foregroundActivity || Application.android.startActivity;
+        if (activity && this._softInputMode === undefined) {
+            const window = activity.getWindow();
+            this._softInputMode = window.getAttributes().softInputMode;
+            window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING | (this._softInputMode & 0x0f));
+        }
         // the bar draws under the status bar: the AppBarLayout pads itself with the inset
         this.androidOverflowEdge = 'top';
         // the root does not pad itself with the status bar inset anymore: the AppBarLayout (and its background) does
@@ -408,37 +514,57 @@ export class AppPage extends Page {
             params.setScrollFlags(flags);
             child.setLayoutParams(params);
         }
-        appBarLayout.setLiftOnScroll(behavior === 'lift');
 
-        // 3. colors: the collapsing area is not the Toolbar
-        const toColor = (value: string | Color) => (value instanceof Color ? value : value ? new Color(value) : null);
-        const backgroundColor = toColor(bar.backgroundColor);
-        if (backgroundColor) {
-            // translucent: the content scrolls under the bar, which stays slightly see through
-            const barColor = translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android;
-            appBarLayout.setBackgroundColor(barColor);
-            this._statusScrim?.setBackgroundColor(barColor);
-        } else if (translucent) {
-            appBarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        // 3. the surface of the bar: the AppBarLayout. The toolbar is transparent and flat, the collapsing area and the status bar area follow the same color
+        toolbar.setBackground(null);
+        toolbar.setElevation(0);
+        toolbar.setStateListAnimator(null);
+        const AlphaTranslucent = 217;
+        let barColor = appBar ? appBar.getBarColor() : toNativeColor(bar.backgroundColor) ?? getThemeColor(toolbar, 'colorSurface', android.graphics.Color.WHITE);
+        const onBarColor = appBar ? appBar.getOnBarColor() : toNativeColor(bar.color) ?? getThemeColor(toolbar, 'colorOnSurface', android.graphics.Color.BLACK);
+        if (translucent) {
+            // the content scrolls under the bar, which stays slightly see through
+            barColor = androidx.core.graphics.ColorUtils.setAlphaComponent(barColor, AlphaTranslucent);
         }
-        if (this._collapsing && backgroundColor) {
-            // the scrim drawn once the bar is collapsed: the color of the bar (the M3 default is the surface color)
-            const scrim = translucent ? androidx.core.graphics.ColorUtils.setAlphaComponent(backgroundColor.android, 217) : backgroundColor.android;
-            this._collapsing.setContentScrimColor(scrim);
-            this._collapsing.setStatusBarScrimColor(scrim);
+        // lifted (content scrolls under the bar): the color of the bar with a little of the content color, the M3 surface container idea
+        const liftedColor = androidx.core.graphics.ColorUtils.blendARGB(barColor, onBarColor, 0.1);
+        const MaterialShapeDrawable = com.google.android.material.shape.MaterialShapeDrawable;
+        let background = appBarLayout.getBackground() as any;
+        if (!(background instanceof MaterialShapeDrawable)) {
+            // the lift animation of the AppBarLayout works on a MaterialShapeDrawable
+            background = new MaterialShapeDrawable();
+            appBarLayout.setBackground(background);
         }
-        const color = toColor(bar.color as any);
-        if (color) {
-            toolbar.setSubtitleTextColor(color.android);
+        background.setFillColor(android.content.res.ColorStateList.valueOf(barColor));
+        (appBarLayout as any).setLiftOnScrollColor(android.content.res.ColorStateList.valueOf(liftedColor));
+        appBarLayout.setLiftOnScroll(behavior === 'lift');
+        const scrollTarget = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        if (behavior === 'lift' && scrollTarget) {
+            (appBarLayout as any).setLiftOnScrollTargetView(scrollTarget);
         }
-        if (this._collapsing && color) {
-            this._collapsing.setCollapsedTitleTextColor(color.android);
-            this._collapsing.setExpandedTitleColor(color.android);
+        this.setStatusScrimColor(appBarLayout.isLifted() && behavior === 'lift' ? liftedColor : barColor);
+        if (!this._liftListener) {
+            // the status bar area follows the color of the bar while it lifts
+            this._liftListener = new com.google.android.material.appbar.AppBarLayout.LiftOnScrollListener({
+                onUpdate: (elevation: number, color: number) => this.setStatusScrimColor(color)
+            });
+            appBarLayout.addLiftOnScrollListener(this._liftListener);
+        }
+        if (this._collapsing) {
+            // the scrim drawn once the bar is collapsed
+            this._collapsing.setContentScrimColor(behavior === 'lift' ? liftedColor : barColor);
+            this._collapsing.setStatusBarScrimColor(behavior === 'lift' ? liftedColor : barColor);
+        }
+        toolbar.setSubtitleTextColor(onBarColor);
+        if (this._collapsing) {
+            this._collapsing.setCollapsedTitleTextColor(onBarColor);
+            this._collapsing.setExpandedTitleColor(onBarColor);
             // the subtitle API of the CollapsingToolbarLayout (Material 1.13+)
             const c: any = this._collapsing;
-            c.setCollapsedSubtitleTextColor?.(color.android);
-            c.setExpandedSubtitleColor?.(color.android);
+            c.setCollapsedSubtitleTextColor?.(onBarColor);
+            c.setExpandedSubtitleColor?.(onBarColor);
         }
+        appBar?.applyTints();
 
         // 4. translucent: the content goes under the bar. The behavior of the content places it below the bar: without it the content fills the page
         const contentParams = this._nativeContent.getLayoutParams() as any;
@@ -451,10 +577,14 @@ export class AppPage extends Page {
                 appBarLayout.bringToFront();
             }
         }
-        appBarLayout.setElevation(translucent ? 0 : appBarLayout.getElevation());
         this.syncTranslucentInset(appBar, translucent);
         this.syncBottomBar(appBar, behavior);
         this.syncSearchBar(appBar);
+    }
+
+    private _liftListener: any;
+    private setStatusScrimColor(color: number) {
+        this._statusScrim?.setBackgroundColor(color);
     }
 
     private _statusScrim: android.view.View;

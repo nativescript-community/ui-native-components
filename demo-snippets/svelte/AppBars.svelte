@@ -84,7 +84,7 @@
                 <uibutton text="large" on:tap={() => (size = 'large')} />
                 <uibutton text="none" on:tap={() => (behavior = 'none')} />
                 <uibutton text="lift" on:tap={() => (behavior = 'lift')} />
-                <uibutton text="hide" on:tap={() => (behavior = 'hide')} />
+                <uibutton text="hide (whole bar)" on:tap={() => (behavior = 'hide')} />
                 <uibutton text="translucent" on:tap={() => (translucent = !translucent)} />
                 <uibutton text="spans" on:tap={() => (spans = !spans)} />
                 <uibutton text="placement" on:tap={() => (searchPlacement = searchPlacement === 'stacked' ? 'integrated' : searchPlacement === 'integrated' ? 'integratedButton' : 'stacked')} />
