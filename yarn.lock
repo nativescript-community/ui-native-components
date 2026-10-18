@@ -5794,6 +5794,7 @@ __metadata:
     "@akylas/nativescript": "npm:8.9.15"
     "@nativescript-community/svelte-native": "npm:1.0.32"
     "@nativescript-community/template-snippet": "npm:*"
+    "@nativescript-community/ui-appbar": "npm:*"
     "@nativescript-community/ui-core": "npm:*"
     "@nativescript/android": "npm:8.9.2"
     "@nativescript/core": "npm:9.0.20"
