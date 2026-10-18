@@ -44,7 +44,7 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^7.3.4",
-        "@nativescript-community/ui-core-tabs": "^7.3.4"
+        "@nativescript-community/ui-core": "^0.0.0",
+        "@nativescript-community/ui-core-tabs": "^0.0.0"
     }
 }

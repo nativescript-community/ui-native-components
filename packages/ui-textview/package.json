@@ -45,6 +45,6 @@
     "readmeFilename": "README.md",
     "dependencies": {
         "@nativescript-community/text": "^1.5.33",
-        "@nativescript-community/ui-core": "^7.3.4"
+        "@nativescript-community/ui-core": "^0.0.0"
     }
 }
