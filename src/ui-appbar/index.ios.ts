@@ -5,7 +5,7 @@ import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarS
 export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent };
 
 function findScrollView(view: View): UIScrollView {
-    const native = view?.nativeViewProtected as any;
+    const native = view?.nativeViewProtected;
     if (!native) {
         return null;
     }
@@ -172,12 +172,13 @@ export class AppBar extends AppBarBase {
         if (size !== 'small') {
             navigationBar.prefersLargeTitles = true;
         }
-        navigationItem.largeTitleDisplayMode = size === 'small' ? UINavigationItemLargeTitleDisplayMode.Never : isRoot ? UINavigationItemLargeTitleDisplayMode.Automatic : UINavigationItemLargeTitleDisplayMode.Always;
+        navigationItem.largeTitleDisplayMode =
+            size === 'small' ? UINavigationItemLargeTitleDisplayMode.Never : isRoot ? UINavigationItemLargeTitleDisplayMode.Automatic : UINavigationItemLargeTitleDisplayMode.Always;
 
         // appearances: one for the bar when content scrolls under it (standard) and one at the top (scroll edge)
-        const base = (navigationBar.standardAppearance ?? UINavigationBarAppearance.new()).copy() as UINavigationBarAppearance;
-        const standard = base.copy() as UINavigationBarAppearance;
-        const edge = base.copy() as UINavigationBarAppearance;
+        const base = (navigationBar.standardAppearance ?? UINavigationBarAppearance.new()).copy();
+        const standard = base.copy();
+        const edge = base.copy();
         if (this.translucent) {
             // the content scrolls under the bar: a blur tinted with the color of the bar, at the top too
             const barColor = standard.backgroundColor;
@@ -269,7 +270,9 @@ export class AppBar extends AppBarBase {
             const handler = BottomItemHandler.initWithOwnerItem(this, item);
             handlers.push(handler);
             const image = item.icon ? getNativeIcon(item.icon) : null;
-            const barButtonItem = image ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap') : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
+            const barButtonItem = image
+                ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap')
+                : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
             barButtonItem.accessibilityLabel = item.text;
             badges.push([barButtonItem, item.badge]);
             barButtonItems.addObject(barButtonItem);
@@ -323,7 +326,9 @@ export class AppBar extends AppBarBase {
             field.tintColor = color.ios;
             field.leftView && (field.leftView.tintColor = color.ios);
             if (this.searchHint) {
-                field.attributedPlaceholder = NSAttributedString.alloc().initWithStringAttributes(this.searchHint, { [NSForegroundColorAttributeName]: new Color(150, color.r, color.g, color.b).ios } as any);
+                field.attributedPlaceholder = NSAttributedString.alloc().initWithStringAttributes(this.searchHint, {
+                    [NSForegroundColorAttributeName]: new Color(150, color.r, color.g, color.b).ios
+                } as any);
             }
         }
         // the search bar stays visible unless the bar scrolls away
@@ -463,7 +468,12 @@ export class AppPage extends Page {
         if (this._overlay) {
             // inside the safe area (also when the content ignores it)
             const safeArea = (this.nativeViewProtected as UIView).safeAreaInsets;
-            const insets = { left: Utils.layout.toDevicePixels(safeArea.left), top: Utils.layout.toDevicePixels(safeArea.top), right: Utils.layout.toDevicePixels(safeArea.right), bottom: Utils.layout.toDevicePixels(safeArea.bottom) };
+            const insets = {
+                left: Utils.layout.toDevicePixels(safeArea.left),
+                top: Utils.layout.toDevicePixels(safeArea.top),
+                right: Utils.layout.toDevicePixels(safeArea.right),
+                bottom: Utils.layout.toDevicePixels(safeArea.bottom)
+            };
             View.layoutChild(this, this._overlay, insets.left, insets.top, right - insets.right, bottom - insets.bottom);
         }
     }

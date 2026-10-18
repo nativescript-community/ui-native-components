@@ -13,9 +13,6 @@ import { getTransformedText } from '@nativescript/core/ui/text-base';
 import { SDK_VERSION } from '@nativescript/core/utils';
 export { TabContentItem, TabStrip, TabStripItem };
 
-// TODO:
-// import { profile } from "../../profiling";
-
 const maxTabsCount = 5;
 const isPhone = Device.deviceType === 'Phone';
 // Liquid Glass (iOS 26+) ignores unselectedItemTintColor and UITabBarAppearance item colors when rendering

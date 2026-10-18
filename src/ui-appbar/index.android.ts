@@ -1,7 +1,18 @@
 import { ActionBar, Application, Color, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent, notifyBottomItemTap } from './index-common';
+import {
+    AppBarBase,
+    AppBarBottomItem,
+    AppBarItem,
+    AppBarScrollBehavior,
+    AppBarSearchMode,
+    AppBarSearchPlacement,
+    AppBarSize,
+    AppPageOverlay,
+    AppPageSearchContent,
+    notifyBottomItemTap
+} from './index-common';
 export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent };
 
 const MATCH_PARENT = -1;
@@ -45,7 +56,7 @@ function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.
     toolbar.post(
         new java.lang.Runnable({
             run: () => {
-                wanted.forEach(({ id, badge }) => {
+                wanted.forEach(({ badge, id }) => {
                     const drawable = BadgeDrawable.create(toolbar.getContext()) as any;
                     if (typeof badge === 'number') {
                         drawable.setNumber(badge);
@@ -163,7 +174,11 @@ export class AppBar extends AppBarBase {
         const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
         const items = ((this.actionItems as any)?.getVisibleItems() ?? []) as AppBarItem[];
         const wanted = items.filter((item) => item instanceof AppBarItem && item.badge !== undefined && item.badge !== null && (item.badge as any) !== false && (item.badge as any) !== '');
-        attachBadges(toolbar, this._badges, wanted.map((item) => ({ id: (item as any)._getItemId(), badge: item.badge })));
+        attachBadges(
+            toolbar,
+            this._badges,
+            wanted.map((item) => ({ id: (item as any)._getItemId(), badge: item.badge }))
+        );
     }
 
     /** a collapsible SearchView as the first action */
@@ -501,7 +516,7 @@ export class AppPage extends Page {
 
         // 2. the scroll behavior: the flags are on the direct child of the AppBarLayout
         const child = this._collapsing || toolbar;
-        const params = child.getLayoutParams() as any;
+        const params = child.getLayoutParams();
         // `hide` with a scroll target: the bar follows the scroll of the list itself (see syncHide), the AppBarLayout does not scroll
         const scrollTargetNative = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
         const customHide = behavior === 'hide' && !!scrollTargetNative;
@@ -524,8 +539,8 @@ export class AppPage extends Page {
         toolbar.setElevation(0);
         toolbar.setStateListAnimator(null);
         const AlphaTranslucent = 160;
-        let barColor = appBar ? appBar.getBarColor() : toNativeColor(bar.backgroundColor) ?? getThemeColor(toolbar, 'colorSurface', android.graphics.Color.WHITE);
-        const onBarColor = appBar ? appBar.getOnBarColor() : toNativeColor(bar.color) ?? getThemeColor(toolbar, 'colorOnSurface', android.graphics.Color.BLACK);
+        let barColor = appBar ? appBar.getBarColor() : (toNativeColor(bar.backgroundColor) ?? getThemeColor(toolbar, 'colorSurface', android.graphics.Color.WHITE));
+        const onBarColor = appBar ? appBar.getOnBarColor() : (toNativeColor(bar.color) ?? getThemeColor(toolbar, 'colorOnSurface', android.graphics.Color.BLACK));
         if (translucent) {
             // the content scrolls under the bar, which stays slightly see through
             barColor = androidx.core.graphics.ColorUtils.setAlphaComponent(barColor, AlphaTranslucent);
@@ -573,7 +588,7 @@ export class AppPage extends Page {
         // 4. translucent: the content goes under the bar. The behavior of the content places it below the bar: without it the content fills the page
         // (also `hide` with a scroll target: the content fills the page, the bar moves over it)
         const overlayContent = translucent || customHide;
-        const contentParams = this._nativeContent.getLayoutParams() as any;
+        const contentParams = this._nativeContent.getLayoutParams();
         const hasBehavior = !!contentParams.getBehavior();
         if (overlayContent === hasBehavior) {
             const AppBarLayout = com.google.android.material.appbar.AppBarLayout as any;
@@ -773,7 +788,9 @@ export class AppPage extends Page {
         attachBadges(
             bar,
             this._bottomBadges,
-            items.map((item, index) => ({ id: index, badge: item.badge })).filter((entry) => entry.badge !== undefined && entry.badge !== null && (entry.badge as any) !== false && (entry.badge as any) !== '')
+            items
+                .map((item, index) => ({ id: index, badge: item.badge }))
+                .filter((entry) => entry.badge !== undefined && entry.badge !== null && (entry.badge as any) !== false && (entry.badge as any) !== '')
         );
         bar.setOnMenuItemClickListener(
             new androidx.appcompat.widget.Toolbar.OnMenuItemClickListener({
@@ -826,7 +843,6 @@ export class AppPage extends Page {
         bar.addOnLayoutChangeListener(this._bottomInsetListener);
         apply();
     }
-
 
     private _insetListener: any;
     /** translucent: the first items of the scrolling view must start below the bar: its top padding follows the height of the bar */
