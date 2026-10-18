@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-core",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "Core module for NativeScript augmented components (Material on Android, native UIKit on iOS)",
     "main": "./index",
     "sideEffects": false,
