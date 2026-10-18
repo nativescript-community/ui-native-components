@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-floatingactionbutton",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "FloatingActionButton with icon, size, expanded and show/hide. Material on Android, native UIButton on iOS.",
     "main": "./index",
     "sideEffects": false,

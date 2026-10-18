@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-snackbar",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "SnackBar: Material 3 Snackbar on Android, liquid-toasts toast on iOS.",
     "main": "./index",
     "sideEffects": false,

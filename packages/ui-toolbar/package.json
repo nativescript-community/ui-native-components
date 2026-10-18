@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-toolbar",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Toolbar with a title, a navigation icon, action items and an overflow menu: Material 3 MaterialToolbar on Android, UINavigationBar (glass bar buttons on iOS 26) on iOS.",
     "main": "./index",
     "sideEffects": false,

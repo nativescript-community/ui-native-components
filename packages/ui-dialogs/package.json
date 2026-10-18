@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-dialogs",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Dialogs with custom views and buttons. Material on Android, native UIAlertController on iOS.",
     "main": "./index",
     "sideEffects": false,

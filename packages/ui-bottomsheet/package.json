@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-bottomsheet",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "BottomSheet: showBottomSheet()/closeBottomSheet() on every View. Material on Android, native UISheetPresentationController on iOS.",
     "main": "./index",
     "sideEffects": false,

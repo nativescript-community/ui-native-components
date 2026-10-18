@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-button",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Button augmented with variant, role, icon src and loading. Material on Android, native UIButton on iOS.",
     "main": "./index",
     "sideEffects": false,

@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-searchbar",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "SearchBar augmented with variants: Material 3 search bar on Android, native UISearchBar (Liquid Glass) on iOS.",
     "main": "./index",
     "sideEffects": false,

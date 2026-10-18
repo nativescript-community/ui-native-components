@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-activityindicator",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "ActivityIndicator augmented with indeterminate/value/maxValue. Material on Android, native UIActivityIndicatorView on iOS.",
     "main": "./index",
     "sideEffects": false,

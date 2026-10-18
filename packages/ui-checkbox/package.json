@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-checkbox",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Checkbox: Material 3 MaterialCheckBox on Android, SF Symbols toggle button on iOS. With an indeterminate state.",
     "main": "./index",
     "sideEffects": false,

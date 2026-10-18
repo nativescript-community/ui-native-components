@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-card",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Card for grouping content: Material 3 MaterialCardView on Android, a grouped rounded surface on iOS (no glass: the HIG keeps Liquid Glass for controls).",
     "main": "./index",
     "sideEffects": false,

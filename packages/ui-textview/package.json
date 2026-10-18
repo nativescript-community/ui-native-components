@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-textview",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "TextView augmented with helper/error/counter/floating label. Material on Android, native UITextView on iOS.",
     "main": "./index",
     "sideEffects": false,

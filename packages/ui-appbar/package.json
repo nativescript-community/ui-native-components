@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-appbar",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "App bar and page: Material top app bar (collapsing, lift on scroll) on Android, native navigation bar on iOS",
     "main": "./index",
     "sideEffects": false,

@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-surface",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "Floating surface for toolbars and action groups: Material 3 surface on Android, Liquid Glass (blur before iOS 26) on iOS.",
     "main": "./index",
     "sideEffects": false,

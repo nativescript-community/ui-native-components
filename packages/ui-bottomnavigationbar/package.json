@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-bottomnavigationbar",
-    "version": "7.3.4",
+    "version": "0.0.0",
     "description": "BottomNavigationBar with tabs, badges and selection events. Material 3 NavigationBar on Android, native UITabBar on iOS.",
     "main": "./index",
     "sideEffects": false,
