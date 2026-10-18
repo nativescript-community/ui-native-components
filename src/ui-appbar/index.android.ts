@@ -502,11 +502,15 @@ export class AppPage extends Page {
         // 2. the scroll behavior: the flags are on the direct child of the AppBarLayout
         const child = this._collapsing || toolbar;
         const params = child.getLayoutParams() as any;
+        // `hide` with a scroll target: the bar follows the scroll of the list itself (see syncHide), the AppBarLayout does not scroll
+        const scrollTargetNative = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        const customHide = behavior === 'hide' && !!scrollTargetNative;
         let flags = 0;
-        if (behavior === 'hide') {
-            // the whole bar leaves the screen (also the pinned toolbar of a medium / large bar) and comes back as soon as the content scrolls up
+        if (behavior === 'hide' && !customHide) {
+            // the whole bar leaves the screen (also the pinned toolbar of a medium / large bar) and comes back as soon as the content scrolls up.
+            // The AppBarLayout consumes the scroll first: the list starts to scroll when the bar is completely shown / hidden
             flags = AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_ENTER_ALWAYS | AppBarLayoutParams.SCROLL_FLAG_SNAP;
-        } else if (size !== 'small') {
+        } else if (behavior !== 'hide' && size !== 'small') {
             // the title collapses into the pinned toolbar
             flags = AppBarLayoutParams.SCROLL_FLAG_SCROLL | AppBarLayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED;
         }
@@ -519,7 +523,7 @@ export class AppPage extends Page {
         toolbar.setBackground(null);
         toolbar.setElevation(0);
         toolbar.setStateListAnimator(null);
-        const AlphaTranslucent = 217;
+        const AlphaTranslucent = 160;
         let barColor = appBar ? appBar.getBarColor() : toNativeColor(bar.backgroundColor) ?? getThemeColor(toolbar, 'colorSurface', android.graphics.Color.WHITE);
         const onBarColor = appBar ? appBar.getOnBarColor() : toNativeColor(bar.color) ?? getThemeColor(toolbar, 'colorOnSurface', android.graphics.Color.BLACK);
         if (translucent) {
@@ -567,19 +571,84 @@ export class AppPage extends Page {
         appBar?.applyTints();
 
         // 4. translucent: the content goes under the bar. The behavior of the content places it below the bar: without it the content fills the page
+        // (also `hide` with a scroll target: the content fills the page, the bar moves over it)
+        const overlayContent = translucent || customHide;
         const contentParams = this._nativeContent.getLayoutParams() as any;
         const hasBehavior = !!contentParams.getBehavior();
-        if (translucent === hasBehavior) {
+        if (overlayContent === hasBehavior) {
             const AppBarLayout = com.google.android.material.appbar.AppBarLayout as any;
-            contentParams.setBehavior(translucent ? null : new AppBarLayout.ScrollingViewBehavior());
+            contentParams.setBehavior(overlayContent ? null : new AppBarLayout.ScrollingViewBehavior());
             this._nativeContent.setLayoutParams(contentParams);
-            if (translucent) {
+            if (overlayContent) {
                 appBarLayout.bringToFront();
             }
         }
-        this.syncTranslucentInset(appBar, translucent);
+        this.syncTranslucentInset(appBar, overlayContent);
+        this.syncHide(customHide ? appBar.scrollTarget : null);
         this.syncBottomBar(appBar, behavior);
         this.syncSearchBar(appBar);
+    }
+
+    private _hideTarget: android.view.View;
+    private _hideView: View;
+    private _hideDetach: () => void;
+    /**
+     * `hide`: the bar leaves the screen while the list scrolls down and comes back while it scrolls up, both at the same time as the list scrolls
+     * (the nested scrolling of the AppBarLayout would let the bar consume the scroll first). The bar follows the scroll deltas of the list and settles when the scroll stops.
+     */
+    private syncHide(targetView: View) {
+        const target = targetView?.nativeViewProtected as android.view.View;
+        const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
+        if (this._hideDetach && this._hideTarget !== target) {
+            this._hideDetach();
+            this._hideDetach = null;
+            this._hideTarget = null;
+            appBarLayout.animate().cancel();
+            appBarLayout.setTranslationY(0);
+        }
+        if (!target || this._hideDetach) {
+            return;
+        }
+        this._hideTarget = target;
+        this._hideView = targetView;
+        let offset = 0;
+        // the status bar area stays
+        const range = () => Math.max(0, appBarLayout.getHeight() - appBarLayout.getPaddingTop());
+        const apply = (value: number) => {
+            appBarLayout.animate().cancel();
+            offset = Math.max(-range(), Math.min(0, value));
+            appBarLayout.setTranslationY(offset);
+        };
+        const settle = () => {
+            const end = offset < -range() / 2 ? -range() : 0;
+            if (end !== offset) {
+                offset = end;
+                appBarLayout.animate().translationY(end).setDuration(160).start();
+            }
+        };
+        let last: number;
+        let timer: any;
+        const view = this._hideView;
+        const listener = (args: any) => {
+            const current: number = args.scrollOffset ?? args.scrollY ?? args.object?.verticalOffset;
+            if (typeof current !== 'number' || isNaN(current)) {
+                return;
+            }
+            const dy = last === undefined ? 0 : current - last;
+            last = current;
+            if (current <= 0) {
+                apply(0);
+            } else if (dy) {
+                apply(offset - dy);
+            }
+            clearTimeout(timer);
+            timer = setTimeout(settle, 150);
+        };
+        view.on('scroll', listener);
+        this._hideDetach = () => {
+            clearTimeout(timer);
+            view.off('scroll', listener);
+        };
     }
 
     private _liftListener: any;
