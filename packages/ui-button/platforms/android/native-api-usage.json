@@ -1,8 +1,8 @@
 {
     "uses": [
-        "android.view:LayoutInflater",
-        "com.google.android.material.button:MaterialButton",
+        "android.graphics.drawable:BitmapDrawable",
         "android.graphics.drawable:Drawable",
-        "android.graphics.drawable:BitmapDrawable"
+        "androidx.core.view:ViewCompat",
+        "com.google.android.material.button:MaterialButton"
     ]
 }

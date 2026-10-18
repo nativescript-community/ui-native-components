@@ -1,0 +1,8 @@
+{
+    "uses": [
+        "android.content:Context",
+        "android.graphics:Color",
+        "android.util:TypedValue",
+        "com.google.android.material.card:MaterialCardView"
+    ]
+}

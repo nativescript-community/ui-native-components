@@ -1,0 +1,7 @@
+{
+    "uses": [
+        "android.content.res:ColorStateList",
+        "android.graphics:Color",
+        "com.google.android.material.checkbox:MaterialCheckBox"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "uses": [
+        "android.content:DialogInterface.OnDismissListener",
+        "android.text.format:DateFormat",
+        "android.view:View.OnClickListener",
+        "androidx.appcompat.app:AppCompatActivity",
+        "androidx.core.util:Pair",
+        "androidx.fragment.app:FragmentManager",
+        "com.google.android.material.datepicker:MaterialDatePicker.Builder",
+        "java.util:ArrayList"
+    ]
+}

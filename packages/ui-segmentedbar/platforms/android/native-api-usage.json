@@ -1,0 +1,10 @@
+{
+    "uses": [
+        "android.graphics.drawable:BitmapDrawable",
+        "android.graphics:Bitmap",
+        "android.widget:LinearLayout.LayoutParams",
+        "com.google.android.material.button:MaterialButton",
+        "com.google.android.material.button:MaterialButtonToggleGroup",
+        "com.google.android.material.button:MaterialButtonToggleGroup.OnButtonCheckedListener"
+    ]
+}

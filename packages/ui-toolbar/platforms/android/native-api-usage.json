@@ -1,0 +1,12 @@
+{
+    "uses": [
+        "android.graphics.drawable:BitmapDrawable",
+        "android.graphics.drawable:Drawable",
+        "android.graphics:Color",
+        "android.util:TypedValue",
+        "android.view:MenuItem",
+        "android.view:View.OnClickListener",
+        "androidx.appcompat.widget:Toolbar.OnMenuItemClickListener",
+        "com.google.android.material.appbar:MaterialToolbar"
+    ]
+}

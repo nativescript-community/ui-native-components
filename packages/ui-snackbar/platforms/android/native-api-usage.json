@@ -1,13 +1,15 @@
 {
     "uses": [
-        "com.google.android.material.snackbar:BaseTransientBottomBar",
-        "com.google.android.material.snackbar:BaseTransientBottomBar.BaseCallback",
-        "androidx.coordinatorlayout.widget:CoordinatorLayout",
-        "android.widget:FrameLayout.LayoutParams",
         "android.view:Gravity",
-        "android.view:ViewGroup.LayoutParams",
-        "com.google.android.material.snackbar:Snackbar",
+        "android.view:View",
         "android.view:View.OnClickListener",
+        "android.view:ViewGroup",
+        "android.view:ViewGroup.LayoutParams",
+        "android.widget:FrameLayout.LayoutParams",
+        "android.widget:TextView",
+        "androidx.coordinatorlayout.widget:CoordinatorLayout",
+        "com.google.android.material.snackbar:BaseTransientBottomBar.BaseCallback",
+        "com.google.android.material.snackbar:Snackbar",
         "com.nativescript.material.snackbar:SnackCallback",
         "com.nativescript.material.snackbar:SnackCallback.SnackCallbackListener"
     ]

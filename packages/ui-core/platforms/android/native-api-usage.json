@@ -1,17 +1,25 @@
 {
     "uses": [
-        "com.nativescript.material.core:Utils",
-        "android.graphics:Color",
-        "android.graphics.drawable:RippleDrawable",
-        "android.os:Build",
         "android.content.res:ColorStateList",
-        "com.google.android.material.shape:ShapeAppearanceModel",
-        "com.google.android.material.shape:ShapeAppearanceModel.Builder",
-        "com.google.android.material.shape:MaterialShapeDrawable",
+        "android.content:Context",
+        "android.graphics.drawable:Drawable",
+        "android.graphics.drawable:RippleDrawable",
+        "android.graphics:Bitmap",
+        "android.graphics:Bitmap.Config",
+        "android.graphics:Canvas",
+        "android.graphics:Color",
+        "android.graphics:Paint",
+        "android.text:Layout",
+        "android.text:SpannableStringBuilder",
+        "android.text:StaticLayout.Builder",
+        "android.text:TextPaint",
+        "android.view:View",
+        "android.widget:Button",
+        "androidx.core.view:ViewCompat",
         "com.google.android.material.shape:CornerTreatment",
         "com.google.android.material.shape:CutCornerTreatment",
         "com.google.android.material.shape:RelativeCornerSize",
         "com.google.android.material.shape:RoundedCornerTreatment",
-        "android.content.res:TypedArray"
+        "com.google.android.material.shape:ShapeAppearanceModel"
     ]
 }

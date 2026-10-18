@@ -1,0 +1,9 @@
+{
+    "uses": [
+        "android.content:Context",
+        "android.graphics.drawable:GradientDrawable",
+        "android.graphics:Color",
+        "android.util:TypedValue",
+        "android.view:ViewGroup"
+    ]
+}

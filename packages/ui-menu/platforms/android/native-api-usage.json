@@ -1,0 +1,17 @@
+{
+    "uses": [
+        "android.graphics.drawable:BitmapDrawable",
+        "android.graphics.drawable:Drawable",
+        "android.graphics:Color",
+        "android.text.style:ForegroundColorSpan",
+        "android.text.style:RelativeSizeSpan",
+        "android.text:SpannableString",
+        "android.view:Gravity",
+        "android.view:Menu",
+        "android.view:MenuItem",
+        "android.view:View",
+        "android.view:ViewGroup",
+        "android.widget:FrameLayout.LayoutParams",
+        "androidx.appcompat.widget:PopupMenu"
+    ]
+}

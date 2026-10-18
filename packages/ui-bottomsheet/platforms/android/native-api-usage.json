@@ -1,8 +1,34 @@
 {
     "uses": [
-        "android.view:WindowManager",
+        "android.app:Dialog",
+        "android.content:Context",
+        "android.content:DialogInterface",
+        "android.os:Bundle",
+        "android.view:Gravity",
+        "android.view:LayoutInflater",
+        "android.view:MotionEvent",
+        "android.view:View",
+        "android.view:View.OnClickListener",
+        "android.view:View.OnTouchListener",
+        "android.view:ViewGroup",
+        "android.view:ViewGroup.LayoutParams",
+        "android.view:ViewGroup.MarginLayoutParams",
+        "android.view:Window",
         "android.view:WindowManager.LayoutParams",
+        "android.webkit:WebView",
+        "android.widget:AbsListView",
+        "android.widget:FrameLayout.LayoutParams",
+        "android.widget:ScrollView",
+        "androidx.appcompat.app:AppCompatActivity",
+        "androidx.core.view:ViewCompat",
         "com.google.android.material.bottomsheet:BottomSheetBehavior",
-        "com.google.android.material.bottomsheet:BottomSheetBehavior.BottomSheetCallback"
+        "com.google.android.material.bottomsheet:BottomSheetBehavior.BottomSheetCallback",
+        "com.google.android.material.bottomsheet:BottomSheetDialogFragment",
+        "com.google.android.material.bottomsheet:BottomSheetDragHandleView",
+        "com.google.android.material.shape:MaterialShapeDrawable",
+        "com.nativescript.material.bottomsheet:BottomSheetDialog",
+        "com.nativescript.material.bottomsheet:BottomSheetDialog.BottomSheetDialogListener",
+        "com.nativescript.material.bottomsheet:BottomSheetDialogFragment",
+        "com.nativescript.material.bottomsheet:BottomSheetDialogFragment.BottomSheetDialogFragmentListener"
     ]
 }

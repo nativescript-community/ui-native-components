@@ -1,6 +1,5 @@
 {
     "uses": [
-        "com.google.android.material.materialswitch:MaterialSwitch",
-        "androidx.appcompat.widget:SwitchCompat"
+        "com.google.android.material.materialswitch:MaterialSwitch"
     ]
 }

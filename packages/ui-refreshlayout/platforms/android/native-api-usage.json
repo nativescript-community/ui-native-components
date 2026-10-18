@@ -1,0 +1,6 @@
+{
+    "uses": [
+        "androidx.swiperefreshlayout.widget:SwipeRefreshLayout.OnRefreshListener",
+        "com.nativescript.material.refreshlayout:RefreshLayout"
+    ]
+}

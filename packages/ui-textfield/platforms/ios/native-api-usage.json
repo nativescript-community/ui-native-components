@@ -1,0 +1,11 @@
+{
+    "uses": [
+        "CoreFoundation*",
+        "CoreGraphics*",
+        "Darwin*",
+        "Foundation*",
+        "ObjectiveC*",
+        "QuartzCore*",
+        "UIKit*"
+    ]
+}

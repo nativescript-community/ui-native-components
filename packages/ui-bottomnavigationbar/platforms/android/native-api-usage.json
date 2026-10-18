@@ -1,0 +1,11 @@
+{
+    "uses": [
+        "android.content.res:ColorStateList",
+        "android.graphics.drawable:BitmapDrawable",
+        "android.view:Menu",
+        "android.view:MenuItem",
+        "com.google.android.material.bottomnavigation:BottomNavigationView",
+        "com.google.android.material.bottomnavigation:BottomNavigationView.OnNavigationItemReselectedListener",
+        "com.google.android.material.bottomnavigation:BottomNavigationView.OnNavigationItemSelectedListener"
+    ]
+}

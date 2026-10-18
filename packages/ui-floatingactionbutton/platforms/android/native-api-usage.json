@@ -1,5 +1,8 @@
 {
     "uses": [
+        "android.graphics.drawable:BitmapDrawable",
+        "android.graphics.drawable:Drawable",
+        "androidx.core.view:ViewCompat",
         "com.google.android.material.floatingactionbutton:ExtendedFloatingActionButton"
     ]
 }

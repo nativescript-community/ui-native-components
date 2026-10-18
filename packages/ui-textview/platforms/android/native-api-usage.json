@@ -1,10 +1,14 @@
 {
     "uses": [
-        "android.view:LayoutInflater",
-        "android.widget:LinearLayout.LayoutParams",
+        "android.graphics:Color",
+        "android.text:InputType",
+        "android.view:Gravity",
         "android.view:ViewGroup",
-        "android.text.method:DigitsKeyListener",
-        "com.nativescript.material.textfield:TextInputLayout",
-        "com.nativescript.material.textfield:TextViewInputEditText"
+        "android.widget:EditText",
+        "android.widget:FrameLayout.LayoutParams",
+        "android.widget:LinearLayout.LayoutParams",
+        "com.google.android.material.shape:MaterialShapeDrawable",
+        "com.google.android.material.textfield:TextInputLayout",
+        "com.nativescript.material.textview:TextViewInputEditText"
     ]
 }

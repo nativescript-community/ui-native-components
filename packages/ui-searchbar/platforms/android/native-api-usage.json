@@ -1,0 +1,12 @@
+{
+    "uses": [
+        "android.content:Context",
+        "android.graphics.drawable:GradientDrawable",
+        "android.graphics:Color",
+        "android.graphics:PorterDuff.Mode",
+        "android.util:TypedValue",
+        "android.widget:EditText",
+        "android.widget:ImageView",
+        "androidx.appcompat.widget:SearchView"
+    ]
+}

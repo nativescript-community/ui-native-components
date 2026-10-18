@@ -1,0 +1,22 @@
+{
+    "uses": [
+        "android.content.res:Resources",
+        "android.content:Context",
+        "android.graphics.drawable:BitmapDrawable",
+        "android.graphics.drawable:Drawable",
+        "android.graphics:Bitmap",
+        "android.os:Bundle",
+        "android.view:LayoutInflater",
+        "android.view:View",
+        "android.view:ViewGroup",
+        "android.widget:ImageView",
+        "androidx.core.view:ViewCompat",
+        "androidx.fragment.app:Fragment",
+        "androidx.fragment.app:FragmentActivity",
+        "androidx.fragment.app:FragmentManager",
+        "androidx.viewpager2.adapter:FragmentStateAdapter",
+        "androidx.viewpager2.widget:ViewPager2",
+        "androidx.viewpager2.widget:ViewPager2.OnPageChangeCallback",
+        "com.nativescript.material.core:TabItemSpec"
+    ]
+}
