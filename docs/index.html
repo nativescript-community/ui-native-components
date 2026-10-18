@@ -1,0 +1,150 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>NativeScript augmented components: Material on Android, native UIKit on iOS</title><meta name="description" content="Documentation for NativeScript augmented components: Material on Android, native UIKit on iOS"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><script async src="assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">NativeScript augmented components: Material on Android, native UIKit on iOS</a><div id="tsd-toolbar-links"><a href="https://docs.nativescript.org">Nativescript Doc</a></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>NativeScript augmented components: Material on Android, native UIKit on iOS</h1></div><div class="tsd-panel tsd-typography"><h1 id="nativescript-ui-native-components" class="tsd-anchor-link">NativeScript UI Native Components<a href="#nativescript-ui-native-components" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p><a href="https://opensource.org/license/apache-2-0/"><img src="https://img.shields.io/badge/License-Apache%20v2-yellow.svg" alt="License: Apache 2.0"></a>
+<a href="http://www.typescriptlang.org/"><img src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg" alt="TypeScript"></a>
+<a href="https://github.com/lerna-lite/lerna-lite"><img src="https://img.shields.io/badge/maintained%20with-lerna--lite-e137ff" alt="lerna--lite"></a></p>
+<p>NativeScript components with the same API on every platform, each using the platform's own design system:</p>
+<ul>
+<li><strong>Android</strong>: Material 3 (Material Components)</li>
+<li><strong>iOS</strong>: native UIKit, with Liquid Glass on iOS 26+ and fallbacks before, following the Apple Human Interface Guidelines</li>
+</ul>
+<p>Features that only exist in one design system (ripple, elevation, shape, floating labels...) are Android only properties and are ignored on iOS.</p>
+<h2 id="packages" class="tsd-anchor-link">Packages<a href="#packages" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Each package is independent: install only what you use.</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="media/ui-activityindicator"><code>@nativescript-community/ui-activityindicator</code></a></td>
+<td>Circular progress / activity indicator</td>
+</tr>
+<tr>
+<td><a href="media/ui-bottom-navigation"><code>@nativescript-community/ui-bottom-navigation</code></a></td>
+<td>Bottom navigation with content</td>
+</tr>
+<tr>
+<td><a href="media/ui-bottomnavigationbar"><code>@nativescript-community/ui-bottomnavigationbar</code></a></td>
+<td>Bottom navigation bar (no content)</td>
+</tr>
+<tr>
+<td><a href="media/ui-bottomsheet"><code>@nativescript-community/ui-bottomsheet</code></a></td>
+<td>Bottom sheets with detents</td>
+</tr>
+<tr>
+<td><a href="media/ui-button"><code>@nativescript-community/ui-button</code></a></td>
+<td>Button: variants (Material and Liquid Glass), role, icon, busy</td>
+</tr>
+<tr>
+<td><a href="media/ui-card"><code>@nativescript-community/ui-card</code></a></td>
+<td>Card for content (no glass on iOS)</td>
+</tr>
+<tr>
+<td><a href="media/ui-checkbox"><code>@nativescript-community/ui-checkbox</code></a></td>
+<td>Checkbox with indeterminate state</td>
+</tr>
+<tr>
+<td><a href="media/ui-core"><code>@nativescript-community/ui-core</code></a></td>
+<td>Shared theming, CSS properties and helpers</td>
+</tr>
+<tr>
+<td><a href="media/ui-core-tabs"><code>@nativescript-community/ui-core-tabs</code></a></td>
+<td>Tab strip elements shared by Tabs and BottomNavigation</td>
+</tr>
+<tr>
+<td><a href="media/ui-datetimepicker"><code>@nativescript-community/ui-datetimepicker</code></a></td>
+<td>Date, time and date range pickers</td>
+</tr>
+<tr>
+<td><a href="media/ui-dialogs"><code>@nativescript-community/ui-dialogs</code></a></td>
+<td>alert, confirm, prompt, login, action</td>
+</tr>
+<tr>
+<td><a href="media/ui-floatingactionbutton"><code>@nativescript-community/ui-floatingactionbutton</code></a></td>
+<td>Floating action button</td>
+</tr>
+<tr>
+<td><a href="media/ui-menu"><code>@nativescript-community/ui-menu</code></a></td>
+<td>Popup and context menus</td>
+</tr>
+<tr>
+<td><a href="media/ui-progress"><code>@nativescript-community/ui-progress</code></a></td>
+<td>Linear progress</td>
+</tr>
+<tr>
+<td><a href="media/ui-refreshlayout"><code>@nativescript-community/ui-refreshlayout</code></a></td>
+<td>Pull to refresh, top and bottom (chat ready)</td>
+</tr>
+<tr>
+<td><a href="media/ui-searchbar"><code>@nativescript-community/ui-searchbar</code></a></td>
+<td>Search bar</td>
+</tr>
+<tr>
+<td><a href="media/ui-segmentedbar"><code>@nativescript-community/ui-segmentedbar</code></a></td>
+<td>Segmented control with icons and spans</td>
+</tr>
+<tr>
+<td><a href="media/ui-slider"><code>@nativescript-community/ui-slider</code></a></td>
+<td>Slider</td>
+</tr>
+<tr>
+<td><a href="media/ui-snackbar"><code>@nativescript-community/ui-snackbar</code></a></td>
+<td>Snackbar: Material (Android), <a href="https://github.com/SimplifyJobs/liquid-toasts">liquid-toasts</a> (iOS)</td>
+</tr>
+<tr>
+<td><a href="media/ui-surface"><code>@nativescript-community/ui-surface</code></a></td>
+<td>Floating surface for toolbars and action groups (Liquid Glass)</td>
+</tr>
+<tr>
+<td><a href="media/ui-switch"><code>@nativescript-community/ui-switch</code></a></td>
+<td>Switch</td>
+</tr>
+<tr>
+<td><a href="media/ui-tabs"><code>@nativescript-community/ui-tabs</code></a></td>
+<td>Top tabs</td>
+</tr>
+<tr>
+<td><a href="media/ui-toolbar"><code>@nativescript-community/ui-toolbar</code></a></td>
+<td>Toolbar: title, navigation icon, actions, overflow (glass on iOS 26)</td>
+</tr>
+<tr>
+<td><a href="media/ui-textfield"><code>@nativescript-community/ui-textfield</code></a></td>
+<td>Text field</td>
+</tr>
+<tr>
+<td><a href="media/ui-textview"><code>@nativescript-community/ui-textview</code></a></td>
+<td>Text view</td>
+</tr>
+</tbody>
+</table>
+<h2 id="installation" class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">@nativescript-community/ui-button</span><span class="hl-1">   </span><span class="hl-3"># any package of the list</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="android" class="tsd-anchor-link">Android<a href="#android" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>The components use <strong>Material 3</strong>. Your Android theme must inherit from a <code>Theme.Material3</code> theme: in <code>App_Resources/Android/src/main/res/values/styles.xml</code> replace <code>Theme.AppCompat</code> / <code>Theme.MaterialComponents</code> with <code>Theme.Material3.DayNight.NoActionBar</code> (see <code>demo-svelte</code>).
+The Material Components version is <code>1.14.0</code> by default (Material 3 Expressive: wavy progress, retreat animation...), set the <code>androidXMaterial</code> gradle property to change it.
+Material 1.14 requires <strong><code>minSdkVersion 23</code></strong>. For the Expressive look use <code>Theme.Material3Expressive.DayNight.NoActionBar</code> (the plain <code>Theme.Material3</code> themes work too).</p>
+<h3 id="ios" class="tsd-anchor-link">iOS<a href="#ios" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Nothing to install: the components use UIKit. No CocoaPods.</p>
+<h3 id="production-build" class="tsd-anchor-link">Production build<a href="#production-build" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>With proguard on Android you must keep the resources of the plugins: add <code>tools:keep=&quot;@layout/ns_*&quot;</code> as explained <a href="https://developer.android.com/build/shrink-code#keep-resources">here</a>.</p>
+<h2 id="usage" class="tsd-anchor-link">Usage<a href="#usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The components are regular NativeScript views: use them in XML, in code or in your framework.</p>
+<pre><code class="xml"><Button text="Save" variant="contained" />
+</code><button type="button">Copy</button></pre>
+
+<h3 id="svelte-native" class="tsd-anchor-link">svelte-native<a href="#svelte-native" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Register the elements you use, once, at startup (<code>registerNativeViewElement</code> comes from <code>@nativescript-community/svelte-native/dom</code>):</p>
+<pre><code class="ts"><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">Button</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@nativescript-community/ui-button&#39;</span><span class="hl-1">;</span><br/><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">Switch</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@nativescript-community/ui-switch&#39;</span><span class="hl-1">;</span><br/><span class="hl-0">registerNativeViewElement</span><span class="hl-1">(</span><span class="hl-2">&#39;uibutton&#39;</span><span class="hl-1">, () </span><span class="hl-6">=&gt;</span><span class="hl-1"> </span><span class="hl-5">Button</span><span class="hl-1">);</span><br/><span class="hl-0">registerNativeViewElement</span><span class="hl-1">(</span><span class="hl-2">&#39;uiswitch&#39;</span><span class="hl-1">, () </span><span class="hl-6">=&gt;</span><span class="hl-1"> </span><span class="hl-5">Switch</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="optional-dependencies" class="tsd-anchor-link">Optional dependencies<a href="#optional-dependencies" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>@nativescript-community/text</code> is <strong>optional</strong>. When it is installed the spans (<code>formattedText</code>, <code>formattedHint</code>...) of the components use it, else the spans of NativeScript core.</p>
+<h2 id="demo" class="tsd-anchor-link">Demo<a href="#demo" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p><code>demo-svelte</code> (with the pages of <code>demo-snippets/svelte</code>) shows every component:</p>
+<pre><code class="bash"><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">build</span><span class="hl-1">                  </span><span class="hl-3"># builds every package</span><br/><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">demo.svelte.android</span><span class="hl-1">    </span><span class="hl-3"># or yarn demo.svelte.ios</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="development" class="tsd-anchor-link">Development<a href="#development" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>sources are in <code>src/ui-*</code>, the packages in <code>packages/ui-*</code> are their build output</li>
+<li>each package has <code>index.android.ts</code>, <code>index.ios.ts</code>, <code>index.d.ts</code> and <code>index-common.ts</code></li>
+<li><code>ui-core</code> and <code>ui-core-tabs</code> must be built first (<code>yarn build</code> takes care of the order)</li>
+<li>see <a href="media/NATIVE_COMPONENTS_PLAN.md">NATIVE_COMPONENTS_PLAN.md</a> for the design decisions and the status</li>
+</ul>
+<h2 id="contributing" class="tsd-anchor-link">Contributing<a href="#contributing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Issues and pull requests are welcome on <a href="https://github.com/nativescript-community/ui-native-components">https://github.com/nativescript-community/ui-native-components</a>.</p>
+<h2 id="license" class="tsd-anchor-link">License<a href="#license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Apache-2.0</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#nativescript-ui-native-components"><span>Native<wbr/>Script <wbr/>UI <wbr/>Native <wbr/>Components</span></a><ul><li><a href="#packages"><span>Packages</span></a></li><li><a href="#installation"><span>Installation</span></a></li><li><ul><li><a href="#android"><span>Android</span></a></li><li><a href="#ios"><span>i<wbr/>OS</span></a></li><li><a href="#production-build"><span>Production build</span></a></li></ul></li><li><a href="#usage"><span>Usage</span></a></li><li><ul><li><a href="#svelte-native"><span>svelte-<wbr/>native</span></a></li><li><a href="#optional-dependencies"><span>Optional dependencies</span></a></li></ul></li><li><a href="#demo"><span>Demo</span></a></li><li><a href="#development"><span>Development</span></a></li><li><a href="#contributing"><span>Contributing</span></a></li><li><a href="#license"><span>License</span></a></li></ul></div></details></div><div class="site-menu"><nav id="tsd-sidebar-links" class="tsd-navigation"><a href="https://docs.nativescript.org" class="tsd-nav-link">Nativescript Doc</a></nav><nav class="tsd-navigation"><a href="modules.html">NativeScript augmented components: Material on Android, native UIKit on iOS</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
