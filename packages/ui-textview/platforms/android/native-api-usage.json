@@ -1,11 +1,15 @@
 {
     "uses": [
         "android.graphics:Color",
+        "android.text.method:DigitsKeyListener",
         "android.text:InputType",
         "android.view:Gravity",
+        "android.view:LayoutInflater",
         "android.view:ViewGroup",
         "android.widget:EditText",
+        "android.widget:FrameLayout",
         "android.widget:FrameLayout.LayoutParams",
+        "android.widget:LinearLayout",
         "android.widget:LinearLayout.LayoutParams",
         "com.google.android.material.shape:MaterialShapeDrawable",
         "com.google.android.material.textfield:TextInputLayout",

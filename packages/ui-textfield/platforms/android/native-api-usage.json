@@ -2,9 +2,13 @@
     "uses": [
         "android.graphics:Color",
         "android.text.method:DigitsKeyListener",
+        "android.text:TextUtils",
         "android.text:TextUtils.TruncateAt",
+        "android.view:LayoutInflater",
         "android.view:ViewGroup",
+        "android.widget:FrameLayout",
         "android.widget:FrameLayout.LayoutParams",
+        "android.widget:LinearLayout",
         "android.widget:LinearLayout.LayoutParams",
         "com.google.android.material.shape:MaterialShapeDrawable",
         "com.google.android.material.textfield:TextInputLayout",

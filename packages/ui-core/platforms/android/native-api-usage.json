@@ -1,6 +1,7 @@
 {
     "uses": [
         "android.content.res:ColorStateList",
+        "android.content.res:TypedArray",
         "android.content:Context",
         "android.graphics.drawable:Drawable",
         "android.graphics.drawable:RippleDrawable",
@@ -9,8 +10,10 @@
         "android.graphics:Canvas",
         "android.graphics:Color",
         "android.graphics:Paint",
+        "android.os:Build",
         "android.text:Layout",
         "android.text:SpannableStringBuilder",
+        "android.text:StaticLayout",
         "android.text:StaticLayout.Builder",
         "android.text:TextPaint",
         "android.view:View",
@@ -18,8 +21,10 @@
         "androidx.core.view:ViewCompat",
         "com.google.android.material.shape:CornerTreatment",
         "com.google.android.material.shape:CutCornerTreatment",
+        "com.google.android.material.shape:MaterialShapeDrawable",
         "com.google.android.material.shape:RelativeCornerSize",
         "com.google.android.material.shape:RoundedCornerTreatment",
-        "com.google.android.material.shape:ShapeAppearanceModel"
+        "com.google.android.material.shape:ShapeAppearanceModel",
+        "com.google.android.material.shape:ShapeAppearanceModel.Builder"
     ]
 }
