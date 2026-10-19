@@ -1,8 +1,11 @@
 {
     "uses": [
+        "android.content.res:Resources.Theme",
         "android.content:Context",
         "android.graphics:Color",
         "android.util:TypedValue",
-        "com.google.android.material.card:MaterialCardView"
+        "com.google.android.material.card:MaterialCardView",
+        "com.google.android.material.shape:ShapeAppearanceModel",
+        "com.google.android.material.shape:ShapeAppearanceModel.Builder"
     ]
 }

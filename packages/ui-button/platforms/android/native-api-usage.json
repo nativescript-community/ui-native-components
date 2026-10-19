@@ -2,6 +2,7 @@
     "uses": [
         "android.graphics.drawable:BitmapDrawable",
         "android.graphics.drawable:Drawable",
+        "android.view:LayoutInflater",
         "androidx.core.view:ViewCompat",
         "com.google.android.material.button:MaterialButton"
     ]

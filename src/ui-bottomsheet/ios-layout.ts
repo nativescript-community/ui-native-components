@@ -1,4 +1,5 @@
 import { Application, IOSHelper, Screen, Trace, Utils, View } from '@nativescript/core';
+import type { BottomSheetDetent } from './index-common';
 
 const majorVersion = Utils.ios.MajorVersion;
 
@@ -44,6 +45,110 @@ function initLayoutGuide(controller: UIViewController) {
 
     return layoutGuide;
 }
+/**
+ * The size of the window the sheet is presented in: smaller than the screen on Mac Catalyst and iPad windows
+ */
+function getWindowSizePixels(controller: UIViewController) {
+    const window = controller.presentingViewController?.view?.window ?? controller.view?.window;
+    if (!window) {
+        return { width: Screen.mainScreen.widthPixels, height: Screen.mainScreen.heightPixels };
+    }
+    return { width: Utils.layout.toDevicePixels(window.bounds.size.width), height: Utils.layout.toDevicePixels(window.bounds.size.height) };
+}
+/**
+ * Mac Catalyst: UIKit shows a sheet as a window modal one (no detents, no tap outside to close).
+ * The sheet is then a card at the bottom of the window, `detents` are its heights.
+ */
+export interface CatalystCard {
+    detents: BottomSheetDetent[];
+    index: number;
+    grabberArea?: UIView;
+    /** px, set while the card is dragged: replaces the height of the detent */
+    dragHeight?: number;
+    /** px, known after the layout */
+    maxHeight?: number;
+    contentHeight?: number;
+    /** px, the current height of the card */
+    height?: number;
+    /** the slide in was started */
+    entered?: boolean;
+    /** a detent animation runs */
+    animating?: boolean;
+}
+
+/** px */
+export function getCatalystDetentHeights(card: CatalystCard) {
+    return card.detents.map((detent) => resolveCatalystDetentHeight(detent, card.maxHeight, card.contentHeight));
+}
+
+function resolveCatalystDetentHeight(detent: BottomSheetDetent, maxHeight: number, contentHeight: number) {
+    let height: number;
+    if (detent === 'large') {
+        height = maxHeight;
+    } else if (detent === 'medium') {
+        height = maxHeight / 2;
+    } else if (detent === 'content') {
+        height = contentHeight;
+    } else if (typeof detent === 'number') {
+        height = Utils.layout.toDevicePixels(detent);
+    } else {
+        height = detent.fraction * maxHeight;
+    }
+    return Math.round(Math.min(height, maxHeight));
+}
+
+/**
+ * The card is laid out at the height of its largest detent once: the other detents move it with a transform, no layout of the content
+ * @param visibleHeight px
+ */
+export function setCatalystVisibleHeight(card: CatalystCard, nativeView: UIView, visibleHeight: number) {
+    const offset = CGAffineTransformMakeTranslation(0, Utils.layout.toDeviceIndependentPixels(Math.max(0, card.height - visibleHeight)));
+    nativeView.transform = offset;
+    if (card.grabberArea) {
+        card.grabberArea.transform = offset;
+    }
+}
+
+function getCatalystVisibleHeight(card: CatalystCard) {
+    return card.dragHeight ?? (getCatalystDetentHeights(card)[Math.min(card.index, card.detents.length - 1)] || card.height);
+}
+
+function layoutCatalystCard(controller: IMDLayoutViewController, owner: View) {
+    const card = controller.catalystCard;
+    const { size } = controller.view.bounds;
+    const windowWidth = Utils.layout.toDevicePixels(size.width);
+    const windowHeight = Utils.layout.toDevicePixels(size.height);
+    const maxHeight = windowHeight - Utils.layout.toDevicePixels(controller.view.safeAreaInsets.top);
+    const width = windowWidth;
+    View.measureChild(null, owner, Utils.layout.makeMeasureSpec(width, Utils.layout.EXACTLY), Utils.layout.makeMeasureSpec(maxHeight, Utils.layout.AT_MOST));
+    const contentHeight = owner.getMeasuredHeight();
+    card.maxHeight = maxHeight;
+    card.contentHeight = contentHeight;
+    const height = Math.max(...getCatalystDetentHeights(card)) || contentHeight;
+    if (height !== contentHeight) {
+        View.measureChild(null, owner, Utils.layout.makeMeasureSpec(width, Utils.layout.EXACTLY), Utils.layout.makeMeasureSpec(height, Utils.layout.EXACTLY));
+    }
+    card.height = height;
+    const top = windowHeight - height;
+    View.layoutChild(null, owner, 0, top, width, top + height);
+    const nativeView = owner.nativeViewProtected as UIView;
+    if (card.grabberArea) {
+        const area = card.grabberArea;
+        area.center = CGPointMake(Utils.layout.toDeviceIndependentPixels(width) / 2, Utils.layout.toDeviceIndependentPixels(top) + area.bounds.size.height / 2);
+    }
+    if (!(nativeView instanceof UIView)) {
+        return;
+    }
+    if (!card.entered) {
+        // slide in from the bottom of the window
+        card.entered = true;
+        setCatalystVisibleHeight(card, nativeView, -40);
+        UIView.animateWithDurationDelayOptionsAnimationsCompletion(0.3, 0, UIViewAnimationOptions.CurveEaseOut, () => setCatalystVisibleHeight(card, nativeView, getCatalystVisibleHeight(card)), null);
+    } else if (!card.animating) {
+        setCatalystVisibleHeight(card, nativeView, getCatalystVisibleHeight(card));
+    }
+}
+
 function layoutView(controller: IMDLayoutViewController, owner: View): void {
     let layoutGuide = controller.view.safeAreaLayoutGuide;
     if (!layoutGuide) {
@@ -65,7 +170,8 @@ function layoutView(controller: IMDLayoutViewController, owner: View): void {
     const safeAreaHeight = Utils.layout.round(Utils.layout.toDevicePixels(safeAreaSize.height));
 
     const widthSpec = Utils.layout.makeMeasureSpec(safeAreaWidth, Utils.layout.EXACTLY);
-    const heightSpec = Utils.layout.makeMeasureSpec(Screen.mainScreen.heightPixels, Utils.layout.AT_MOST);
+    const windowSize = getWindowSizePixels(controller);
+    const heightSpec = Utils.layout.makeMeasureSpec(windowSize.height, Utils.layout.AT_MOST);
 
     // reset _cachedFrame or it will wrongly move the view on subsequent layouts
     // (owner as any)._cachedFrame = null;
@@ -75,7 +181,7 @@ function layoutView(controller: IMDLayoutViewController, owner: View): void {
     const marginLeft = owner.effectiveMarginLeft + position.left;
     const marginRight = owner.effectiveMarginRight;
     const top = marginTop + position.top;
-    const width = Screen.mainScreen.widthPixels;
+    const width = windowSize.width;
     const height = owner.getMeasuredHeight();
     View.layoutChild(null, owner, marginLeft, top, width - marginLeft - marginRight, position.top + height + marginBottom);
 
@@ -221,6 +327,7 @@ export declare class IMDLayoutViewController extends UIViewController {
     ignoreBottomSafeArea: boolean;
     ignoreTopSafeArea: boolean;
     onLayoutCallback?: () => void;
+    catalystCard?: CatalystCard;
 }
 
 @NativeClass
@@ -230,6 +337,7 @@ export class MDLayoutViewController extends UIViewController {
     ignoreTopSafeArea: boolean;
     nsAnimated: boolean;
     _trackingScrollView: UIScrollView;
+    catalystCard?: CatalystCard;
     /**
      * called after each layout pass, once preferredContentSize was updated
      */
@@ -268,7 +376,11 @@ export class MDLayoutViewController extends UIViewController {
         super.viewDidLayoutSubviews();
         const owner = this.owner?.get();
         if (owner) {
-            layoutView(this, owner);
+            if (this.catalystCard) {
+                layoutCatalystCard(this, owner);
+            } else {
+                layoutView(this, owner);
+            }
             this.onLayoutCallback?.();
         }
         // safeAreaInsetsDidChange inflates contentInset.bottom on this layout pass, floating

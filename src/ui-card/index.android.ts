@@ -2,6 +2,13 @@ import { Background, Color, Utils, backgroundColorProperty, backgroundInternalPr
 import { CardBase, CardVariant, variantProperty } from './index-common';
 export * from './index-common';
 
+// R is blacklisted from the native metadata of some apps: read the attribute ids with reflection
+function getAttr(rClass: string, field: string): number {
+    return +java.lang.Class.forName(rClass + '$attr')
+        .getDeclaredField(field)
+        .get(null);
+}
+
 function themeColor(context: android.content.Context, attr: number, fallback: number) {
     const value = new android.util.TypedValue();
     return context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
@@ -35,20 +42,19 @@ export class Card extends CardBase {
             return;
         }
         const context = card.getContext();
-        const R = (com.google.android.material as any).R;
         const variant = this.variant;
         const dp = (value: number) => Utils.layout.toDevicePixels(value);
         let color: number;
         let strokeWidth = 0;
-        let strokeColor = themeColor(context, R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY);
+        let strokeColor = themeColor(context, getAttr('com.google.android.material.R', 'colorOutlineVariant'), android.graphics.Color.LTGRAY);
         let elevation = 0;
         if (variant === 'filled') {
-            color = themeColor(context, R.attr.colorSurfaceContainerHighest, android.graphics.Color.LTGRAY);
+            color = themeColor(context, getAttr('com.google.android.material.R', 'colorSurfaceContainerHighest'), android.graphics.Color.LTGRAY);
         } else if (variant === 'outlined') {
-            color = themeColor(context, R.attr.colorSurface, android.graphics.Color.WHITE);
+            color = themeColor(context, getAttr('com.google.android.material.R', 'colorSurface'), android.graphics.Color.WHITE);
             strokeWidth = dp(1);
         } else {
-            color = themeColor(context, R.attr.colorSurfaceContainerLow, android.graphics.Color.WHITE);
+            color = themeColor(context, getAttr('com.google.android.material.R', 'colorSurfaceContainerLow'), android.graphics.Color.WHITE);
             elevation = dp(1);
         }
         const user = this.mUserBackground;

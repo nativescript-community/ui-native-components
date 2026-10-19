@@ -3,12 +3,14 @@
         "android.content:Context",
         "android.content:DialogInterface",
         "android.content:DialogInterface.OnClickListener",
+        "android.content:DialogInterface.OnKeyListener",
         "android.graphics.drawable:BitmapDrawable",
         "android.view.inputmethod:InputMethodManager",
         "android.view:KeyEvent",
         "android.widget:FrameLayout",
         "android.widget:TextView",
         "androidx.appcompat.app:AlertDialog",
+        "androidx.appcompat.app:AlertDialog.Builder",
         "com.google.android.material.button:MaterialButton",
         "com.google.android.material.dialog:MaterialAlertDialogBuilder"
     ]

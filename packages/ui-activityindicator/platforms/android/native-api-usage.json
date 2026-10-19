@@ -1,5 +1,7 @@
 {
     "uses": [
+        "android.widget:ProgressBar",
+        "com.google.android.material.progressindicator:BaseProgressIndicator",
         "com.google.android.material.progressindicator:CircularProgressIndicator"
     ]
 }

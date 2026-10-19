@@ -2,6 +2,9 @@
     "uses": [
         "android.content.res:ColorStateList",
         "android.graphics:Color",
-        "com.google.android.material.checkbox:MaterialCheckBox"
+        "android.widget:CheckBox",
+        "androidx.appcompat.widget:AppCompatCheckBox",
+        "com.google.android.material.checkbox:MaterialCheckBox",
+        "com.google.android.material.checkbox:MaterialCheckBox.OnCheckedStateChangedListener"
     ]
 }
