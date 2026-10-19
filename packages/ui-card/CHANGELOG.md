@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/nativescript-community/ui-native-components/compare/v1.0.0...v1.0.1) (2026-10-19)
+
+### Bug Fixes
+
+* **android:** complete native-api-usage.json and read R attrs without R ([1a5c054](https://github.com/nativescript-community/ui-native-components/commit/1a5c05442dac31e3bc0277ffc49fb5672bf01705))
+
 ## 1.0.0 (2026-10-18)
 
 ### Features

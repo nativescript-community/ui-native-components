@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/nativescript-community/ui-native-components/compare/v1.0.0...v1.0.1) (2026-10-19)
+
+### Features
+
+* **ui-bottomsheet:** bottom card with detents on Mac Catalyst ([1a1830c](https://github.com/nativescript-community/ui-native-components/commit/1a1830c51e34d513bb48bd6225e0e95d728dd61b))
+
+### Bug Fixes
+
+* **android:** complete native-api-usage.json and read R attrs without R ([1a5c054](https://github.com/nativescript-community/ui-native-components/commit/1a5c05442dac31e3bc0277ffc49fb5672bf01705))
+* **dialogs:** stop showUIAlertController reading isAlertController of a null controller ([922840c](https://github.com/nativescript-community/ui-native-components/commit/922840c2078008bbc1e94dbb8b961339f8226888))
+
 ## 1.0.0 (2026-10-18)
 
 ### Features
