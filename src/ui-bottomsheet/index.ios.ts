@@ -2,7 +2,7 @@ import { Application, Page, Trace, Utils, View, fromObject } from '@nativescript
 import { applyMixins } from '@nativescript-community/ui-core';
 import { BottomSheetOptions } from './index-common';
 import { StateBottomSheet, ViewWithBottomSheetBase } from './index-common';
-import { IMDLayoutViewController, MDLayoutViewController, getPresentingController } from './ios-layout';
+import { CatalystCard, IMDLayoutViewController, MDLayoutViewController, getCatalystDetentHeights, getPresentingController, setCatalystVisibleHeight } from './ios-layout';
 
 export { ViewWithBottomSheetBase } from './index-common';
 
@@ -10,6 +10,24 @@ const majorVersion = Utils.ios.MajorVersion;
 const CONTENT_DETENT = 'content';
 const PEEK_DETENT = 'peek';
 const LARGE_DETENT = 'large';
+// UIKit shows a sheet as a window modal one on Mac Catalyst: the sheet is then a card at the bottom of the window
+// isMacCatalystApp is not always in the runtime metadata: fall back to the KVC key
+function detectCatalyst() {
+    const info = NSProcessInfo.processInfo as NSProcessInfo & { isMacCatalystApp?: boolean };
+    if (typeof info.isMacCatalystApp === 'boolean') {
+        return info.isMacCatalystApp;
+    }
+    try {
+        return !!info.valueForKey('macCatalystApp');
+    } catch (error) {
+        return false;
+    }
+}
+// the build flag of the app, when it defines one
+declare const __CATALYST__: boolean | undefined;
+const isCatalyst = (typeof __CATALYST__ !== 'undefined' && !!__CATALYST__) || detectCatalyst();
+const CATALYST_GRABBER_AREA = { width: 120, height: 24 };
+const CATALYST_SCRIM_ALPHA = 0.32;
 
 /**
  * iOS: native UISheetPresentationController (iOS 15+, custom detents for iOS 16+).
@@ -70,6 +88,61 @@ class OutsideTapTarget extends NSObject {
     };
 }
 
+/**
+ * Catalyst card: a pan on the card moves it between its detents (like the scroll of its content, which is pinned while the card moves),
+ * a tap on the grabber goes to the next detent
+ */
+@NativeClass
+class CatalystCardTarget extends NSObject {
+    static ObjCProtocols = [UIGestureRecognizerDelegate];
+    _owner: WeakRef<ViewWithBottomSheet>;
+    static initWithOwner(owner: ViewWithBottomSheet) {
+        const target = CatalystCardTarget.new() as CatalystCardTarget;
+        target._owner = new WeakRef(owner);
+        return target;
+    }
+    cardPanned(recognizer: UIPanGestureRecognizer) {
+        this._owner.get()?._onCatalystPan(recognizer);
+    }
+    cardScrolled(recognizer: UIPanGestureRecognizer) {
+        this._owner.get()?._onCatalystScroll(recognizer);
+    }
+    grabberTapped() {
+        this._owner.get()?._cycleCatalystDetent();
+    }
+    gestureRecognizerShouldBegin(recognizer: UIGestureRecognizer) {
+        // the tap outside has this delegate too
+        if (!(recognizer instanceof UIPanGestureRecognizer)) {
+            return true;
+        }
+        return this._owner.get()?._shouldBeginCatalystPan(recognizer as UIPanGestureRecognizer) ?? false;
+    }
+    gestureRecognizerShouldReceiveTouch(recognizer: UIGestureRecognizer, touch: UITouch) {
+        // the tap outside: not for the touches in the card
+        return !(recognizer instanceof UITapGestureRecognizer) || !this._owner.get()?._isInCatalystCard(touch.view);
+    }
+    gestureRecognizerShouldRecognizeSimultaneouslyWithGestureRecognizer(recognizer: UIGestureRecognizer, other: UIGestureRecognizer) {
+        // the scrolling of the content runs along, it is pinned while the card moves
+        return other.view instanceof UIScrollView;
+    }
+    static ObjCExposedMethods = {
+        cardPanned: { returns: interop.types.void, params: [interop.types.id] },
+        cardScrolled: { returns: interop.types.void, params: [interop.types.id] },
+        grabberTapped: { returns: interop.types.void, params: [] }
+    };
+}
+
+/**
+ * Catalyst card: the empty part of the window lets the touches through (the sheet is not modal)
+ */
+@NativeClass
+class CatalystPassThroughView extends UIView {
+    hitTestWithEvent(point: CGPoint, event: _UIEvent) {
+        const hit = super.hitTestWithEvent(point, event);
+        return hit === this ? null : hit;
+    }
+}
+
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     bottomSheetDelegate: SheetDelegateImpl;
     _detentIds: string[] = [];
@@ -79,6 +152,9 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     _outsideTapRecognizer: UITapGestureRecognizer;
     _outsideTapTarget: OutsideTapTarget;
     _outsideTapView: UIView;
+    _catalystTarget: CatalystCardTarget;
+    _catalystOptions: BottomSheetOptions;
+    _catalystPan: { startHeight: number; scrollView: UIScrollView; startOffsetY: number };
 
     _onOutsideTap() {
         const sheet = this.bottomSheetController?.sheetPresentationController;
@@ -126,6 +202,9 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             controller = MDLayoutViewController.initWithOwner(this);
             controller.ignoreBottomSafeArea = options.ignoreBottomSafeArea !== undefined ? options.ignoreBottomSafeArea : false;
             controller.ignoreTopSafeArea = options.ignoreTopSafeArea !== undefined ? options.ignoreTopSafeArea : true;
+            if (isCatalyst && (options.canTouchBehind === true || options.disableDimBackground === true)) {
+                controller.view = CatalystPassThroughView.alloc().initWithFrame(controller.view.frame);
+            }
             if (nativeView instanceof UIView) {
                 controller.view.addSubview(nativeView);
             }
@@ -134,14 +213,22 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         this._raiseShowingBottomSheetEvent();
         this.bottomSheetController = controller;
-        controller.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
-        const sheet = controller.sheetPresentationController;
-        if (sheet) {
-            this.configureSheet(sheet, controller, options, parentController);
+        const catalystCard = isCatalyst;
+        controller.modalPresentationStyle = catalystCard ? UIModalPresentationStyle.OverFullScreen : UIModalPresentationStyle.PageSheet;
+        if (catalystCard) {
+            controller.modalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+            this.configureCatalystCard(controller, options, parentController);
+        } else {
+            const sheet = controller.sheetPresentationController;
+            if (sheet) {
+                this.configureSheet(sheet, controller, options, parentController);
+            }
         }
         controller.nsAnimated = true;
         parentController.presentViewControllerAnimatedCompletion(controller, true, null);
-        if (options.transparent === true) {
+        if (catalystCard) {
+            this.styleCatalystCard(controller, options);
+        } else if (options.transparent === true) {
             controller.view.backgroundColor = UIColor.clearColor;
         } else {
             if (!(this instanceof Page)) {
@@ -160,6 +247,272 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         } else {
             this.bindingContext = fromObject(options.context);
             this._raiseShownBottomSheetEvent();
+        }
+    }
+
+    private configureCatalystCard(controller: IMDLayoutViewController, options: BottomSheetOptions, parentController: UIViewController) {
+        this._onDetentChange = options.onDetentChange;
+        this._onWillDismiss = options.onWillDismiss;
+        this._onDismissAttempt = options.onDismissAttempt;
+        this._catalystOptions = options;
+        let detents = options.detents;
+        if (!detents?.length) {
+            detents = options.peekHeight && options.skipCollapsedState !== true ? [options.peekHeight, CONTENT_DETENT] : [CONTENT_DETENT];
+        }
+        const card: CatalystCard = { detents, index: Math.min(options.initialDetentIndex || 0, detents.length - 1) };
+        controller.catalystCard = card;
+        this._catalystTarget = CatalystCardTarget.initWithOwner(this);
+        const nativeView = this.nativeViewProtected as UIView;
+        if (nativeView instanceof UIView) {
+            const pan = UIPanGestureRecognizer.alloc().initWithTargetAction(this._catalystTarget, 'cardPanned');
+            pan.delegate = this._catalystTarget;
+            nativeView.addGestureRecognizer(pan);
+            // the wheel and the trackpad: the card opens first, then the content scrolls. They never close it
+            const scroll = UIPanGestureRecognizer.alloc().initWithTargetAction(this._catalystTarget, 'cardScrolled');
+            scroll.delegate = this._catalystTarget;
+            scroll.allowedTouchTypes = NSArray.arrayWithArray([]);
+            scroll.allowedScrollTypesMask = UIScrollTypeMask.All;
+            nativeView.addGestureRecognizer(scroll);
+        }
+        if (options.transparent !== true && options.grabber !== false) {
+            const area = UIView.alloc().initWithFrame(CGRectMake(0, 0, CATALYST_GRABBER_AREA.width, CATALYST_GRABBER_AREA.height));
+            const grabber = UIView.alloc().initWithFrame(CGRectMake((CATALYST_GRABBER_AREA.width - 36) / 2, 6, 36, 5));
+            grabber.backgroundColor = UIColor.tertiaryLabelColor;
+            grabber.layer.cornerRadius = 2.5;
+            area.addSubview(grabber);
+            area.addGestureRecognizer(UITapGestureRecognizer.alloc().initWithTargetAction(this._catalystTarget, 'grabberTapped'));
+            controller.view.addSubview(area);
+            card.grabberArea = area;
+        }
+        if (options.canTouchBehind === true || options.disableDimBackground === true) {
+            if (options.canTouchBehind !== true && options.dismissOnBackgroundTap !== false) {
+                // no scrim to tap: a recognizer on the content behind closes the sheet and keeps the touch from it
+                const view = parentController?.view;
+                if (view) {
+                    this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
+                    this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
+                    this._outsideTapRecognizer.cancelsTouchesInView = true;
+                    view.addGestureRecognizer(this._outsideTapRecognizer);
+                    this._outsideTapView = view;
+                }
+            }
+        } else if (options.dismissOnBackgroundTap !== false) {
+            this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
+            this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
+            this._outsideTapRecognizer.delegate = this._catalystTarget;
+            controller.view.addGestureRecognizer(this._outsideTapRecognizer);
+            this._outsideTapView = controller.view;
+        }
+    }
+
+    private styleCatalystCard(controller: IMDLayoutViewController, options: BottomSheetOptions) {
+        const dimmed = options.transparent !== true && options.canTouchBehind !== true && options.disableDimBackground !== true;
+        controller.view.backgroundColor = dimmed ? UIColor.blackColor.colorWithAlphaComponent(CATALYST_SCRIM_ALPHA) : UIColor.clearColor;
+        const nativeView = this.nativeViewProtected as UIView;
+        if (options.transparent === true || !(nativeView instanceof UIView)) {
+            return;
+        }
+        nativeView.backgroundColor = UIColor.systemBackgroundColor;
+        if (options.backgroundOpacity) {
+            nativeView.backgroundColor = nativeView.backgroundColor.colorWithAlphaComponent(options.backgroundOpacity);
+        }
+        nativeView.layer.cornerRadius = options.cornerRadius ?? 16;
+        // top corners only
+        nativeView.layer.maskedCorners = CACornerMask.kCALayerMinXMinYCorner | CACornerMask.kCALayerMaxXMinYCorner;
+        nativeView.clipsToBounds = true;
+    }
+
+    _isInCatalystCard(view: UIView) {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        const nativeView = this.nativeViewProtected as UIView;
+        return !!view && ((nativeView instanceof UIView && view.isDescendantOfView(nativeView)) || (!!card?.grabberArea && view.isDescendantOfView(card.grabberArea)));
+    }
+
+    _shouldBeginCatalystPan(recognizer: UIPanGestureRecognizer) {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        if (!card) {
+            return false;
+        }
+        if (recognizer.allowedScrollTypesMask) {
+            // the wheel: only to open the card
+            return card.index < card.detents.length - 1;
+        }
+        const velocity = recognizer.velocityInView(recognizer.view);
+        // the velocity is often still 0 here with a mouse: _onCatalystPan then leaves to the content what it must scroll
+        return velocity.x === 0 && velocity.y === 0 ? true : Math.abs(velocity.y) > Math.abs(velocity.x);
+    }
+
+    private _findCatalystScrollView(recognizer: UIPanGestureRecognizer): UIScrollView {
+        const cardView = recognizer.view;
+        let view = cardView.hitTestWithEvent(recognizer.locationInView(cardView), null);
+        while (view && view !== cardView) {
+            if (view instanceof UIScrollView) {
+                return view;
+            }
+            view = view.superview;
+        }
+        return null;
+    }
+
+    private _snapCatalystCard(card: CatalystCard, velocity: number) {
+        const toDip = (value: number) => Utils.layout.toDeviceIndependentPixels(value);
+        const heights = getCatalystDetentHeights(card).map(toDip);
+        const lowest = Math.min(...heights);
+        const projected = toDip(card.dragHeight ?? card.height) - velocity * 0.15;
+        if (projected < lowest * 0.6 && this._dismissCatalystCard()) {
+            return;
+        }
+        let index = 0;
+        heights.forEach((height, heightIndex) => {
+            if (Math.abs(height - projected) < Math.abs(heights[index] - projected)) {
+                index = heightIndex;
+            }
+        });
+        this._applyCatalystDetent(index, true);
+    }
+
+    /**
+     * Moves the card to a visible `height` (dip), from closed to the largest detent, without any layout
+     */
+    private _dragCatalystCard(card: CatalystCard, height: number) {
+        const toPx = (value: number) => Utils.layout.toDevicePixels(value);
+        const clamped = Math.min(card.height, Math.max(0, toPx(height)));
+        card.dragHeight = clamped;
+        const nativeView = this.nativeViewProtected as UIView;
+        if (nativeView instanceof UIView) {
+            setCatalystVisibleHeight(card, nativeView, clamped);
+        }
+    }
+
+    _onCatalystPan(recognizer: UIPanGestureRecognizer) {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        if (!card) {
+            return;
+        }
+        const toDip = (value: number) => Utils.layout.toDeviceIndependentPixels(value);
+        if (recognizer.state === UIGestureRecognizerState.Began) {
+            const scrollView = this._findCatalystScrollView(recognizer);
+            this._catalystPan = { startHeight: toDip(card.dragHeight ?? this._visibleCatalystHeight(card)), scrollView, startOffsetY: scrollView ? scrollView.contentOffset.y : 0 };
+            return;
+        }
+        const pan = this._catalystPan;
+        if (!pan) {
+            return;
+        }
+        if (recognizer.state === UIGestureRecognizerState.Changed) {
+            const translation = recognizer.translationInView(recognizer.view).y;
+            const scrollView = pan.scrollView;
+            const maxHeight = toDip(card.height);
+            const currentHeight = toDip(card.dragHeight ?? this._visibleCatalystHeight(card));
+            const contentAtTop = !scrollView || scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top + 1;
+            if ((translation < 0 && currentHeight >= maxHeight - 0.5) || (translation > 0 && !contentAtTop)) {
+                // the content scrolls: the card closes only once the content is back at its top
+                pan.startHeight = currentHeight;
+                recognizer.setTranslationInView(CGPointMake(0, 0), recognizer.view);
+                return;
+            }
+            this._dragCatalystCard(card, pan.startHeight - translation);
+            if (scrollView && toDip(card.dragHeight) < maxHeight) {
+                scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, pan.startOffsetY);
+            }
+            return;
+        }
+        this._catalystPan = null;
+        this._snapCatalystCard(card, recognizer.velocityInView(recognizer.view).y);
+    }
+
+    _onCatalystScroll(recognizer: UIPanGestureRecognizer) {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        if (!card) {
+            return;
+        }
+        const toDip = (value: number) => Utils.layout.toDeviceIndependentPixels(value);
+        if (recognizer.state === UIGestureRecognizerState.Began) {
+            this._catalystPan = { startHeight: 0, scrollView: this._findCatalystScrollView(recognizer), startOffsetY: 0 };
+            this._catalystPan.startOffsetY = this._catalystPan.scrollView ? this._catalystPan.scrollView.contentOffset.y : 0;
+            return;
+        }
+        const pan = this._catalystPan;
+        if (!pan) {
+            return;
+        }
+        if (recognizer.state === UIGestureRecognizerState.Changed) {
+            const delta = recognizer.translationInView(recognizer.view).y;
+            recognizer.setTranslationInView(CGPointMake(0, 0), recognizer.view);
+            // content moving up = scrolling to its end: the card opens first
+            if (delta < 0 && toDip(card.dragHeight ?? this._visibleCatalystHeight(card)) < toDip(card.height) - 0.5) {
+                this._dragCatalystCard(card, toDip(card.dragHeight ?? this._visibleCatalystHeight(card)) - delta);
+                if (pan.scrollView) {
+                    pan.scrollView.contentOffset = CGPointMake(pan.scrollView.contentOffset.x, pan.startOffsetY);
+                }
+            }
+            return;
+        }
+        this._catalystPan = null;
+        if (card.dragHeight !== undefined) {
+            this._snapCatalystCard(card, 0);
+        }
+    }
+
+    private _visibleCatalystHeight(card: CatalystCard) {
+        return getCatalystDetentHeights(card)[Math.min(card.index, card.detents.length - 1)] || card.height;
+    }
+
+    /**
+     * @returns false when the card cannot be dismissed (it then goes back to a detent)
+     */
+    private _dismissCatalystCard() {
+        if (this._catalystOptions?.dismissOnDraggingDownSheet === false) {
+            return false;
+        }
+        if (this._onWillDismiss?.() === false) {
+            this._onDismissAttempt?.();
+            return false;
+        }
+        this.closeBottomSheet();
+        return true;
+    }
+
+    private _applyCatalystDetent(index: number, animated: boolean) {
+        const controller = this.bottomSheetController as IMDLayoutViewController;
+        const card = controller?.catalystCard;
+        if (!card) {
+            return;
+        }
+        const changed = index !== card.index;
+        card.index = index;
+        card.dragHeight = undefined;
+        const nativeView = this.nativeViewProtected as UIView;
+        const apply = () => {
+            if (nativeView instanceof UIView) {
+                setCatalystVisibleHeight(card, nativeView, this._visibleCatalystHeight(card));
+            }
+        };
+        if (animated) {
+            // a layout during the animation must not set the final position before it
+            card.animating = true;
+            UIView.animateWithDurationDelayOptionsAnimationsCompletion(
+                0.25,
+                0,
+                UIViewAnimationOptions.CurveEaseOut | UIViewAnimationOptions.BeginFromCurrentState,
+                apply,
+                () => {
+                    card.animating = false;
+                }
+            );
+        } else {
+            apply();
+        }
+        if (changed) {
+            this._onChangeStateBottomSheetCallback?.(index === 0 ? StateBottomSheet.COLLAPSED : StateBottomSheet.EXPANDED);
+            this._onDetentChange?.(index);
+        }
+    }
+
+    _cycleCatalystDetent() {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        if (card && card.detents.length > 1) {
+            this.setBottomSheetDetentIndex((card.index + 1) % card.detents.length);
         }
     }
 
@@ -256,6 +609,14 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     }
 
     setBottomSheetDetentIndex(index: number, animated = true) {
+        const controller = this.bottomSheetController as IMDLayoutViewController;
+        const card = controller?.catalystCard;
+        if (card) {
+            if (index >= 0 && index < card.detents.length) {
+                this._applyCatalystDetent(index, animated);
+            }
+            return;
+        }
         const sheet = this.bottomSheetController?.sheetPresentationController;
         const id = this._detentIds[index];
         if (!sheet || !id) {
@@ -268,6 +629,10 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     }
 
     getBottomSheetDetentIndex() {
+        const card = (this.bottomSheetController as IMDLayoutViewController)?.catalystCard;
+        if (card) {
+            return card.index;
+        }
         const sheet = this.bottomSheetController?.sheetPresentationController;
         return sheet ? this._detentIds.indexOf(sheet.selectedDetentIdentifier) : -1;
     }
@@ -280,9 +645,13 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                 sheet.delegate = null;
             }
             (this.bottomSheetController as IMDLayoutViewController).onLayoutCallback = null;
+            (this.bottomSheetController as IMDLayoutViewController).catalystCard = null;
             this.bottomSheetController = null;
         }
         this.bottomSheetDelegate = null;
+        this._catalystTarget = null;
+        this._catalystPan = null;
+        this._catalystOptions = null;
         if (this._outsideTapRecognizer) {
             this._outsideTapView?.removeGestureRecognizer(this._outsideTapRecognizer);
             this._outsideTapRecognizer = null;
@@ -304,6 +673,27 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
         const parentController = getPresentingController(parent);
         const animated = this.viewController.nsAnimated;
+        const controller = this.bottomSheetController as IMDLayoutViewController;
+        const nativeView = this.nativeViewProtected as UIView;
+        const card = controller?.catalystCard;
+        if (card && animated && nativeView instanceof UIView) {
+            // slide out, the scrim fades along
+            const offset = CGAffineTransformMakeTranslation(0, Utils.layout.toDeviceIndependentPixels(card.height + 40));
+            // no layout may move the card back before it slides out
+            card.animating = true;
+            UIView.animateWithDurationDelayOptionsAnimationsCompletion(
+                0.25,
+                0,
+                UIViewAnimationOptions.CurveEaseIn | UIViewAnimationOptions.BeginFromCurrentState,
+                () => {
+                    nativeView.transform = offset;
+                    card.grabberArea && (card.grabberArea.transform = offset);
+                    controller.view.backgroundColor = UIColor.clearColor;
+                },
+                () => parentController.dismissViewControllerAnimatedCompletion(false, whenClosedCallback)
+            );
+            return;
+        }
         parentController.dismissViewControllerAnimatedCompletion(animated, whenClosedCallback);
     }
 
