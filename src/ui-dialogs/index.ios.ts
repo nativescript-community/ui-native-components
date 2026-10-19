@@ -495,11 +495,12 @@ function showUIAlertController(alertController: AlertController, options: Dialog
         while (viewController.presentedViewController && !viewController.presentedViewController.beingDismissed) {
             while (
                 viewController.presentedViewController instanceof UIAlertController ||
-                (viewController.presentedViewController['isAlertController'] && viewController.presentedViewController.presentedViewController)
+                (viewController.presentedViewController?.['isAlertController'] && viewController.presentedViewController.presentedViewController)
             ) {
                 viewController = viewController.presentedViewController;
             }
-            if (viewController.presentedViewController instanceof UIAlertController || viewController.presentedViewController['isAlertController']) {
+            // the alert just reached has nothing presented on top: show on it
+            if (!viewController.presentedViewController || viewController.presentedViewController instanceof UIAlertController || viewController.presentedViewController['isAlertController']) {
                 break;
             } else {
                 viewController = viewController.presentedViewController;
