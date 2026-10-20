@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-progress",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Progress augmented with progressColor, indeterminate and busy. Material on Android, native UIKit on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.0.1"
+        "@nativescript-community/ui-core": "^1.0.2"
     }
 }

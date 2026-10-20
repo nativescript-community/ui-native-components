@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-bottom-navigation",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "BottomNavigation: tabs with a bottom bar and content. Material on Android, native UITabBarController on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,7 +44,7 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.0.1",
-        "@nativescript-community/ui-core-tabs": "^1.0.1"
+        "@nativescript-community/ui-core": "^1.0.2",
+        "@nativescript-community/ui-core-tabs": "^1.0.2"
     }
 }

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.2](https://github.com/nativescript-community/ui-native-components/compare/v1.0.1...v1.0.2) (2026-10-20)
+
+### Bug Fixes
+
+* **android:** look up material attr and id ints by name instead of R reflection ([59ca829](https://github.com/nativescript-community/ui-native-components/commit/59ca8292ed801864802cff3b31b6fee05f9bcbfd))
+
 ## [1.0.1](https://github.com/nativescript-community/ui-native-components/compare/v1.0.0...v1.0.1) (2026-10-19)
 
 ### Features
