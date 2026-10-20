@@ -24,19 +24,13 @@ function _getReason(value: number) {
     }
 }
 
-function getMaterialR(rtype: string, field: string): number {
-    return +java.lang.Class.forName('com.google.android.material.R$' + rtype)
-        .getDeclaredField(field)
-        .get(null);
-}
-
 export class SnackBar extends SnackBarBase {
     // Use this to get the textview instance inside the snackbar
     private static _SNACKBAR_TEXT_ID;
 
     get SNACKBAR_TEXT_ID() {
         if (!SnackBar._SNACKBAR_TEXT_ID) {
-            SnackBar._SNACKBAR_TEXT_ID = getMaterialR('id', 'snackbar_text');
+            SnackBar._SNACKBAR_TEXT_ID = Utils.android.resources.getId(':id/snackbar_text');
         }
         return SnackBar._SNACKBAR_TEXT_ID;
     }
