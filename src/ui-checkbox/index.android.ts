@@ -1,12 +1,10 @@
-import { Color, colorProperty, fontInternalProperty, Font } from '@nativescript/core';
+import { Color, colorProperty, fontInternalProperty, Font, Utils } from '@nativescript/core';
 import { CheckBoxBase, checkedColorProperty, checkedProperty, indeterminateProperty, textProperty } from './index-common';
 export * from './index-common';
 
-// R is blacklisted from the native metadata of some apps: read the attribute ids with reflection
-function getAttr(rClass: string, field: string): number {
-    return +java.lang.Class.forName(rClass + '$attr')
-        .getDeclaredField(field)
-        .get(null);
+// the R classes are blacklisted from the native metadata and stripped by R8 in some apps: look the ids up by name
+function getAttr(name: string): number {
+    return Utils.android.resources.getId(':attr/' + name);
 }
 
 // the typings of the Material classes do not have the checked states (Material 1.7+)
@@ -84,9 +82,9 @@ export class CheckBox extends CheckBoxBase {
         if (value) {
             const states = Array.create('[I', 3);
             states[0] = Array.create('int', 1);
-            states[0][0] = getAttr('android.R', 'state_checked');
+            states[0][0] = 16842912 /* android.R.attr.state_checked */;
             states[1] = Array.create('int', 1);
-            states[1][0] = getAttr('com.google.android.material.R', 'state_indeterminate');
+            states[1][0] = getAttr('state_indeterminate');
             states[2] = Array.create('int', 0);
             const current = this.nativeViewProtected.getButtonTintList();
             const unchecked = current ? current.getDefaultColor() : android.graphics.Color.GRAY;

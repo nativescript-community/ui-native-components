@@ -28,7 +28,7 @@ function getActionBarSize(context: android.content.Context) {
 }
 
 function getMaterialAttr(name: string): number {
-    return +java.lang.Class.forName('com.google.android.material.R$attr').getDeclaredField(name).get(null);
+    return Utils.android.resources.getId(':attr/' + name);
 }
 
 /** a color of the Material theme (colorSurface, colorOnSurface...) */
@@ -227,12 +227,12 @@ export class AppBar extends AppBarBase {
         );
         {
             // the SearchView follows the colors of the bar
-            const R = (androidx.appcompat as any).R.id;
-            const edit = searchView.findViewById(R.search_src_text) as android.widget.EditText;
+            const getId = (name: string) => Utils.android.resources.getId(':id/' + name);
+            const edit = searchView.findViewById(getId('search_src_text')) as android.widget.EditText;
             edit?.setTextColor(onBar);
             edit?.setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(onBar, 150));
-            for (const id of [R.search_close_btn, R.search_mag_icon, R.search_button, R.search_go_btn, R.search_voice_btn]) {
-                const icon = searchView.findViewById(id) as android.widget.ImageView;
+            for (const name of ['search_close_btn', 'search_mag_icon', 'search_button', 'search_go_btn', 'search_voice_btn']) {
+                const icon = searchView.findViewById(getId(name)) as android.widget.ImageView;
                 icon?.setColorFilter(onBar);
             }
         }
