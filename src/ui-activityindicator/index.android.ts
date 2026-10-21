@@ -4,23 +4,64 @@ import { ActivityIndicatorBase, indeterminateProperty, maxValueProperty, valuePr
 
 export class ActivityIndicator extends ActivityIndicatorBase {
     nativeViewProtected: com.google.android.material.progressindicator.CircularProgressIndicator;
+    private defaults?: { inset: number; thickness: number; outer: number };
 
-    // The indicator draws at its own size (40dp, 48dp when wavy), whatever the size of the view: it follows the size of the view
-    // (width/height of the view, the smallest side) in onLayout.
+    // The indicator draws at its own size (40dp, 48dp when wavy), whatever the size of the view. NativeScript lays out
+    // natively on Android, onMeasure/onLayout are never called in JS, and the Material indicator measures itself at its
+    // own size whatever the spec: the size asked for (the smallest side of width/height) is applied to it before the
+    // first measure, and again if the layout changes.
     createNativeView() {
         return inflateLayout(this._context, 'ns_ui_circular_progress') as com.google.android.material.progressindicator.CircularProgressIndicator;
     }
 
-    onLayout(left: number, top: number, right: number, bottom: number) {
-        super.onLayout(left, top, right, bottom);
-        const indicator = this.nativeViewProtected;
-        const size = Math.min(right - left, bottom - top);
-        if (indicator && size > 0 && (this.width !== undefined || this.height !== undefined)) {
-            const inset = indicator.getIndicatorInset();
-            indicator.setIndicatorSize(Math.max(0, size - 2 * inset));
+    initNativeView() {
+        // before super: that is where the native layout listener is installed, only if somebody listens by then
+        this.on('layoutChanged', this.fitIndicatorSize, this);
+        super.initNativeView();
+        // the first measure must already see the size: the indicator measures itself at its own size, whatever the spec
+        const requested = this.getRequestedSize();
+        if (requested !== Infinity) {
+            this.applyIndicatorSize(requested);
         }
     }
-
+    disposeNativeView() {
+        this.off('layoutChanged', this.fitIndicatorSize, this);
+        super.disposeNativeView();
+    }
+    // the smallest side of the width/height asked for, in pixels, Infinity without any
+    private getRequestedSize() {
+        const toPixels = (length: any) => {
+            if (typeof length === 'number') {
+                return Math.round(Utils.layout.toDevicePixels(length));
+            }
+            if (length && typeof length === 'object') {
+                return length.unit === 'dip' ? Math.round(Utils.layout.toDevicePixels(length.value)) : length.unit === 'px' ? length.value : Infinity;
+            }
+            return Infinity;
+        };
+        return Math.min(toPixels(this.width), toPixels(this.height));
+    }
+    private fitIndicatorSize() {
+        const params = this.nativeViewProtected?.getLayoutParams();
+        const requested = params ? Math.min(params.width > 0 ? params.width : Infinity, params.height > 0 ? params.height : Infinity) : Infinity;
+        if (requested !== Infinity) {
+            this.applyIndicatorSize(requested);
+        }
+    }
+    private applyIndicatorSize(requested: number) {
+        const indicator = this.nativeViewProtected;
+        // a smaller indicator gets a thinner track and a smaller inset, or it ends up a blob
+        this.defaults ??= { inset: indicator.getIndicatorInset(), thickness: indicator.getTrackThickness(), outer: indicator.getIndicatorSize() + 2 * indicator.getIndicatorInset() };
+        const scale = Math.min(1, requested / this.defaults.outer);
+        const inset = Math.round(this.defaults.inset * scale);
+        const thickness = Math.max(1, Math.round(this.defaults.thickness * scale));
+        const indicatorSize = Math.max(0, requested - 2 * inset);
+        if (inset !== indicator.getIndicatorInset() || thickness !== indicator.getTrackThickness() || indicatorSize !== indicator.getIndicatorSize()) {
+            indicator.setIndicatorInset(inset);
+            indicator.setTrackThickness(thickness);
+            indicator.setIndicatorSize(indicatorSize);
+        }
+    }
     [wavyProperty.setNative](value: boolean) {
         // the wave APIs are new in Material 1.14: not in the typings
         const indicator = this.nativeViewProtected as any;
