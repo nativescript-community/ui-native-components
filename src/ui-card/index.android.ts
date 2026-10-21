@@ -1,4 +1,5 @@
-import { Background, Color, Utils, backgroundColorProperty, backgroundInternalProperty } from '@nativescript/core';
+import { Background, Color, Length, Utils, backgroundColorProperty, backgroundInternalProperty } from '@nativescript/core';
+import { elevationProperty, shapeProperty, themer } from '@nativescript-community/ui-core';
 import { CardBase, CardVariant, variantProperty } from './index-common';
 export * from './index-common';
 
@@ -19,6 +20,9 @@ export class Card extends CardBase {
     nativeViewProtected: com.google.android.material.card.MaterialCardView;
     private mUserColor: Color;
     private mUserBackground: Background;
+    private mUserElevation: number;
+    private mShape: string;
+    private mDefaultAppearanceModel: com.google.android.material.shape.ShapeAppearanceModel;
 
     public createNativeView() {
         return new com.google.android.material.card.MaterialCardView(this._context);
@@ -66,8 +70,29 @@ export class Card extends CardBase {
         card.setCardBackgroundColor(color);
         card.setStrokeWidth(strokeWidth);
         card.setStrokeColor(strokeColor);
-        card.setCardElevation(elevation);
-        card.setRadius(user?.borderTopLeftRadius ? dp(user.borderTopLeftRadius) : dp(12));
+        // the elevation of the style (elevation: 0 for a flat card) wins over the one of the variant
+        card.setCardElevation(this.mUserElevation ?? elevation);
+        // the radius would replace the shape
+        if (!this.mShape) {
+            card.setRadius(user?.borderTopLeftRadius ? dp(user.borderTopLeftRadius) : dp(12));
+        }
+    }
+
+    [shapeProperty.setNative](shape: any) {
+        this.mShape = shape;
+        const card = this.nativeViewProtected;
+        if (!shape) {
+            if (this.mDefaultAppearanceModel) {
+                card.setShapeAppearanceModel(this.mDefaultAppearanceModel);
+            }
+        } else {
+            this.mDefaultAppearanceModel ??= card.getShapeAppearanceModel();
+            card.setShapeAppearanceModel(themer.getShape(shape));
+        }
+    }
+    [elevationProperty.setNative](value: any) {
+        this.mUserElevation = value === undefined || value === null ? undefined : Length.toDevicePixels(typeof value === 'string' ? Length.parse(value) : value, 0);
+        this.updateLook();
     }
 
     [variantProperty.setNative](value: CardVariant) {
