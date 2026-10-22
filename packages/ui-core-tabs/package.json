@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-core-tabs",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Shared base of the tabs components (tab strip, tab content, selection). Material on Android, native UIKit on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.0.3"
+        "@nativescript-community/ui-core": "^1.0.4"
     }
 }
