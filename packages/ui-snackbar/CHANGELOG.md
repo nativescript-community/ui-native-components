@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/nativescript-community/ui-native-components/compare/v1.0.2...v1.0.3) (2026-10-22)
+
+### Bug Fixes
+
+* **ui-snackbar:** ship nativescript.config.ts in the package ([2697b7e](https://github.com/nativescript-community/ui-native-components/commit/2697b7eb7fd74216931190390c5f1e863cffa34e))
+
 ## [1.0.2](https://github.com/nativescript-community/ui-native-components/compare/v1.0.1...v1.0.2) (2026-10-20)
 
 **Note:** Version bump only for package @nativescript-community/ui-snackbar
