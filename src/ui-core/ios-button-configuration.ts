@@ -140,6 +140,7 @@ export function applyButtonConfigurationState(owner: any, changes?: Partial<Butt
         Object.assign(state, changes);
     }
     nativeView.configuration = buildConfiguration(state);
+    nativeView.setNeedsUpdateConfiguration();
 }
 
 const toDIP = (value: number) => Utils.layout.toDeviceIndependentPixels(value);
@@ -204,12 +205,24 @@ class ButtonConfigurationMixin {
     }
 }
 
+class ButtonTextMixin {
+    //TODO: remove as it needs to be added after TS 5.7 change https://github.com/microsoft/TypeScript/pull/59860
+    [key: symbol]: (...args: any[]) => any | void;
+
+    // the core draws the title with the font of `titleLabel`, ignored by a configuration: the configured font (an icon font
+    // for glyph buttons) is only applied by the next configuration update, which otherwise waits for the first touch
+    _setNativeText(this: any) {
+        this.nativeViewProtected?.setNeedsUpdateConfiguration();
+    }
+}
+
 /**
  * Makes a core Button class (or subclass) render with the UIButton configuration of its native view.
  * The native view must be created with {@link createConfigurationButton}.
  */
 export function installButtonConfiguration(ctor: any) {
     applyMixins(ctor, [ButtonConfigurationMixin], { override: true });
+    applyMixins(ctor, [ButtonTextMixin], { after: true });
 }
 
 /**
