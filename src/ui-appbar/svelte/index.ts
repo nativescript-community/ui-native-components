@@ -1,5 +1,6 @@
 import { ActionBarElement, PageElement, registerElement, registerNativeViewElement } from '@nativescript-community/svelte-native/dom';
-import { AppBar, AppBarItem, AppPage, AppPageOverlay, AppPageSearchContent } from '../index';
+import { NavigationButton } from '@nativescript/core';
+import { AppBar, AppBarBottomView, AppBarItem, AppBarSearchField, AppPage, AppPageOverlay, AppPageSearchContent } from '../index';
 
 /** svelte-native `navigate` needs a PageElement: this one wraps an AppPage instead of the core Page */
 class AppPageElement extends PageElement {
@@ -21,11 +22,14 @@ class AppBarElement extends ActionBarElement {
     }
 }
 
-/** registers `<appPage>` and `<appBar>` */
+/** registers `<appPage>`, `<appBar>`, `<appBarItem>`, `<appBarSearchField>`, `<appBarBottomView>` and `<navigationButton>` (not registered by svelte-native: only its `<actionBar>` does) */
 export function register() {
     registerElement('AppPage', () => new AppPageElement());
     registerElement('AppBar', () => new AppBarElement());
     registerNativeViewElement('AppPageSearchContent', () => AppPageSearchContent as any, 'searchContent');
     registerNativeViewElement('AppPageOverlay', () => AppPageOverlay as any, 'overlay');
+    registerNativeViewElement('NavigationButton', () => NavigationButton, 'navigationButton');
+    registerNativeViewElement('AppBarSearchField', () => AppBarSearchField as any, 'searchField');
+    registerNativeViewElement('AppBarBottomView', () => AppBarBottomView as any, 'bottomView');
     registerNativeViewElement('AppBarItem', () => AppBarItem as any, 'actionItems');
 }
