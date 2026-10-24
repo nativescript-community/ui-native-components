@@ -1,11 +1,13 @@
-import { ActionBar, Application, Color, FormattedString, ImageSource, Page, Utils, View } from '@nativescript/core';
+import { ActionBar, Application, Color, ContentView, EventData, FormattedString, ImageSource, Page, TextField, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon, showMenu } from '@nativescript-community/ui-menu';
 import {
     AppBarBase,
     AppBarBottomItem,
+    AppBarBottomView,
     AppBarItem,
     AppBarScrollBehavior,
+    AppBarSearchField,
     AppBarSearchMode,
     AppBarSearchPlacement,
     AppBarSize,
@@ -13,7 +15,7 @@ import {
     AppPageSearchContent,
     notifyBottomItemTap
 } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent };
+export { AppBarBottomItem, AppBarBottomView, AppBarItem, AppBarScrollBehavior, AppBarSearchField, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageOverlay, AppPageSearchContent };
 
 const MATCH_PARENT = -1;
 const WRAP_CONTENT = -2;
@@ -41,6 +43,33 @@ function getThemeColor(view: android.view.View, name: string, fallback: number) 
     // The theme of the activity is the one that is applied again when the mode changes
     const activity = Application.android.foregroundActivity || Application.android.startActivity;
     return com.google.android.material.color.MaterialColors.getColor(activity || view.getContext(), getMaterialAttr(name), fallback);
+}
+
+let noShadowOutline: android.view.ViewOutlineProvider;
+/** a view that only takes part in the stacking order (elevation) casts no shadow */
+function getNoShadowOutline() {
+    if (!noShadowOutline) {
+        // @ts-ignore abstract class: extended through the runtime
+        const NoShadowOutline = android.view.ViewOutlineProvider.extend({ getOutline: (_view, outline) => outline.setEmpty() });
+        noShadowOutline = new NoShadowOutline();
+    }
+    return noShadowOutline;
+}
+
+/** the SearchBar draws its fill in a MaterialShapeDrawable under a ripple / focus ring layer */
+function findShapeDrawable(drawable: android.graphics.drawable.Drawable): com.google.android.material.shape.MaterialShapeDrawable {
+    if (drawable instanceof com.google.android.material.shape.MaterialShapeDrawable) {
+        return drawable;
+    }
+    if (drawable instanceof android.graphics.drawable.LayerDrawable) {
+        for (let index = 0; index < drawable.getNumberOfLayers(); index++) {
+            const found = findShapeDrawable(drawable.getDrawable(index));
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return null;
 }
 
 function toNativeColor(value: any): number {
@@ -147,6 +176,20 @@ export class AppBar extends AppBarBase {
                 toolbar.setNavigationIcon(androidx.core.content.ContextCompat.getDrawable(context, id));
             }
         }
+    }
+
+    _addViewToNativeVisualTree(child: View, atIndex?: number): boolean {
+        // the page places them (search field, floating toolbar), not the toolbar
+        return child === this.searchField || child === this.bottomView || super._addViewToNativeVisualTree(child, atIndex);
+    }
+
+    _removeViewFromNativeVisualTree(child: View) {
+        if (child === this.searchField || child === this.bottomView) {
+            const nativeChild = child.nativeViewProtected;
+            (nativeChild?.getParent() as android.view.ViewGroup)?.removeView(nativeChild);
+            return;
+        }
+        super._removeViewFromNativeVisualTree(child);
     }
 
     onAppBarPropertyChanged() {
@@ -441,10 +484,7 @@ export class AppPage extends Page {
         coordinator.addView(scrim, new CoordinatorLayout.LayoutParams(MATCH_PARENT, 0));
         // the AppBarLayout is elevated (lift on scroll): a sibling is drawn below it unless it is elevated more
         scrim.setElevation(Math.round(12 * Utils.layout.getDisplayDensity()));
-        // only the stacking order matters: no shadow under the status bar
-        // @ts-ignore abstract class: extended through the runtime
-        const NoShadowOutline = android.view.ViewOutlineProvider.extend({ getOutline: (_view, outline) => outline.setEmpty() });
-        scrim.setOutlineProvider(new NoShadowOutline());
+        scrim.setOutlineProvider(getNoShadowOutline());
         this._statusScrim = scrim;
         // the full screen search of the M3 SearchBar: on top of everything, hidden until the bar is tapped
         const searchView = new com.google.android.material.search.SearchView(context);
@@ -476,28 +516,16 @@ export class AppPage extends Page {
         super.onUnloaded();
     }
 
+    // the activity handles `uiMode` itself (no recreate): the theme resolves the new colors right away, but the views keep the ones they were created with
     private _appearanceListener = () => {
-        // the theme resolves its colors after the app handled the change: read them again once it is settled
-        setTimeout(() => this.refreshThemeColors(), 300);
-        setTimeout(() => this.refreshThemeColors(), 1500);
-    };
-
-    /** dark / light switch without recreating the activity: the colors a native view reads from the theme are cached, the search bar is created again */
-    private refreshThemeColors() {
-        const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
-        if (!appBarLayout) {
-            return;
+        const bar = this.hasActionBar ? this.actionBar : null;
+        if (bar instanceof AppBar) {
+            bar.update();
+        } else {
+            this.syncAppBar();
         }
-        [this._searchBar, this._inlineField].forEach((view) => view && appBarLayout.removeView(view));
-        this._searchBar = null;
-        this._inlineField = null;
-        this._inlineEdit = null;
-        this._inlineOpen = false;
-        this._searchBarSetup = false;
-        this._defaultSearchBarIcon = undefined;
-        this.syncAppBar();
         this.syncStatusBarIcons();
-    }
+    };
 
     /** the icons of the status bar follow the luminance of the bar drawn under it: the style of the page is not applied again by a live dark / light switch */
     private syncStatusBarIcons() {
@@ -616,7 +644,8 @@ export class AppPage extends Page {
         const child = this._collapsing || toolbar;
         const params = child.getLayoutParams();
         // `hide` with a scroll target: the bar follows the scroll of the list itself (see syncHide), the AppBarLayout does not scroll
-        const scrollTargetNative = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        const scrollTargetView = appBar?.getScrollTarget();
+        const scrollTargetNative = scrollTargetView?.nativeViewProtected as android.view.View;
         const customHide = behavior === 'hide' && !!scrollTargetNative;
         let flags = 0;
         if (behavior === 'hide' && !customHide) {
@@ -669,6 +698,7 @@ export class AppPage extends Page {
             this._collapsing.setContentScrimColor(behavior === 'lift' ? liftedColor : barColor);
             this._collapsing.setStatusBarScrimColor(behavior === 'lift' ? liftedColor : barColor);
         }
+        toolbar.setTitleTextColor(onBarColor);
         toolbar.setSubtitleTextColor(onBarColor);
         if (this._collapsing) {
             this._collapsing.setCollapsedTitleTextColor(onBarColor);
@@ -694,7 +724,7 @@ export class AppPage extends Page {
             }
         }
         this.syncTranslucentInset(appBar, overlayContent);
-        this.syncHide(customHide ? appBar.scrollTarget : null);
+        this.syncHide(customHide ? scrollTargetView : null);
         this.syncBottomBar(appBar, behavior);
         this.syncSearchBar(appBar);
     }
@@ -765,8 +795,7 @@ export class AppPage extends Page {
     private _liftContentListener: any;
     /** the first vertically scrolling view under `view`: the lift state must follow one view, else several nested scroll events disagree and the bar blinks */
     private findScrollingView(view: android.view.View): android.view.View {
-        const name = view.getClass().getName();
-        if (name.endsWith('RecyclerView') || name.endsWith('ScrollView')) {
+        if (view instanceof androidx.recyclerview.widget.RecyclerView || view instanceof androidx.core.widget.NestedScrollView || view instanceof android.widget.ScrollView) {
             return view;
         }
         if (view instanceof android.view.ViewGroup) {
@@ -780,13 +809,13 @@ export class AppPage extends Page {
         return null;
     }
 
-    /** `lift` follows `scrollTarget`, by default the first scrolling view of the content (searched again when the content is laid out) */
+    /** `lift` follows `scrollTarget` / `scrollTargetId`, by default the first scrolling view of the content (searched again when the content is laid out) */
     private syncLiftTarget(appBar: AppBar, behavior: AppBarScrollBehavior) {
         const content = this._nativeContent as android.view.View;
         if (behavior !== 'lift') {
             return;
         }
-        const explicit = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        const explicit: android.view.View = appBar?.getScrollTarget()?.nativeViewProtected;
         const target = explicit ?? this.findScrollingView(content);
         if (target && target !== this._liftTarget) {
             this._liftTarget = target;
@@ -852,6 +881,7 @@ export class AppPage extends Page {
         }
         searchBar.setHint(appBar.searchHint ?? null);
         this.syncSearchBarHost(appBar, searchBar);
+        this.syncSearchBarColors(searchBar);
         if (appBar.searchMode === 'inline') {
             this.syncInlineSearch(appBar, searchBar);
             return;
@@ -901,10 +931,25 @@ export class AppPage extends Page {
         }
     }
 
+    // the native view of a hosted view of the bar is created after the bar is added to the page
+    private _syncOnLoaded = (args: EventData) => {
+        args.object.off('loaded', this._syncOnLoaded);
+        this.syncAppBar();
+    };
+
+    private syncWhenLoaded(view: View) {
+        view.off('loaded', this._syncOnLoaded);
+        view.on('loaded', this._syncOnLoaded);
+    }
+
     private _inlineField: android.widget.LinearLayout;
     private _inlineEdit: android.widget.EditText;
+    private _inlineBack: android.widget.ImageView;
+    private _inlineClear: android.widget.ImageView;
     private _inlineOwner: WeakRef<AppBar>;
     private _inlineOpen = false;
+    private _inlineTextField: TextField;
+    private _inlineTextFieldDetach: () => void;
 
     private getAppCompatDrawable(name: string) {
         const context = this._context;
@@ -912,15 +957,81 @@ export class AppPage extends Page {
         return id ? androidx.core.content.ContextCompat.getDrawable(context, id) : null;
     }
 
-    private createInlineButton(drawableName: string, onBar: number, onClick: () => void) {
+    private createInlineButton(drawableName: string, onClick: () => void) {
         const density = Utils.layout.getDisplayDensity();
         const button = new android.widget.ImageView(this._context);
         button.setImageDrawable(this.getAppCompatDrawable(drawableName));
-        button.setColorFilter(onBar);
         button.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         button.setLayoutParams(new android.widget.LinearLayout.LayoutParams(Math.round(48 * density), Math.round(48 * density)));
         button.setOnClickListener(new android.view.View.OnClickListener({ onClick }));
         return button;
+    }
+
+    private notifySearchChange(text: string) {
+        const bar = this._inlineOwner?.get();
+        if (bar && this._inlineOpen && bar.searchText !== text) {
+            bar.searchText = text;
+            bar.notify({ eventName: AppBarBase.searchChangeEvent, object: bar, text });
+        }
+    }
+
+    private notifySearchSubmit(text: string) {
+        const bar = this._inlineOwner?.get();
+        bar?.notify({ eventName: AppBarBase.searchSubmitEvent, object: bar, text });
+    }
+
+    private getInlineText() {
+        return this._inlineTextField ? (this._inlineTextField.text ?? '') : this._inlineEdit.getText().toString();
+    }
+
+    private clearInlineText() {
+        if (this._inlineTextField) {
+            this._inlineTextField.text = '';
+        } else {
+            this._inlineEdit.setText('');
+        }
+    }
+
+    private dismissInlineKeyboard() {
+        if (this._inlineTextField) {
+            this._inlineTextField.dismissSoftInput();
+        } else {
+            Utils.dismissSoftInput(this._inlineEdit);
+        }
+    }
+
+    /** the field of the search: the `searchField` of the bar when it holds a TextField, else the built-in EditText */
+    private bindInlineTextField(appBar: AppBar) {
+        const host = appBar.searchField;
+        if (host && !host.nativeViewProtected) {
+            this.syncWhenLoaded(host);
+            return;
+        }
+        const textField = host instanceof TextField ? host : host instanceof ContentView && host.content instanceof TextField ? host.content : null;
+        if (textField === this._inlineTextField) {
+            return;
+        }
+        this._inlineTextFieldDetach?.();
+        this._inlineTextFieldDetach = null;
+        this._inlineTextField = textField;
+        const field = this._inlineField;
+        const input = textField ? host.nativeViewProtected : this._inlineEdit;
+        (input.getParent() as android.view.ViewGroup)?.removeView(input);
+        field.removeViewAt(1);
+        field.addView(input, 1, new android.widget.LinearLayout.LayoutParams(0, WRAP_CONTENT, 1));
+        if (textField) {
+            const onTextChange = () => this.notifySearchChange(this.getInlineText());
+            const onReturnPress = () => {
+                this.notifySearchSubmit(this.getInlineText());
+                textField.dismissSoftInput();
+            };
+            textField.on('textChange', onTextChange);
+            textField.on('returnPress', onReturnPress);
+            this._inlineTextFieldDetach = () => {
+                textField.off('textChange', onTextChange);
+                textField.off('returnPress', onReturnPress);
+            };
+        }
     }
 
     /** `searchMode="inline"`: the SearchBar turns into an editable field in place, the app filters its own content from `searchChange` */
@@ -929,8 +1040,6 @@ export class AppPage extends Page {
         searchBar.setOnClickListener(new android.view.View.OnClickListener({ onClick: () => this.openInlineSearch() }));
         if (!this._inlineField) {
             const context = this._context;
-            const density = Utils.layout.getDisplayDensity();
-            const onBar = appBar.getOnBarColor();
             const field = new android.widget.LinearLayout(context);
             field.setOrientation(android.widget.LinearLayout.HORIZONTAL);
             field.setGravity(android.view.Gravity.CENTER_VERTICAL);
@@ -940,48 +1049,53 @@ export class AppPage extends Page {
             edit.setSingleLine(true);
             edit.setTextSize(16);
             edit.setPadding(0, 0, 0, 0);
-            edit.setTextColor(onBar);
-            edit.setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(onBar, 153));
             edit.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
-            edit.setLayoutParams(new android.widget.LinearLayout.LayoutParams(0, WRAP_CONTENT, 1));
             edit.addTextChangedListener(
                 new android.text.TextWatcher({
                     beforeTextChanged: () => null,
                     onTextChanged: () => null,
-                    afterTextChanged: (editable: android.text.Editable) => {
-                        const bar = this._inlineOwner?.get();
-                        const text = editable.toString();
-                        if (bar && this._inlineOpen && bar.searchText !== text) {
-                            bar.searchText = text;
-                            bar.notify({ eventName: AppBarBase.searchChangeEvent, object: bar, text });
-                        }
-                    }
+                    afterTextChanged: (editable: android.text.Editable) => this.notifySearchChange(editable.toString())
                 })
             );
             edit.setOnEditorActionListener(
                 new android.widget.TextView.OnEditorActionListener({
                     onEditorAction: () => {
-                        const bar = this._inlineOwner?.get();
-                        bar?.notify({ eventName: AppBarBase.searchSubmitEvent, object: bar, text: edit.getText().toString() });
+                        this.notifySearchSubmit(edit.getText().toString());
                         Utils.dismissSoftInput(edit);
                         return true;
                     }
                 })
             );
-            const back = this.createInlineButton('abc_ic_ab_back_material', onBar, () => this.closeInlineSearch());
-            const clear = this.createInlineButton('abc_ic_clear_material', onBar, () => (edit.getText().length ? edit.setText('') : this.closeInlineSearch()));
-            field.addView(back);
-            field.addView(edit);
-            field.addView(clear);
+            this._inlineBack = this.createInlineButton('abc_ic_ab_back_material', () => this.closeInlineSearch());
+            this._inlineClear = this.createInlineButton('abc_ic_clear_material', () => (this.getInlineText().length ? this.clearInlineText() : this.closeInlineSearch()));
+            field.addView(this._inlineBack);
+            field.addView(edit, new android.widget.LinearLayout.LayoutParams(0, WRAP_CONTENT, 1));
+            field.addView(this._inlineClear);
             const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
             field.setVisibility(android.view.View.GONE);
             appBarLayout.addView(field, searchBar.getLayoutParams());
             this._inlineField = field;
             this._inlineEdit = edit;
         }
+        this.bindInlineTextField(appBar);
+        this.syncInlineColors(appBar);
         this._inlineEdit.setHint(appBar.searchHint ?? null);
         searchBar.setVisibility(this._inlineOpen ? android.view.View.GONE : android.view.View.VISIBLE);
         this._inlineField.setVisibility(this._inlineOpen ? android.view.View.VISIBLE : android.view.View.GONE);
+    }
+
+    /** the colors of the theme are read again at each sync (dark / light switch): the field follows the bar */
+    private syncInlineColors(appBar: AppBar) {
+        const onBar = appBar.getOnBarColor();
+        findShapeDrawable(this._inlineField.getBackground())?.setFillColor(android.content.res.ColorStateList.valueOf(this.getSearchBarColor()));
+        this._inlineEdit.setTextColor(onBar);
+        this._inlineEdit.setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(onBar, 153));
+        this._inlineBack.setColorFilter(onBar);
+        this._inlineClear.setColorFilter(onBar);
+    }
+
+    private getSearchBarColor() {
+        return getThemeColor(this._searchBar, 'colorSurfaceContainerHigh', getThemeColor(this._searchBar, 'colorSurface', android.graphics.Color.WHITE));
     }
 
     /** cross fades the search bar and the editable field (same size and position) */
@@ -1004,8 +1118,13 @@ export class AppPage extends Page {
             this._inlineField.setMinimumHeight(height);
         }
         this.morphSearch(this._searchBar, this._inlineField);
-        this._inlineEdit.requestFocus();
-        Utils.android.showSoftInput(this._inlineEdit);
+        if (this._inlineTextField) {
+            this._inlineTextField.focus();
+            Utils.android.showSoftInput(this._inlineTextField.nativeViewProtected);
+        } else {
+            this._inlineEdit.requestFocus();
+            Utils.android.showSoftInput(this._inlineEdit);
+        }
         return true;
     }
 
@@ -1015,8 +1134,8 @@ export class AppPage extends Page {
             return false;
         }
         this._inlineOpen = false;
-        Utils.dismissSoftInput(this._inlineEdit);
-        this._inlineEdit.setText('');
+        this.dismissInlineKeyboard();
+        this.clearInlineText();
         this.morphSearch(this._inlineField, this._searchBar);
         const bar = this._inlineOwner?.get();
         if (bar) {
@@ -1024,6 +1143,15 @@ export class AppPage extends Page {
             bar.notify({ eventName: AppBarBase.searchCancelEvent, object: bar, text: '' });
         }
         return true;
+    }
+
+    /** the SearchBar reads the colors of the theme when it is created: they are applied again at each sync */
+    private syncSearchBarColors(searchBar: com.google.android.material.search.SearchBar) {
+        findShapeDrawable(searchBar.getBackground())?.setFillColor(android.content.res.ColorStateList.valueOf(this.getSearchBarColor()));
+        const onVariant = getThemeColor(searchBar, 'colorOnSurfaceVariant', android.graphics.Color.BLACK);
+        searchBar.getTextView().setTextColor(onVariant);
+        searchBar.getTextView().setHintTextColor(onVariant);
+        searchBar.getNavigationIcon()?.mutate().setTint(onVariant);
     }
 
     private _defaultSearchBarIcon: android.graphics.drawable.Drawable;
@@ -1077,7 +1205,12 @@ export class AppPage extends Page {
         const items = (appBar?.bottomItems || []).filter((item) => !item.spacer && !item.search);
         const coordinator = this._coordinator as androidx.coordinatorlayout.widget.CoordinatorLayout;
         const floating = appBar?.bottomBarStyle !== 'bottomAppBar';
-        if (!items.length || floating) {
+        // a bottomView only fits the floating toolbar: the BottomAppBar is a Toolbar with a menu
+        if (floating && appBar?.bottomView && !appBar.bottomView.nativeViewProtected) {
+            this.syncWhenLoaded(appBar.bottomView);
+        }
+        const hasContent = items.length > 0 || (floating && !!appBar?.bottomView?.nativeViewProtected);
+        if (!hasContent || floating) {
             if (this._bottomBar) {
                 this._bottomBar.setVisibility(android.view.View.GONE);
                 if (!floating) {
@@ -1085,13 +1218,13 @@ export class AppPage extends Page {
                 }
             }
         }
-        if (!items.length || !floating) {
+        if (!hasContent || !floating) {
             if (this._floatingBar) {
                 this._floatingBar.setVisibility(android.view.View.GONE);
                 this.syncBottomInset(appBar, false, this._floatingBar);
             }
         }
-        if (!items.length) {
+        if (!hasContent) {
             return;
         }
         if (floating) {
@@ -1114,12 +1247,14 @@ export class AppPage extends Page {
         const menu = bar.getMenu();
         menu.clear();
         const owner = new WeakRef(appBar);
+        const onBarList = android.content.res.ColorStateList.valueOf(appBar.getOnBarColor());
         items.forEach((item, index) => {
             const menuItem = menu.add(0, index, index, item.text || '');
             const icon = item.icon ? getNativeIcon(item.icon) : null;
             if (icon) {
                 menuItem.setIcon(icon);
             }
+            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, onBarList);
             menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
         });
         attachBadges(
@@ -1148,7 +1283,7 @@ export class AppPage extends Page {
 
     private _floatingBar: android.widget.FrameLayout;
     private _floatingHolder: android.widget.LinearLayout;
-    /** `bottomBarStyle="floating"`: a Material 3 Expressive FloatingToolbarLayout (a pill over the content, centered above the gesture bar) holding icon buttons */
+    /** `bottomBarStyle="floating"`: a Material 3 Expressive FloatingToolbarLayout (a pill over the content, centered above the gesture bar) holding icon buttons, or the `bottomView` of the bar */
     private syncFloatingBar(appBar: AppBar, items: AppBarBottomItem[], behavior: AppBarScrollBehavior) {
         const coordinator = this._coordinator as androidx.coordinatorlayout.widget.CoordinatorLayout;
         const context = this._context;
@@ -1176,17 +1311,30 @@ export class AppPage extends Page {
         const params = bar.getLayoutParams() as any;
         params.setBehavior(behavior === 'hide' ? new com.google.android.material.behavior.HideBottomViewOnScrollBehavior() : null);
         bar.setVisibility(android.view.View.VISIBLE);
+        const background = bar.getBackground();
+        if (background instanceof com.google.android.material.shape.MaterialShapeDrawable) {
+            background.setFillColor(android.content.res.ColorStateList.valueOf(getThemeColor(bar, 'colorSurfaceContainer', getThemeColor(bar, 'colorSurface', android.graphics.Color.WHITE))));
+        }
         holder.removeAllViews();
+        const customView = appBar.bottomView?.nativeViewProtected as android.view.View;
+        if (customView) {
+            (customView.getParent() as android.view.ViewGroup)?.removeView(customView);
+            holder.addView(customView, new android.widget.LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+            this.syncBottomInset(appBar, true, bar);
+            return;
+        }
         const owner = new WeakRef(appBar);
         const ripple = new android.util.TypedValue();
         context.getTheme().resolveAttribute(16843868 /* android.R.attr.selectableItemBackgroundBorderless */, ripple, true);
         const size = Math.round(48 * density);
+        const onBarList = android.content.res.ColorStateList.valueOf(appBar.getOnBarColor());
         items.forEach((item) => {
             const button = new android.widget.ImageButton(context);
             const icon = item.icon ? getNativeIcon(item.icon) : null;
             if (icon) {
                 button.setImageDrawable(icon);
             }
+            button.setImageTintList(onBarList);
             button.setContentDescription(item.text || '');
             button.setBackground(androidx.core.content.ContextCompat.getDrawable(context, ripple.resourceId));
             button.setOnClickListener(
@@ -1208,7 +1356,7 @@ export class AppPage extends Page {
 
     /** the last items of the scrolling view must not stay under the bottom bar */
     private syncBottomInset(appBar: AppBar, visible: boolean, bar: android.view.View) {
-        const target = (appBar?.scrollTarget?.nativeViewProtected as android.view.View) ?? this._liftTarget;
+        const target = (appBar?.getScrollTarget()?.nativeViewProtected as android.view.View) ?? this._liftTarget;
         if (this._bottomInsetListener) {
             this._bottomInsetView?.removeOnLayoutChangeListener(this._bottomInsetListener);
             this._bottomInsetListener = null;
@@ -1250,7 +1398,7 @@ export class AppPage extends Page {
     /** translucent: the first items of the scrolling view must start below the bar: its top padding follows the height of the bar */
     private syncTranslucentInset(appBar: AppBar, translucent: boolean) {
         const appBarLayout = this._appBarLayout as com.google.android.material.appbar.AppBarLayout;
-        const target = appBar?.scrollTarget?.nativeViewProtected as android.view.View;
+        const target = appBar?.getScrollTarget()?.nativeViewProtected as android.view.View;
         if (this._insetListener) {
             appBarLayout.removeOnLayoutChangeListener(this._insetListener);
             this._insetListener = null;

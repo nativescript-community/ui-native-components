@@ -1,4 +1,4 @@
-import { ActionBar, ActionItem, EventData, FormattedString, GridLayout, ImageSource, ItemSpec, Property, View, isAndroid } from '@nativescript/core';
+import { ActionBar, ActionItem, ContentView, EventData, FormattedString, GridLayout, ImageSource, ItemSpec, Property, View, ViewBase, isAndroid } from '@nativescript/core';
 import { MenuItem, showMenu } from '@nativescript-community/ui-menu';
 
 /** small: standard bar, medium / large: a title that collapses on scroll (M3 collapsing app bar on Android, large title on iOS) */
@@ -25,6 +25,7 @@ export const translucentProperty = new Property<AppBarBase, boolean>({ name: 'tr
 export const searchableProperty = new Property<AppBarBase, boolean>({ name: 'searchable', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: changed });
 export const searchHintProperty = new Property<AppBarBase, string>({ name: 'searchHint', valueChanged: changed });
 export const scrollTargetProperty = new Property<AppBarBase, View>({ name: 'scrollTarget', valueChanged: changed });
+export const scrollTargetIdProperty = new Property<AppBarBase, string>({ name: 'scrollTargetId', valueChanged: changed });
 
 function itemChanged(target: AppBarItem) {
     (target.actionBar as AppBarBase)?.update?.();
@@ -113,6 +114,16 @@ export const bottomBarStyleProperty = new Property<AppBarBase, AppBarBottomBarSt
 
 export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
 
+/**
+ * Android `searchMode="inline"`: holds the text field of the search in place of the built-in one, a core `TextField` or a `@nativescript-community/ui-textfield`: `<appBarSearchField><uitextfield /></appBarSearchField>`. Ignored on iOS.
+ */
+export class AppBarSearchField extends ContentView {}
+
+/**
+ * Android `bottomBarStyle="floating"`: holds the content of the floating toolbar in place of the `bottomItems` buttons: `<appBarBottomView><stacklayout orientation="horizontal">...</stacklayout></appBarBottomView>`. Ignored on iOS.
+ */
+export class AppBarBottomView extends ContentView {}
+
 export class AppBarBase extends ActionBar {
     static bottomItemTapEvent = 'bottomItemTap';
     /** actions of a bar at the bottom of the page: iOS the bottom toolbar, Android a `BottomAppBar` */
@@ -134,6 +145,62 @@ export class AppBarBase extends ActionBar {
     /** the current text of the search (read only) */
     searchText = '';
 
+    private _searchField: View;
+    private _bottomView: View;
+
+    /** Android `inline` search: the view holding the text field of the search (an `AppBarSearchField`, or directly a `TextField`), instead of the built-in `EditText` */
+    get searchField(): View {
+        return this._searchField;
+    }
+    set searchField(value: View) {
+        this._searchField = this.swapHostedView(this._searchField, value);
+        this.onAppBarPropertyChanged();
+    }
+
+    /** Android `floating` bottom toolbar: the view shown in the toolbar instead of the `bottomItems` buttons */
+    get bottomView(): View {
+        return this._bottomView;
+    }
+    set bottomView(value: View) {
+        this._bottomView = this.swapHostedView(this._bottomView, value);
+        this.onAppBarPropertyChanged();
+    }
+
+    // the native views of the hosted views are placed by the page, not by the bar
+    private swapHostedView(current: View, value: View) {
+        if (current !== value && isAndroid) {
+            if (current) {
+                this._removeView(current);
+            }
+            if (value) {
+                this._addView(value);
+            }
+        }
+        return value;
+    }
+
+    eachChildView(callback: (child: View) => boolean) {
+        super.eachChildView(callback);
+        [this._searchField, this._bottomView].forEach((view) => view && callback(view));
+    }
+
+    // the core ActionBar only lists the title view, the items and the navigation button: the hosted views are also set up and loaded with the bar
+    eachChild(callback: (child: ViewBase) => boolean) {
+        super.eachChild(callback);
+        [this._searchField, this._bottomView].forEach((view) => view && callback(view));
+    }
+
+    _addChildFromBuilder(name: string, value: any) {
+        if (value instanceof AppBarSearchField) {
+            this.searchField = value;
+        } else if (value instanceof AppBarBottomView) {
+            this.bottomView = value;
+        } else {
+            // @ts-ignore
+            super._addChildFromBuilder?.(name, value);
+        }
+    }
+
     /** closes an expanded `inline` search. Returns true when there was one to close (use it in a back button handler) */
     closeSearch(): boolean {
         return false;
@@ -154,6 +221,13 @@ export class AppBarBase extends ActionBar {
     translucent: boolean;
     /** the scrolling view (collectionview, scrollview...) that drives the bar. By default the first one found */
     scrollTarget: View;
+    /** same as `scrollTarget`, by `id` in the page: spares the search of the scrolling view */
+    scrollTargetId: string;
+
+    /** the scrolling view the bar follows: `scrollTarget`, else the view of the page with the id `scrollTargetId` */
+    getScrollTarget(): View {
+        return this.scrollTarget ?? (this.scrollTargetId ? this.page?.getViewById(this.scrollTargetId) : null) ?? null;
+    }
 
     onAppBarPropertyChanged() {
         this.update();
@@ -171,6 +245,7 @@ titleAlignmentProperty.register(AppBarBase);
 formattedTitleProperty.register(AppBarBase);
 translucentProperty.register(AppBarBase);
 scrollTargetProperty.register(AppBarBase);
+scrollTargetIdProperty.register(AppBarBase);
 searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
 bottomItemsProperty.register(AppBarBase);

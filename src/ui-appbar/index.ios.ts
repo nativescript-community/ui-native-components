@@ -1,8 +1,20 @@
 import { Color, GridLayout, ItemSpec, Page, Utils, View } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
-import { AppBarBase, AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent, notifyBottomItemTap } from './index-common';
-export { AppBarBottomItem, AppBarItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent };
+import {
+    AppBarBase,
+    AppBarBottomItem,
+    AppBarBottomView,
+    AppBarItem,
+    AppBarScrollBehavior,
+    AppBarSearchField,
+    AppBarSearchMode,
+    AppBarSearchPlacement,
+    AppBarSize,
+    AppPageSearchContent,
+    notifyBottomItemTap
+} from './index-common';
+export { AppBarBottomItem, AppBarBottomView, AppBarItem, AppBarScrollBehavior, AppBarSearchField, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent };
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected;
@@ -117,7 +129,7 @@ class SearchDelegate extends NSObject implements UISearchResultsUpdating, UISear
  * - `size` medium / large: large title that collapses with the scroll (limit: on a pushed page the inline title is not shown once collapsed, UIKit `Always` mode)
  * - `scrollBehavior`: `lift` separator / shadow only when content scrolls under the bar, `hide` hides the bar when swiping (hidesBarsOnSwipe)
  * - `translucent`: blur when content scrolls under the bar, see through at the top
- * - `scrollTarget`: the scroll view the bar follows (setContentScrollView), by default UIKit finds the first one
+ * - `scrollTarget` / `scrollTargetId`: the scroll view the bar follows (setContentScrollView), by default UIKit finds the first one
  * - `subtitle` and `formattedTitle` (spans): iOS 26 (`subtitle`, `attributedTitle`)
  * iOS 26 gives the bar buttons the Liquid Glass look.
  */
@@ -436,7 +448,7 @@ export class AppBar extends AppBarBase {
     }
 
     private applyScrollTarget(viewController: UIViewController) {
-        const target = this.scrollTarget;
+        const target = this.getScrollTarget();
         if (!target) {
             return;
         }

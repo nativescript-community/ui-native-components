@@ -5,7 +5,7 @@
  * @module @nativescript-community/ui-appbar
  */
 
-import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
+import { ActionBar, ActionItem, ContentView, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
 import { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment } from './index-common';
 export { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment };
@@ -24,7 +24,7 @@ export class AppBar extends ActionBar {
     formattedTitle: FormattedString;
     /** the content goes under the bar: it is see through until the content scrolls (blur on iOS) */
     translucent: boolean;
-    /** Android search style: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) */
+    /** Android search style: `collapsible` (default, a search icon in the bar), `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) or `inline` (the SearchBar turns into an editable field in place, your content is filtered from `searchChange`) */
     searchMode: AppBarSearchMode;
     /** iOS: `leading` aligns the inline title of a small bar to the left. Android: ignored (always at the start) */
     titleAlignment: AppBarTitleAlignment;
@@ -42,6 +42,12 @@ export class AppBar extends ActionBar {
     static bottomItemTapEvent: string;
     /** the scrolling view the bar follows. iOS: `setContentScrollView`. By default the first scrolling view found */
     scrollTarget: View;
+    /** @platform android the view holding the text field of an `inline` search, in place of the built-in `EditText`: an `AppBarSearchField` or directly a `TextField` (core or `@nativescript-community/ui-textfield`). The bar wires `searchChange`, `searchSubmit` and the clear button to it */
+    searchField: View;
+    /** @platform android the view shown in the `floating` bottom toolbar in place of the `bottomItems` buttons: an `AppBarBottomView` or any view */
+    bottomView: View;
+    /** the `id` of the scrolling view the bar follows, used when `scrollTarget` is not set. Android: spares the search of the first scrolling view of the content, which is the default */
+    scrollTargetId: string;
 }
 
 /**
@@ -69,6 +75,12 @@ export class AppPage extends Page {
     /** Android `searchMode="bar"`: the content of the full screen search (suggestions, results). Ignored on iOS */
     searchContent: View;
 }
+
+/** @platform android holds the text field of the `inline` search, the `searchField` of an AppBar (`<appBarSearchField>`) */
+export class AppBarSearchField extends ContentView {}
+
+/** @platform android holds the content of the floating bottom toolbar, the `bottomView` of an AppBar (`<appBarBottomView>`) */
+export class AppBarBottomView extends ContentView {}
 
 /** the layout to use as the `searchContent` of an AppPage */
 export class AppPageSearchContent extends GridLayout {}

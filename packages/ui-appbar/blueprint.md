@@ -44,7 +44,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
 | `searchMode` | Android: `collapsible` (default, a search icon in the bar) `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) or `inline` (Material 3 `SearchBar` that morphs into an editable field in place: filter your content from `searchChange`, no full screen view; without a `title` the bar hosts the navigation icon and the actions, `closeSearch()` closes it) |
 | `searchPlacement` | iOS 26: where the search bar goes: `stacked` (under the title, default), `integrated` (a glass button / field in the bar), `integratedButton`, `integratedCentered`, `automatic` |
-| `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
+| `scrollTarget`, `scrollTargetId` | the scrolling view the bar follows (iOS: `setContentScrollView`), as a view or by its `id` in the page. By default (Android) the first scrolling view of the content is searched: giving it spares that search |
 
 Status and limits: see [APPBAR_PLAN.md](../../APPBAR_PLAN.md). On iOS a large title on a pushed page uses the UIKit `Always` mode, which never shows the inline title: a title view is shown while the bar is collapsed (the height of the bar tells). On the root page of the Frame UIKit does it.
 On Android the bar draws under the status bar (edge to edge) and the page handles the inset.
@@ -87,10 +87,22 @@ On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text varia
 ## Bottom items
 
 `bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, onTap }`, event `bottomItemTap`; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
-The last items of the `scrollTarget` stay above the Android bar.
+The last items of the `scrollTarget` stay above the Android bar. The icons of the Android bars take the color of the bar (`color` css, else the theme `colorOnSurface`) and follow a dark / light switch.
 
 ```svelte
 <appBar bottomItems={[{ icon: 'sys://house', text: 'Home', onTap }, { spacer: true }, { icon: 'sys://plus', text: 'Add', onTap }]} />
+```
+
+## Custom views (Android)
+
+`<appBarSearchField>` (`searchField`) replaces the built-in text field of the `inline` search by any NativeScript `TextField` (core, or `@nativescript-community/ui-textfield`). The bar puts it between the back and the clear buttons and keeps `searchChange`, `searchSubmit`, the clear button and the keyboard working with it.
+`<appBarBottomView>` (`bottomView`) puts any view in the `floating` bottom toolbar instead of the `bottomItems` buttons (`bottomItems` stay the default; the `bottomAppBar` style ignores `bottomView`). Both are ignored on iOS.
+
+```svelte
+<appBar searchable searchMode="inline" on:searchChange={(e) => (query = e.text)}>
+  <appBarSearchField><textfield hint="Search" /></appBarSearchField>
+  <appBarBottomView><stacklayout orientation="horizontal"><button text="Share" /></stacklayout></appBarBottomView>
+</appBar>
 ```
 
 ## Overlay
