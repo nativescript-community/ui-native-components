@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0](https://github.com/nativescript-community/ui-native-components/compare/v1.0.4...v1.1.0) (2026-10-24)
+
+### Bug Fixes
+
+* **ui-menu:** declare PopupMenu listener classes for Android ([8b4953a](https://github.com/nativescript-community/ui-native-components/commit/8b4953a74615ee21056cc49d8ff32e61e48e1270))
+
 ## [1.0.4](https://github.com/nativescript-community/ui-native-components/compare/v1.0.3...v1.0.4) (2026-10-22)
 
 **Note:** Version bump only for package @nativescript-community/ui-menu

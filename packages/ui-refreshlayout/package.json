@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-refreshlayout",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "description": "Pull to refresh at the top and the bottom of a scrollable view: SwipeRefreshLayout on Android, UIRefreshControl on iOS. Made for CollectionView and chat UX.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.0.4"
+        "@nativescript-community/ui-core": "^1.1.0"
     }
 }
