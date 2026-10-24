@@ -16,6 +16,9 @@ function changed(target: AppBarBase) {
 
 export const sizeProperty = new Property<AppBarBase, AppBarSize>({ name: 'size', defaultValue: 'small', valueChanged: changed });
 export const scrollBehaviorProperty = new Property<AppBarBase, AppBarScrollBehavior>({ name: 'scrollBehavior', defaultValue: 'none', valueChanged: changed });
+/** iOS: `leading` aligns the inline title of a small bar to the left (navigation item style `browser`), `center` is the system default. Android: the title of a small bar is always at the start */
+export type AppBarTitleAlignment = 'center' | 'leading';
+export const titleAlignmentProperty = new Property<AppBarBase, AppBarTitleAlignment>({ name: 'titleAlignment', defaultValue: 'center', valueChanged: changed });
 export const subtitleProperty = new Property<AppBarBase, string>({ name: 'subtitle', valueChanged: changed });
 export const formattedTitleProperty = new Property<AppBarBase, FormattedString>({ name: 'formattedTitle', valueChanged: changed });
 export const translucentProperty = new Property<AppBarBase, boolean>({ name: 'translucent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: changed });
@@ -57,7 +60,7 @@ export class AppBarItem extends ActionItem {
             this.actionView.notify({ eventName: 'tap', object: this.actionView });
         }
         if (isAndroid && this.menu?.length && this.actionBar) {
-            showMenu({ anchor: this.actionBar, items: this.menu, placement: { horizontal: 'end', vertical: 'below' } });
+            showMenu({ anchor: (this.actionBar as AppBarBase).getMenuAnchor(), items: this.menu, placement: { horizontal: 'end', vertical: 'below' } });
             return;
         }
         super._raiseTap();
@@ -80,20 +83,33 @@ export interface AppBarBottomItem {
     text?: string;
     /** iOS: a flexible space between the buttons. Android: ignored (the actions are at the end of the bar) */
     spacer?: boolean;
+    /** iOS 26: the search field of the bar, in the bottom toolbar (needs `searchable` and `searchPlacement="integrated"`). Android: ignored */
+    search?: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot */
     badge?: string | number | boolean;
+    /** items of a menu shown when the button is tapped (no `onTap`): iOS native menu, Android popup menu above the bar */
+    menu?: MenuItem[];
     /** called when the action is tapped */
     onTap?: (item: AppBarBottomItem) => void;
     [key: string]: any;
 }
 
-/** collapsible: a search icon in the bar that expands (Android SearchView action). bar: Android Material 3 `SearchBar` under the title that opens a full screen `SearchView`. iOS: always the `UISearchController` */
-export type AppBarSearchMode = 'collapsible' | 'bar';
+/**
+ * collapsible: a search icon in the bar that expands (Android SearchView action).
+ * bar: Android Material 3 `SearchBar` under the title that opens a full screen `SearchView`.
+ * inline: Android Material 3 `SearchBar` that turns into an editable field in place: the search filters the current content, no full screen view.
+ * iOS: always the `UISearchController`
+ */
+export type AppBarSearchMode = 'collapsible' | 'bar' | 'inline';
 export const searchModeProperty = new Property<AppBarBase, AppBarSearchMode>({ name: 'searchMode', defaultValue: 'collapsible', valueChanged: changed });
 
 /** iOS 26 placement of the search bar of the navigation bar: stacked (under the title, default), integrated (a field / button in the bar), integratedButton (always a button), integratedCentered (centered on iPad), automatic */
 export type AppBarSearchPlacement = 'automatic' | 'stacked' | 'integrated' | 'integratedButton' | 'integratedCentered';
 export const searchPlacementProperty = new Property<AppBarBase, AppBarSearchPlacement>({ name: 'searchPlacement', defaultValue: 'stacked', valueChanged: changed });
+
+/** Android look of `bottomItems`: a Material 3 `floating` toolbar (default, a pill over the content) or a full width `bottomAppBar`. iOS: ignored (UIToolbar) */
+export type AppBarBottomBarStyle = 'floating' | 'bottomAppBar';
+export const bottomBarStyleProperty = new Property<AppBarBase, AppBarBottomBarStyle>({ name: 'bottomBarStyle', valueChanged: changed });
 
 export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
 
@@ -101,6 +117,8 @@ export class AppBarBase extends ActionBar {
     static bottomItemTapEvent = 'bottomItemTap';
     /** actions of a bar at the bottom of the page: iOS the bottom toolbar, Android a `BottomAppBar` */
     bottomItems: AppBarBottomItem[];
+    /** Android: the look of the `bottomItems`, a `floating` toolbar (default) or a `bottomAppBar` (badges are only shown by the bottomAppBar) */
+    bottomBarStyle: AppBarBottomBarStyle;
 
     /** raised when the text of the search changes */
     static searchChangeEvent = 'searchChange';
@@ -116,8 +134,19 @@ export class AppBarBase extends ActionBar {
     /** the current text of the search (read only) */
     searchText = '';
 
+    /** closes an expanded `inline` search. Returns true when there was one to close (use it in a back button handler) */
+    closeSearch(): boolean {
+        return false;
+    }
+
+    /** focuses the search field (keyboard shortcut, menu command). Returns true when the bar is searchable */
+    focusSearch(): boolean {
+        return false;
+    }
+
     size: AppBarSize;
     scrollBehavior: AppBarScrollBehavior;
+    titleAlignment: AppBarTitleAlignment;
     subtitle: string;
     /** the title with spans (needs `@nativescript-community/text` for the full support) */
     formattedTitle: FormattedString;
@@ -129,16 +158,23 @@ export class AppBarBase extends ActionBar {
     onAppBarPropertyChanged() {
         this.update();
     }
+
+    /** @internal the view the menu of an action opens under */
+    getMenuAnchor(): View {
+        return this;
+    }
 }
 sizeProperty.register(AppBarBase);
 scrollBehaviorProperty.register(AppBarBase);
 subtitleProperty.register(AppBarBase);
+titleAlignmentProperty.register(AppBarBase);
 formattedTitleProperty.register(AppBarBase);
 translucentProperty.register(AppBarBase);
 scrollTargetProperty.register(AppBarBase);
 searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
 bottomItemsProperty.register(AppBarBase);
+bottomBarStyleProperty.register(AppBarBase);
 searchModeProperty.register(AppBarBase);
 searchPlacementProperty.register(AppBarBase);
 

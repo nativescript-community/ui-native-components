@@ -42,7 +42,7 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `subtitle`, `formattedTitle` | subtitle, title with spans |
 | `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
-| `searchMode` | Android: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) |
+| `searchMode` | Android: `collapsible` (default, a search icon in the bar) `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) or `inline` (Material 3 `SearchBar` that morphs into an editable field in place: filter your content from `searchChange`, no full screen view; without a `title` the bar hosts the navigation icon and the actions, `closeSearch()` closes it) |
 | `searchPlacement` | iOS 26: where the search bar goes: `stacked` (under the title, default), `integrated` (a glass button / field in the bar), `integratedButton`, `integratedCentered`, `automatic` |
 | `scrollTarget` | the scrolling view the bar follows (iOS: `setContentScrollView`) |
 
@@ -86,7 +86,7 @@ On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text varia
 
 ## Bottom items
 
-`bottomItems` (`{ text, icon, spacer, onTap }`, event `bottomItemTap`): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
+`bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, onTap }`, event `bottomItemTap`; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
 The last items of the `scrollTarget` stay above the Android bar.
 
 ```svelte
