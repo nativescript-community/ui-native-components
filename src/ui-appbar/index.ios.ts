@@ -132,6 +132,14 @@ export class AppBar extends AppBarBase {
         this.applyAppBar();
     }
 
+    focusSearch() {
+        if (!this._searchController) {
+            return false;
+        }
+        this._searchController.searchBar.becomeFirstResponder();
+        return true;
+    }
+
     createBarButtonItem(item: AppBarItem): UIBarButtonItem {
         let barButtonItem: UIBarButtonItem;
         if (item instanceof AppBarItem && item.menu?.length && !item.actionView) {
@@ -169,8 +177,14 @@ export class AppBar extends AppBarBase {
         // large title. `Automatic` collapses to an inline title but follows the state of the previous page: it is only large on the root page of the Frame.
         // `Always` shows the large title on a pushed page, but UIKit never shows the inline title once collapsed.
         const isRoot = navController.viewControllers.indexOfObject(viewController) === 0;
-        if (size !== 'small') {
+        if (size !== 'small' && !navigationBar.prefersLargeTitles) {
             navigationBar.prefersLargeTitles = true;
+            // on the first presentation UIKit does not lay out the large title by itself
+            navigationBar.sizeToFit();
+        }
+        if ('style' in navigationItem) {
+            // UINavigationItemStyle: 0 navigator (centered title), 1 browser (leading title)
+            (navigationItem as any).style = this.titleAlignment === 'leading' ? 1 : 0;
         }
         navigationItem.largeTitleDisplayMode =
             size === 'small' ? UINavigationItemLargeTitleDisplayMode.Never : isRoot ? UINavigationItemLargeTitleDisplayMode.Automatic : UINavigationItemLargeTitleDisplayMode.Always;
@@ -190,6 +204,15 @@ export class AppBar extends AppBarBase {
             edge.shadowColor = UIColor.clearColor;
         } else if (behavior === 'lift') {
             edge.shadowColor = UIColor.clearColor;
+        }
+        // css font of the bar (font-size, font-weight, font-family) for the title
+        if (this.style.fontSize || this.style.fontWeight || this.style.fontFamily) {
+            const font = this.style.fontInternal.getUIFont(UIFont.systemFontOfSize(17));
+            for (const appearance of [standard, edge]) {
+                const attributes = NSMutableDictionary.dictionaryWithDictionary((appearance.titleTextAttributes ?? NSDictionary.new()) as any);
+                attributes.setObjectForKey(font, NSFontAttributeName);
+                appearance.titleTextAttributes = attributes as any;
+            }
         }
         // iOS 26: the subtitle and the large title have their own text attributes: same as the title
         for (const appearance of [standard, edge]) {
@@ -267,13 +290,30 @@ export class AppBar extends AppBarBase {
                 barButtonItems.addObject(UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null));
                 continue;
             }
+            if (item.search) {
+                const searchItem = (viewController.navigationItem as any).searchBarPlacementBarButtonItem;
+                if (searchItem) {
+                    barButtonItems.addObject(searchItem);
+                }
+                continue;
+            }
             const handler = BottomItemHandler.initWithOwnerItem(this, item);
             handlers.push(handler);
             const image = item.icon ? getNativeIcon(item.icon) : null;
-            const barButtonItem = image
-                ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap')
-                : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
+            let barButtonItem: UIBarButtonItem;
+            if (item.menu?.length) {
+                const menu = createNativeMenu(item.menu);
+                barButtonItem = image ? UIBarButtonItem.alloc().initWithImageMenu(image, menu) : UIBarButtonItem.alloc().initWithTitleMenu(item.text + '', menu);
+            } else {
+                barButtonItem = image
+                    ? UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, handler, 'tap')
+                    : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
+            }
             barButtonItem.accessibilityLabel = item.text;
+            // iOS 26: each button in its own glass capsule (next to the search field)
+            if ('sharesBackground' in barButtonItem) {
+                (barButtonItem as any).sharesBackground = false;
+            }
             badges.push([barButtonItem, item.badge]);
             barButtonItems.addObject(barButtonItem);
         }
@@ -336,6 +376,9 @@ export class AppBar extends AppBarBase {
         if ('preferredSearchBarPlacement' in navigationItem) {
             // iOS 16+: the search bar under the title, as with large titles
             (navigationItem as any).preferredSearchBarPlacement = SEARCH_PLACEMENTS[this.searchPlacement || 'stacked'] ?? 2;
+        }
+        if ('searchBarPlacementAllowsToolbarIntegration' in navigationItem) {
+            (navigationItem as any).searchBarPlacementAllowsToolbarIntegration = !!this.bottomItems?.some((item) => item.search);
         }
         navigationItem.searchController = this._searchController;
         (this.page.ios as UIViewController).definesPresentationContext = true;
@@ -400,6 +443,8 @@ export class AppBar extends AppBarBase {
         const scrollView = findScrollView(target);
         if (scrollView) {
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Top);
+            // the bottom toolbar follows the same scrolling view (scroll edge effect under the glass buttons)
+            (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
             this.observeInlineTitle(target);
         } else if (!this._scrollTargetLoadedHandler) {
             // not created yet
@@ -442,6 +487,9 @@ export class AppPage extends Page {
             this.overlay = value;
         } else if (value instanceof AppPageSearchContent) {
             // Android only (full screen search)
+        } else if (value instanceof AppBarBase) {
+            // core only matches the constructor name 'ActionBar' (@akylas/nativescript)
+            this.actionBar = value;
         } else {
             super._addChildFromBuilder(name, value);
         }

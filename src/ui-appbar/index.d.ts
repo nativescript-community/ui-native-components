@@ -7,8 +7,8 @@
 
 import { ActionBar, ActionItem, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
-import { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize } from './index-common';
-export { AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize };
+import { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment } from './index-common';
+export { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment };
 
 /**
  * An ActionBar with scroll behaviors. Use it as the `actionBar` of an `AppPage` (Android needs the AppPage: it hosts the AppBarLayout).
@@ -26,10 +26,18 @@ export class AppBar extends ActionBar {
     translucent: boolean;
     /** Android search style: `collapsible` (default, a search icon in the bar) or `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) */
     searchMode: AppBarSearchMode;
+    /** iOS: `leading` aligns the inline title of a small bar to the left. Android: ignored (always at the start) */
+    titleAlignment: AppBarTitleAlignment;
+    /** closes an expanded `inline` search. Returns true when there was one to close (use it in a back button handler) */
+    closeSearch(): boolean;
+    /** focuses the search field (keyboard shortcut, menu command). Returns true when the bar is searchable */
+    focusSearch(): boolean;
     /** iOS 26: where the search bar goes: `stacked` (under the title, default), `integrated` (a field / button in the bar), `integratedButton`, `integratedCentered`, `automatic`. Ignored before iOS 26 */
     searchPlacement: AppBarSearchPlacement;
     /** actions of a bar at the bottom of the page: iOS the bottom toolbar (Liquid Glass on iOS 26), Android a Material `BottomAppBar` (`scrollBehavior="hide"` hides it on scroll too) */
     bottomItems: AppBarBottomItem[];
+    /** Android: the look of the `bottomItems`, a Material 3 `floating` toolbar (default) or a full width `bottomAppBar`. iOS: ignored */
+    bottomBarStyle: AppBarBottomBarStyle;
     /** raised when a bottom item is tapped (`item`) */
     static bottomItemTapEvent: string;
     /** the scrolling view the bar follows. iOS: `setContentScrollView`. By default the first scrolling view found */

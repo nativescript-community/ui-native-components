@@ -12,6 +12,8 @@
         "android.view:View",
         "android.view:ViewGroup",
         "android.widget:FrameLayout.LayoutParams",
-        "androidx.appcompat.widget:PopupMenu"
+        "androidx.appcompat.widget:PopupMenu",
+        "androidx.appcompat.widget:PopupMenu.OnDismissListener",
+        "androidx.appcompat.widget:PopupMenu.OnMenuItemClickListener"
     ]
 }
