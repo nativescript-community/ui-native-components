@@ -74,6 +74,7 @@ class SheetDelegateImpl extends NSObject {
  */
 @NativeClass
 class OutsideTapTarget extends NSObject {
+    static ObjCProtocols = [UIGestureRecognizerDelegate];
     _owner: WeakRef<ViewWithBottomSheet>;
     static initWithOwner(owner: ViewWithBottomSheet) {
         const target = OutsideTapTarget.new() as OutsideTapTarget;
@@ -82,6 +83,10 @@ class OutsideTapTarget extends NSObject {
     }
     outsideTapped() {
         this._owner.get()?._onOutsideTap();
+    }
+    gestureRecognizerShouldBeRequiredToFailByGestureRecognizer(recognizer: UIGestureRecognizer, other: UIGestureRecognizer) {
+        // the taps of the content behind (undimmed sheet) must not swallow the tap that dismisses
+        return other instanceof UITapGestureRecognizer;
     }
     static ObjCExposedMethods = {
         outsideTapped: { returns: interop.types.void, params: [] }
@@ -292,6 +297,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
                     this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
                     this._outsideTapRecognizer.cancelsTouchesInView = true;
+                    this._outsideTapRecognizer.delegate = this._outsideTapTarget;
                     view.addGestureRecognizer(this._outsideTapRecognizer);
                     this._outsideTapView = view;
                 }
@@ -593,6 +599,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
                     this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
                     this._outsideTapRecognizer.cancelsTouchesInView = true;
+                    this._outsideTapRecognizer.delegate = this._outsideTapTarget;
                     view.addGestureRecognizer(this._outsideTapRecognizer);
                     this._outsideTapView = view;
                 }
