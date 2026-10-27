@@ -4,9 +4,11 @@ export * from './index-common';
 
 const ELEVATION_DP = 6;
 
-function themeColor(context: android.content.Context, attr: number, fallback: number) {
+// the R classes are not in the metadata of the apps: the attribute is found by name
+function themeColor(context: android.content.Context, attrName: string, fallback: number) {
+    const attr = context.getResources().getIdentifier(attrName, 'attr', context.getPackageName());
     const value = new android.util.TypedValue();
-    return context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
+    return attr && context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
 }
 
 /**
@@ -31,7 +33,6 @@ export class Surface extends GridLayout {
             return;
         }
         const context = view.getContext();
-        const R = (com.google.android.material as any).R;
         const dp = (value: number) => Utils.layout.toDevicePixels(value);
         const clear = this.variant === 'clear';
         const user = this.mUserBackground;
@@ -41,12 +42,12 @@ export class Surface extends GridLayout {
         if (this.mUserColor) {
             background.setColor(this.mUserColor.android);
         } else {
-            background.setColor(clear ? android.graphics.Color.TRANSPARENT : themeColor(context, R.attr.colorSurfaceContainer, android.graphics.Color.WHITE));
+            background.setColor(clear ? android.graphics.Color.TRANSPARENT : themeColor(context, 'colorSurfaceContainer', android.graphics.Color.WHITE));
         }
         if (user?.borderTopWidth) {
             background.setStroke(dp(user.borderTopWidth), user.borderTopColor ? user.borderTopColor.android : android.graphics.Color.GRAY);
         } else if (clear) {
-            background.setStroke(dp(1), themeColor(context, R.attr.colorOutlineVariant, android.graphics.Color.GRAY));
+            background.setStroke(dp(1), themeColor(context, 'colorOutlineVariant', android.graphics.Color.GRAY));
         }
         view.setBackground(background);
         // the children follow the shape, the shadow follows the background
