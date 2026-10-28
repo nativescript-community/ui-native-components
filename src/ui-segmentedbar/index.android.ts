@@ -80,8 +80,9 @@ export class SegmentedBar extends SegmentedBarBase {
     }
 
     private insertItem(item: SegmentedBarItem) {
-        const R = (com.google.android.material as any).R;
-        const button = new com.google.android.material.button.MaterialButton(this._context, null, R.attr.materialButtonOutlinedStyle);
+        // the R classes are not in the metadata of the apps: the attribute is found by name
+        const style = this._context.getResources().getIdentifier('materialButtonOutlinedStyle', 'attr', this._context.getPackageName());
+        const button = new com.google.android.material.button.MaterialButton(this._context, null, style);
         const height = Utils.layout.toDevicePixels(SEGMENT_HEIGHT);
         // no touch target insets
         button.setInsetTop(0);
