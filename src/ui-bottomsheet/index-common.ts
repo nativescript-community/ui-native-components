@@ -66,6 +66,7 @@ export interface BottomSheetOptions {
     onWillDismiss?: () => boolean | void; // called when the user starts to dismiss the sheet (drag down on iOS, tap outside, back button on Android). Return false to prevent it. Android: the drag down can not be prevented, use dismissOnDraggingDownSheet: false
     onDismissAttempt?: () => void; // called when the user tried to dismiss the sheet but it was prevented (dismissOnXXX: false or onWillDismiss returning false). Android: not called for the drag down
     grabber?: boolean; // shows the drag handle. Default: true
+    userInterfaceStyle?: 'light' | 'dark'; // (iOS only) forces the appearance of the sheet, whatever the one of the window. Default: the one of the window
     cornerRadius?: number; // corner radius of the sheet, in dip
     scrollExpands?: boolean; // (iOS only) scrolling the content to its edge expands/collapses the sheet. Default: true
     edgeAttachedInCompactHeight?: boolean; // (iOS only) in landscape the sheet is attached to the bottom edge instead of covering the full screen. Default: false
