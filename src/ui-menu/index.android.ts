@@ -10,6 +10,14 @@ function getIcon(icon: string | ImageSource | FormattedString): android.graphics
     if (!icon) {
         return null;
     }
+    if (typeof icon === 'string' && icon.startsWith(Utils.RESOURCE_PREFIX)) {
+        // a vector drawable (tinted by the theme) cannot be decoded as an image
+        const context = Utils.android.getApplicationContext() as android.content.Context;
+        const identifier = context.getResources().getIdentifier(icon.slice(Utils.RESOURCE_PREFIX.length), 'drawable', context.getPackageName());
+        if (identifier > 0) {
+            return androidx.appcompat.content.res.AppCompatResources.getDrawable(context, identifier);
+        }
+    }
     let source: ImageSource;
     if (icon instanceof FormattedString) {
         source = renderFormattedTextToImageSource(icon, new Label());
