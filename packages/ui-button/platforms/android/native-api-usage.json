@@ -1,5 +1,7 @@
 {
     "uses": [
+        "android.content.res:Resources",
+        "androidx.appcompat.content.res:AppCompatResources",
         "android.graphics.drawable:BitmapDrawable",
         "android.graphics.drawable:Drawable",
         "android.view:LayoutInflater",

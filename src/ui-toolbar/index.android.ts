@@ -42,15 +42,16 @@ export class Toolbar extends ToolbarBase {
         const toolbar = this.nativeViewProtected;
         // Material 3 surface colors, whatever the toolbar style of the app theme: replaced by `background-color` and `color`
         const context = toolbar.getContext();
-        const R = (com.google.android.material as any).R;
-        const themeColor = (attr: number, fallback: number) => {
+        // the R classes are not in the metadata of the apps: the attributes are found by name
+        const themeColor = (attrName: string, fallback: number) => {
+            const attr = context.getResources().getIdentifier(attrName, 'attr', context.getPackageName());
             const value = new android.util.TypedValue();
-            return context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
+            return attr && context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
         };
-        const onSurface = themeColor(R.attr.colorOnSurface, android.graphics.Color.BLACK);
-        toolbar.setBackgroundColor(themeColor(R.attr.colorSurface, android.graphics.Color.WHITE));
+        const onSurface = themeColor('colorOnSurface', android.graphics.Color.BLACK);
+        toolbar.setBackgroundColor(themeColor('colorSurface', android.graphics.Color.WHITE));
         toolbar.setTitleTextColor(onSurface);
-        toolbar.setSubtitleTextColor(themeColor(R.attr.colorOnSurfaceVariant, android.graphics.Color.GRAY));
+        toolbar.setSubtitleTextColor(themeColor('colorOnSurfaceVariant', android.graphics.Color.GRAY));
         this.mColor = new Color(onSurface);
         toolbar.setNavigationOnClickListener(new android.view.View.OnClickListener({ onClick: () => owner.get()?.notifyNavigationTap() }));
         toolbar.setOnMenuItemClickListener(

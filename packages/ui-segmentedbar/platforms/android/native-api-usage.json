@@ -1,5 +1,6 @@
 {
     "uses": [
+        "android.content.res:Resources",
         "android.graphics.drawable:BitmapDrawable",
         "android.graphics:Bitmap",
         "android.widget:LinearLayout.LayoutParams",

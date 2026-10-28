@@ -1299,6 +1299,12 @@ export class AppPage extends Page {
             params.setMargins(margin, margin, margin, margin);
             // below the overlay (a FAB, a panel)
             coordinator.addView(bar, coordinator.indexOfChild(this._nativeOverlay), params);
+            // the insets are known once the bar is attached
+            bar.addOnLayoutChangeListener(
+                new android.view.View.OnLayoutChangeListener({
+                    onLayoutChange: () => this.applyFloatingBarMargin(bar)
+                })
+            );
             const holder = new android.widget.LinearLayout(context);
             holder.setOrientation(android.widget.LinearLayout.HORIZONTAL);
             holder.setGravity(android.view.Gravity.CENTER_VERTICAL);
@@ -1309,6 +1315,7 @@ export class AppPage extends Page {
         const bar = this._floatingBar;
         const holder = this._floatingHolder;
         const params = bar.getLayoutParams() as any;
+        this.applyFloatingBarMargin(bar);
         params.setBehavior(behavior === 'hide' ? new com.google.android.material.behavior.HideBottomViewOnScrollBehavior() : null);
         bar.setVisibility(android.view.View.VISIBLE);
         const background = bar.getBackground();
@@ -1352,6 +1359,19 @@ export class AppPage extends Page {
             holder.addView(button, new android.widget.LinearLayout.LayoutParams(size, size));
         });
         this.syncBottomInset(appBar, true, bar);
+    }
+
+    /** the coordinator consumes the insets: the floating bar is moved above the navigation bar by hand */
+    private applyFloatingBarMargin(bar: android.view.View) {
+        const window = (Application.android.foregroundActivity || Application.android.startActivity)?.getWindow();
+        const rootInsets = window ? androidx.core.view.ViewCompat.getRootWindowInsets(window.getDecorView()) : null;
+        const navigationInset = rootInsets ? rootInsets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom : 0;
+        const margin = Math.round(16 * Utils.layout.getDisplayDensity());
+        const params = bar.getLayoutParams() as android.view.ViewGroup.MarginLayoutParams;
+        if (params.bottomMargin !== margin + navigationInset || params.leftMargin !== margin) {
+            params.setMargins(margin, margin, margin, margin + navigationInset);
+            bar.setLayoutParams(params);
+        }
     }
 
     /** the last items of the scrolling view must not stay under the bottom bar */

@@ -237,6 +237,16 @@ export class Button extends ButtonBase {
     }
 
     [srcProperty.setNative](value: any) {
+        if (typeof value === 'string' && value.startsWith(Utils.RESOURCE_PREFIX)) {
+            // a vector drawable cannot be decoded as an image
+            const context = this._context;
+            const identifier = context.getResources().getIdentifier(value.slice(Utils.RESOURCE_PREFIX.length), 'drawable', context.getPackageName());
+            if (identifier > 0) {
+                this.nativeViewProtected.setIconPadding(0);
+                this.nativeViewProtected.setIcon(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, identifier));
+                return;
+            }
+        }
         this._createImageSourceFromSrc(value);
     }
     [colorProperty.setNative](value) {

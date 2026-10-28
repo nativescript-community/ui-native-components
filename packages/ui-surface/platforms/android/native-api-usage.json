@@ -1,6 +1,7 @@
 {
     "uses": [
         "android.content:Context",
+        "android.content.res:Resources",
         "android.graphics.drawable:GradientDrawable",
         "android.graphics:Color",
         "android.util:TypedValue",

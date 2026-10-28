@@ -4,9 +4,11 @@ export * from './index-common';
 
 const HEIGHT_DP = 56;
 
-function themeColor(context: android.content.Context, attr: number, fallback: number) {
+// the R classes are not in the metadata of the apps: the attribute is found by name
+function themeColor(context: android.content.Context, attrName: string, fallback: number) {
+    const attr = context.getResources().getIdentifier(attrName, 'attr', context.getPackageName());
     const value = new android.util.TypedValue();
-    return context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
+    return attr && context.getTheme().resolveAttribute(attr, value, true) ? value.data : fallback;
 }
 
 function id(context: android.content.Context, name: string) {
@@ -26,9 +28,8 @@ export class SearchBar extends SearchBarCommon {
     private styleSearchView() {
         const searchView = this.nativeViewProtected as androidx.appcompat.widget.SearchView;
         const context = searchView.getContext();
-        const R = (com.google.android.material as any).R;
-        const onSurface = themeColor(context, R.attr.colorOnSurface, android.graphics.Color.BLACK);
-        const onSurfaceVariant = themeColor(context, R.attr.colorOnSurfaceVariant, android.graphics.Color.GRAY);
+        const onSurface = themeColor(context, 'colorOnSurface', android.graphics.Color.BLACK);
+        const onSurfaceVariant = themeColor(context, 'colorOnSurfaceVariant', android.graphics.Color.GRAY);
         const height = Utils.layout.toDevicePixels(HEIGHT_DP);
         searchView.setIconifiedByDefault(false);
         searchView.setMaxWidth(java.lang.Integer.MAX_VALUE);
@@ -62,7 +63,6 @@ export class SearchBar extends SearchBarCommon {
             return;
         }
         const context = searchView.getContext();
-        const R = (com.google.android.material as any).R;
         const outlined = variant === 'outline' || variant === 'minimal';
         const user = this.mUserBackground;
         const background = new android.graphics.drawable.GradientDrawable();
@@ -74,12 +74,12 @@ export class SearchBar extends SearchBarCommon {
         } else if (outlined) {
             background.setColor(android.graphics.Color.TRANSPARENT);
         } else {
-            background.setColor(themeColor(context, R.attr.colorSurfaceContainerHigh, android.graphics.Color.LTGRAY));
+            background.setColor(themeColor(context, 'colorSurfaceContainerHigh', android.graphics.Color.LTGRAY));
         }
         if (user?.borderTopWidth) {
             background.setStroke(Utils.layout.toDevicePixels(user.borderTopWidth), user.borderTopColor ? user.borderTopColor.android : android.graphics.Color.GRAY);
         } else if (outlined) {
-            background.setStroke(Utils.layout.toDevicePixels(1), themeColor(context, R.attr.colorOutline, android.graphics.Color.GRAY));
+            background.setStroke(Utils.layout.toDevicePixels(1), themeColor(context, 'colorOutline', android.graphics.Color.GRAY));
         }
         searchView.setBackground(background);
     }
