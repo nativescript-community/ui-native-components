@@ -157,6 +157,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
     _outsideTapRecognizer: UITapGestureRecognizer;
     _outsideTapTarget: OutsideTapTarget;
     _outsideTapView: UIView;
+    _outsideTapShield: UIView;
+    _windowStyle: { window: UIWindow; style: UIUserInterfaceStyle };
     _catalystTarget: CatalystCardTarget;
     _catalystOptions: BottomSheetOptions;
     _catalystPan: { startHeight: number; scrollView: UIScrollView; startOffsetY: number };
@@ -220,6 +222,12 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         this.bottomSheetController = controller;
         const catalystCard = isCatalyst;
         controller.modalPresentationStyle = catalystCard ? UIModalPresentationStyle.OverFullScreen : UIModalPresentationStyle.PageSheet;
+        const window = options.userInterfaceStyle ? parentController?.view?.window : null;
+        if (window) {
+            // the glass of the sheet takes the appearance of the window, not the one of its controller
+            this._windowStyle = { window, style: window.overrideUserInterfaceStyle };
+            window.overrideUserInterfaceStyle = options.userInterfaceStyle === 'dark' ? UIUserInterfaceStyle.Dark : UIUserInterfaceStyle.Light;
+        }
         if (catalystCard) {
             controller.modalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
             this.configureCatalystCard(controller, options, parentController);
@@ -593,15 +601,17 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         if (options.largestUndimmedDetentIndex !== undefined && detentIds[options.largestUndimmedDetentIndex]) {
             sheet.largestUndimmedDetentIdentifier = detentIds[options.largestUndimmedDetentIndex];
             if (options.canTouchBehind !== true && options.dismissOnBackgroundTap !== false) {
-                // tap outside dismisses, the touch is not given to the content behind
+                // tap outside dismisses: a transparent view over the content behind takes the touch, no gesture of the content can win over it
                 const view = parentController?.view;
                 if (view) {
+                    const shield = UIView.alloc().initWithFrame(view.bounds);
+                    shield.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
                     this._outsideTapTarget = OutsideTapTarget.initWithOwner(this);
                     this._outsideTapRecognizer = UITapGestureRecognizer.alloc().initWithTargetAction(this._outsideTapTarget, 'outsideTapped');
-                    this._outsideTapRecognizer.cancelsTouchesInView = true;
-                    this._outsideTapRecognizer.delegate = this._outsideTapTarget;
-                    view.addGestureRecognizer(this._outsideTapRecognizer);
-                    this._outsideTapView = view;
+                    shield.addGestureRecognizer(this._outsideTapRecognizer);
+                    view.addSubview(shield);
+                    this._outsideTapView = shield;
+                    this._outsideTapShield = shield;
                 }
             }
         } else if (options.canTouchBehind === true || options.disableDimBackground === true) {
@@ -661,9 +671,15 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         this._catalystOptions = null;
         if (this._outsideTapRecognizer) {
             this._outsideTapView?.removeGestureRecognizer(this._outsideTapRecognizer);
+            this._outsideTapShield?.removeFromSuperview();
+            this._outsideTapShield = null;
             this._outsideTapRecognizer = null;
             this._outsideTapTarget = null;
             this._outsideTapView = null;
+        }
+        if (this._windowStyle) {
+            this._windowStyle.window.overrideUserInterfaceStyle = this._windowStyle.style;
+            this._windowStyle = null;
         }
         this._onDetentChange = null;
         this._onWillDismiss = null;
