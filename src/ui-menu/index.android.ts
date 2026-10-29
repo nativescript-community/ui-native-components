@@ -100,7 +100,10 @@ export function showMenu(options: ShowMenuOptions): Promise<MenuItem | undefined
             popupAnchor = helper;
         }
         const gravity = placement?.horizontal === 'end' ? android.view.Gravity.END : android.view.Gravity.START;
-        const popup = new PopupMenu(anchor.getContext(), popupAnchor, gravity);
+        // the popup grows from the corner of the anchor it is attached to (a style per corner)
+        const context = anchor.getContext();
+        const styleName = `NSMenuPopup_${placement?.horizontal === 'end' ? 'end' : 'start'}_${placement?.vertical === 'above' ? 'above' : 'below'}`;
+        const popup = new PopupMenu(context, popupAnchor, gravity, 0, context.getResources().getIdentifier(styleName, 'style', context.getPackageName()));
         const registry = new Map<number, MenuItem>();
         buildMenu(popup.getMenu(), options.items, registry, { nextId: 1 });
         try {

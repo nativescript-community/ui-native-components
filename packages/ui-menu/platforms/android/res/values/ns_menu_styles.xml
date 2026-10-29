@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NSMenuAnimation_start_below">
+        <item name="android:windowEnterAnimation">@anim/ns_menu_enter_start_below</item>
+        <item name="android:windowExitAnimation">@anim/ns_menu_exit</item>
+    </style>
+    <style name="NSMenuPopup_start_below" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/NSMenuAnimation_start_below</item>
+    </style>
+    <style name="NSMenuAnimation_start_above">
+        <item name="android:windowEnterAnimation">@anim/ns_menu_enter_start_above</item>
+        <item name="android:windowExitAnimation">@anim/ns_menu_exit</item>
+    </style>
+    <style name="NSMenuPopup_start_above" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/NSMenuAnimation_start_above</item>
+    </style>
+    <style name="NSMenuAnimation_end_below">
+        <item name="android:windowEnterAnimation">@anim/ns_menu_enter_end_below</item>
+        <item name="android:windowExitAnimation">@anim/ns_menu_exit</item>
+    </style>
+    <style name="NSMenuPopup_end_below" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/NSMenuAnimation_end_below</item>
+    </style>
+    <style name="NSMenuAnimation_end_above">
+        <item name="android:windowEnterAnimation">@anim/ns_menu_enter_end_above</item>
+        <item name="android:windowExitAnimation">@anim/ns_menu_exit</item>
+    </style>
+    <style name="NSMenuPopup_end_above" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/NSMenuAnimation_end_above</item>
+    </style>
+</resources>
