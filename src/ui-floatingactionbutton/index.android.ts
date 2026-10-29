@@ -116,6 +116,8 @@ export class FloatingActionButton extends FloatingActionButtonBase {
     [colorProperty.setNative](value: Color) {
         const color = !value || value instanceof Color ? value : new Color(value);
         this.nativeViewProtected.setIconTint(getColorStateList(color.android));
+        // the label of an extended button too
+        this.nativeViewProtected.setTextColor?.(getColorStateList(color.android));
     }
     [rippleColorProperty.setNative](value: Color) {
         this.nativeViewProtected.setRippleColor(value? getColorStateList(getRippleColor(value, this.rippleColorAlpha)): null);
