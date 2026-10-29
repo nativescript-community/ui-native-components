@@ -25,6 +25,11 @@ export const hideOnScrollProperty = new Property<FloatingActionButtonBase, View>
     valueChanged: (target, oldValue, newValue) => target.observeScroll(newValue)
 });
 
+export const shrinkOnScrollProperty = new Property<FloatingActionButtonBase, View>({
+    name: 'shrinkOnScroll',
+    valueChanged: (target, oldValue, newValue) => target.observeShrinkScroll(newValue)
+});
+
 @CSSType('FloatingActionButton')
 export abstract class FloatingActionButtonBase extends Button {
     constructor() {
@@ -49,16 +54,26 @@ export abstract class FloatingActionButtonBase extends Button {
     public expanded: boolean;
     /** the scrolling view (collectionview, scrollview...): the button hides when the content scrolls down and shows when it scrolls up */
     public hideOnScroll: View;
+    /** the scrolling view: an extended button collapses to its icon when the content scrolls down and extends when it scrolls up or reaches the top */
+    public shrinkOnScroll: View;
     private _stopObservingScroll: () => void;
+    private _stopObservingShrinkScroll: () => void;
 
     /** @internal */
     observeScroll(target: View) {
         this._stopObservingScroll?.();
         this._stopObservingScroll = target ? observeScrollDirection(target, (direction) => (direction === 'down' ? (this as any).hide() : (this as any).show())) : null;
     }
+    /** @internal */
+    observeShrinkScroll(target: View) {
+        this._stopObservingShrinkScroll?.();
+        this._stopObservingShrinkScroll = target ? observeScrollDirection(target, (direction) => (this.expanded = direction === 'up')) : null;
+    }
     disposeNativeView() {
         this._stopObservingScroll?.();
         this._stopObservingScroll = null;
+        this._stopObservingShrinkScroll?.();
+        this._stopObservingShrinkScroll = null;
         super.disposeNativeView();
     }
 
@@ -147,3 +162,4 @@ srcProperty.register(FloatingActionButtonBase);
 sizeProperty.register(FloatingActionButtonBase);
 expandedProperty.register(FloatingActionButtonBase);
 hideOnScrollProperty.register(FloatingActionButtonBase);
+shrinkOnScrollProperty.register(FloatingActionButtonBase);

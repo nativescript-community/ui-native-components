@@ -35,6 +35,7 @@ The Android components use **Material 3**: see the [repository README](https://g
 | `size` | `mini`, `normal`, `auto`. Android: `fabSize`, `fabCustomSize` |
 | `variant` | iOS button variants, default `prominentGlass` |
 | `expanded`, `show()`, `hide()` | |
+| `hideOnScroll`, `shrinkOnScroll` | the scrolling view (collectionview...): `hideOnScroll` hides the button when the content scrolls down, `shrinkOnScroll` collapses an extended button to its icon (Android) and extends it again when scrolling up or at the top |
 | `color`, `elevation`, `rippleColor` | Material only (Android) |
 
 {{ load:../../tools/readme/demos-and-development.md }}
