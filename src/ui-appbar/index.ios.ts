@@ -27,6 +27,8 @@ function findScrollView(view: View): UIScrollView {
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
 }
 
+const toolbarDefaults = new WeakMap<UIToolbar, { standard: UIToolbarAppearance; edge: UIToolbarAppearance }>();
+
 @NativeClass
 class BottomItemHandler extends NSObject {
     static ObjCExposedMethods = {
@@ -205,12 +207,12 @@ export class AppBar extends AppBarBase {
         const base = (navigationBar.standardAppearance ?? UINavigationBarAppearance.new()).copy();
         const standard = base.copy();
         const edge = base.copy();
+        const barColor = standard.backgroundColor;
+        const tinted = barColor ? barColor.colorWithAlphaComponent(0.4) : null;
         if (this.translucent) {
             // the content scrolls under the bar: a blur tinted with the color of the bar, at the top too
-            const barColor = standard.backgroundColor;
-            const tinted = barColor ? barColor.colorWithAlphaComponent(0.7) : null;
             for (const appearance of [standard, edge]) {
-                appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemChromeMaterial);
+                appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
                 appearance.backgroundColor = tinted;
             }
             edge.shadowColor = UIColor.clearColor;
@@ -277,6 +279,7 @@ export class AppBar extends AppBarBase {
         }
 
         this.applyOverflowSafeArea();
+        this.applyToolbarAppearance(navController, tinted);
         this.applyBottomItems(viewController, navController);
         this.applySearch(navigationItem, behavior);
         this.applyScrollTarget(viewController);
@@ -340,21 +343,53 @@ export class AppBar extends AppBarBase {
         badges.forEach(([barButtonItem, badge]) => applyBadge(barButtonItem, badge));
     }
 
-    private _ignoredSafeArea = false;
+    private _overflowViews: View[] = [];
     /**
-     * translucent: the page does not shrink its content to the safe area (the NativeScript Page places its content below the bar):
-     * the scrolling view starts at the top of the page, under the bar. UIKit adds the safe area to its content inset,
-     * so the first rows start below the bar and the next ones scroll under the blur.
-     * Works when the scrolling view is the content of the page.
+     * translucent: the content goes under the bars. The scroll target and its parents (up to the page) overflow the safe area
+     * (`iosOverflowSafeArea`, a safe area expand of the NativeScript view, the page itself keeps its size), and UIKit adds the safe area
+     * to the content inset of the scroll view: the first rows start below the bar, the next ones scroll under the blur.
+     * (the page `iosIgnoreSafeArea` is not used: the page would be measured with the safe area size but laid out from the top of the screen,
+     * the bottom of the content would be cut)
      */
     private applyOverflowSafeArea() {
-        const page = this.page;
         const wanted = this.translucent;
-        if (wanted !== this._ignoredSafeArea) {
-            this._ignoredSafeArea = wanted;
-            page.iosIgnoreSafeArea = wanted;
-            page.requestLayout();
-            (page.ios as UIViewController).view.setNeedsLayout();
+        const page = this.page;
+        const target = wanted ? this.getScrollTarget() : null;
+        const views: View[] = [];
+        for (let view: View = target; view && view !== page; view = view.parent as View) {
+            views.push(view);
+        }
+        if (wanted && !views.length) {
+            return;
+        }
+        this._overflowViews.filter((view) => !views.includes(view)).forEach((view) => (view.iosOverflowSafeArea = false));
+        views.forEach((view) => (view.iosOverflowSafeArea = true));
+        this._overflowViews = views;
+        page?.requestLayout();
+    }
+
+    /** the bottom toolbar is shared by all the pages of the Frame: follows the bar of the current page */
+    private applyToolbarAppearance(navController: UINavigationController, tint: UIColor) {
+        const toolbar = navController.toolbar;
+        if (!toolbar) {
+            return;
+        }
+        if (!toolbarDefaults.has(toolbar)) {
+            toolbarDefaults.set(toolbar, { standard: toolbar.standardAppearance?.copy(), edge: toolbar.scrollEdgeAppearance?.copy() });
+        }
+        if (this.translucent) {
+            const appearance = UIToolbarAppearance.new();
+            appearance.configureWithDefaultBackground();
+            appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
+            appearance.backgroundColor = tint;
+            toolbar.standardAppearance = appearance;
+            toolbar.scrollEdgeAppearance = appearance;
+            toolbar.compactAppearance = appearance;
+        } else {
+            const defaults = toolbarDefaults.get(toolbar);
+            toolbar.standardAppearance = defaults.standard;
+            toolbar.scrollEdgeAppearance = defaults.edge;
+            toolbar.compactAppearance = defaults.standard;
         }
     }
 
@@ -450,6 +485,19 @@ export class AppBar extends AppBarBase {
         navigationItem.titleView = label;
     }
 
+    /**
+     * iOS 26: the system scroll edge effect fills the area under the bars with a solid / faded band, the content is hidden there.
+     * A translucent bar shows the content under its own blur: the effect is hidden.
+     */
+    private applyScrollEdgeEffect(scrollView: UIScrollView) {
+        const effects = scrollView as unknown as Record<'topEdgeEffect' | 'bottomEdgeEffect', { hidden: boolean }>;
+        if (!effects.topEdgeEffect) {
+            return;
+        }
+        effects.topEdgeEffect.hidden = this.translucent;
+        effects.bottomEdgeEffect.hidden = this.translucent;
+    }
+
     private applyScrollTarget(viewController: UIViewController) {
         const target = this.getScrollTarget();
         if (!target) {
@@ -457,6 +505,7 @@ export class AppBar extends AppBarBase {
         }
         const scrollView = findScrollView(target);
         if (scrollView) {
+            this.applyScrollEdgeEffect(scrollView);
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Top);
             // the bottom toolbar follows the same scrolling view (scroll edge effect under the glass buttons)
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
