@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.0](https://github.com/nativescript-community/ui-native-components/compare/v1.2.0...v1.3.0) (2026-10-29)
+
+### Features
+
+* **ui-floatingactionbutton:** add shrinkOnScroll ([1143833](https://github.com/nativescript-community/ui-native-components/commit/1143833a9249b6e8e67dd5a6a5b8834b665532ce))
+
 ## [1.2.0](https://github.com/nativescript-community/ui-native-components/compare/v1.1.0...v1.2.0) (2026-10-29)
 
 ### Features
