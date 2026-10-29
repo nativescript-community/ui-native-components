@@ -1,7 +1,7 @@
 import { cssProperty } from '@nativescript-community/ui-core';
 import { dynamicElevationOffsetProperty, elevationProperty, rippleColorAlphaProperty, rippleColorProperty, shapeProperty, themer } from '@nativescript-community/ui-core';
 import { createStateListAnimator, getColorStateList, isPostLollipop } from '@nativescript-community/ui-core/android/utils';
-import { Background, Color, ImageSource, Length, backgroundInternalProperty, colorProperty } from '@nativescript/core';
+import { Background, Color, ImageSource, Length, Utils, backgroundInternalProperty, colorProperty } from '@nativescript/core';
 import { textProperty } from '@nativescript/core/ui/text-base';
 import { FloatingActionButtonBase, expandedProperty, imageSourceProperty, sizeProperty, srcProperty } from './index-common';
 import { getRippleColor } from '@nativescript-community/ui-core/index.android';
@@ -39,6 +39,15 @@ export class FloatingActionButton extends FloatingActionButtonBase {
     }
 
     [srcProperty.setNative](value: any) {
+        if (typeof value === 'string' && value.startsWith(Utils.RESOURCE_PREFIX)) {
+            // a vector drawable cannot be decoded as an image
+            const context = this._context;
+            const identifier = context.getResources().getIdentifier(value.slice(Utils.RESOURCE_PREFIX.length), 'drawable', context.getPackageName());
+            if (identifier > 0) {
+                this.nativeViewProtected.setIcon(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, identifier));
+                return;
+            }
+        }
         this._createImageSourceFromSrc(value);
     }
     public show() {
