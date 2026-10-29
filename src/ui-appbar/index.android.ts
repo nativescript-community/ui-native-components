@@ -1,4 +1,4 @@
-import { ActionBar, Application, Color, ContentView, EventData, FormattedString, ImageSource, Page, TextField, Utils, View } from '@nativescript/core';
+import { ActionBar, Application, Color, ContentView, EventData, FormattedString, ImageSource, Page, TextField, Utils, View, colorProperty } from '@nativescript/core';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon, showMenu } from '@nativescript-community/ui-menu';
 import {
@@ -211,6 +211,16 @@ export class AppBar extends AppBarBase {
         const page = this.page;
         if (page instanceof AppPage) {
             page.syncAppBar();
+        }
+    }
+
+    // the color of the bar changes with the theme: the icons (also of the search bar) follow it
+    [colorProperty.setNative](value) {
+        // @ts-ignore
+        super[colorProperty.setNative](value);
+        if (this.nativeViewProtected) {
+            this.applyTints();
+            this.update();
         }
     }
 
