@@ -21,6 +21,7 @@
         "android.view:MenuItem",
         "android.view:MenuItem.OnActionExpandListener",
         "android.view:View",
+        "android.view:ViewPropertyAnimator",
         "android.view:View.OnClickListener",
         "android.view:View.OnLayoutChangeListener",
         "android.view:ViewGroup",
