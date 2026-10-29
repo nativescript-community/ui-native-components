@@ -8,6 +8,23 @@ import { FormattedString, ImageSource, View } from '@nativescript/core';
 import { ContextMenuOptions, MenuItem, ShowMenuOptions } from './index-common';
 export * from './index-common';
 
+/** colors of the Android menu: the ones of the Material theme, unless set here (the app theme can differ from the activity theme) */
+export interface MenuColors {
+    surface: string;
+    row: string;
+    selected: string;
+    onSelected: string;
+    onSurface: string;
+    onSurfaceVariant: string;
+    accent: string;
+    onAccent: string;
+    outline: string;
+    error: string;
+}
+
+/** Android only: sets the colors of the menus */
+export function setMenuColors(colors: Partial<MenuColors>): void;
+
 /**
  * Shows a menu attached to the `anchor` view.
  * @returns the selected item, or undefined when the menu is dismissed

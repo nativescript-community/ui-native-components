@@ -2,7 +2,7 @@ import type { FormattedString, ImageSource, View } from '@nativescript/core';
 
 /**
  * An entry of a menu.
- * Use `{ separator: true }` to start a new section (a divider on Android, an inline group on iOS).
+ * Use `{ separator: true, title?: string }` to start a new section, with an optional title above it (a segment on Android, an inline group on iOS).
  */
 export interface MenuItem {
     /** returned when the item is selected */
@@ -12,14 +12,16 @@ export interface MenuItem {
     subtitle?: string;
     /** `sys://name` (SF Symbol, iOS), `res://name` or a file path, an ImageSource, or a FormattedString (spans drawn into an icon) */
     icon?: string | ImageSource | FormattedString;
-    /** shows a check mark when true */
+    /** shows a check mark when true (Android: a tonal row, for a single choice) */
     checked?: boolean;
+    /** a setting which is on or off: the state is `checked`, Android draws a switch instead of a tonal row */
+    toggle?: boolean;
     /** red item */
     destructive?: boolean;
     disabled?: boolean;
     /** a submenu */
     items?: MenuItem[];
-    /** starts a new section */
+    /** starts a new section, `title` is the label of the section */
     separator?: boolean;
     /** called when the item is selected */
     onSelect?: (item: MenuItem) => void;
@@ -70,4 +72,29 @@ export function splitSections(items: MenuItem[]): MenuItem[][] {
         }
     }
     return sections.filter((s) => s.length);
+}
+
+export interface MenuSection {
+    title?: string;
+    items: MenuItem[];
+}
+
+/**
+ * Splits the items on the separators, keeping the title of each section
+ */
+export function getSections(items: MenuItem[]): MenuSection[] {
+    const sections: MenuSection[] = [{ items: [] }];
+    for (const item of items) {
+        if (item.separator) {
+            const current = sections[sections.length - 1];
+            if (!current.items.length && !current.title) {
+                current.title = item.title;
+            } else if (current.items.length) {
+                sections.push({ title: item.title, items: [] });
+            }
+        } else {
+            sections[sections.length - 1].items.push(item);
+        }
+    }
+    return sections.filter((section) => section.items.length);
 }
