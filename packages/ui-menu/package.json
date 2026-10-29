@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-menu",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Menus: Material PopupMenu on Android, native UIMenu (pull-down and context menus) on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.1.0"
+        "@nativescript-community/ui-core": "^1.2.0"
     }
 }

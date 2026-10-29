@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/nativescript-community/ui-native-components/compare/v1.1.0...v1.2.0) (2026-10-29)
+
+**Note:** Version bump only for package @nativescript-community/ui-tabs
+
 ## [1.1.0](https://github.com/nativescript-community/ui-native-components/compare/v1.0.4...v1.1.0) (2026-10-24)
 
 **Note:** Version bump only for package @nativescript-community/ui-tabs

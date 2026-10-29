@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/nativescript-community/ui-material-components/compare/v1.1.0...v1.2.0) (2026-10-29)
+
+### Features
+
+* **ui-appbar:** add a color to bottom items ([5863732](https://github.com/nativescript-community/ui-material-components/commit/58637322dd5a352c6e386c23c640fbf5a6b837ac))
+
 ## [1.1.0](https://github.com/nativescript-community/ui-material-components/compare/v1.0.4...v1.1.0) (2026-10-24)
 
 ### Features

@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-segmentedbar",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Segmented control: MaterialButtonToggleGroup on Android, native UISegmentedControl on iOS, with icon items.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.1.0"
+        "@nativescript-community/ui-core": "^1.2.0"
     }
 }

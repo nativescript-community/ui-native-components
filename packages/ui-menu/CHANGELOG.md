@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/nativescript-community/ui-native-components/compare/v1.1.0...v1.2.0) (2026-10-29)
+
+### Features
+
+* **android:** load `res://` vector drawables in menu items and buttons ([caa3605](https://github.com/nativescript-community/ui-native-components/commit/caa3605ca61224827c70c6778f9026397210d502))
+
+### Bug Fixes
+
+* **android/ui-menu:** scale the popup from the corner of its anchor ([4fb60cf](https://github.com/nativescript-community/ui-native-components/commit/4fb60cf9860bacf86f40571664d2d2c6f316ab36))
+
 ## [1.1.0](https://github.com/nativescript-community/ui-native-components/compare/v1.0.4...v1.1.0) (2026-10-24)
 
 ### Bug Fixes

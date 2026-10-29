@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/nativescript-community/ui-native-components/compare/v1.1.0...v1.2.0) (2026-10-29)
+
+### Bug Fixes
+
+* **ui-surface:** read the Android theme colors without the R classes ([cdff719](https://github.com/nativescript-community/ui-native-components/commit/cdff71950f162dd930827d9fe45ca75cec34903b))
+
 ## [1.1.0](https://github.com/nativescript-community/ui-native-components/compare/v1.0.4...v1.1.0) (2026-10-24)
 
 **Note:** Version bump only for package @nativescript-community/ui-surface

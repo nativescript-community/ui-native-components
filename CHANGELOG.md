@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/nativescript-community/ui-native-components/compare/v1.1.0...v1.2.0) (2026-10-29)
+
+### Features
+
+* **android:** load `res://` vector drawables in menu items and buttons ([caa3605](https://github.com/nativescript-community/ui-native-components/commit/caa3605ca61224827c70c6778f9026397210d502))
+* **ui-appbar:** add a color to bottom items ([5863732](https://github.com/nativescript-community/ui-native-components/commit/58637322dd5a352c6e386c23c640fbf5a6b837ac))
+* **ui-bottomsheet:** userInterfaceStyle option and a shield for the outside tap (iOS) ([8b837f9](https://github.com/nativescript-community/ui-native-components/commit/8b837f9a008762bafc1fced51aa505d00accd188))
+
+### Bug Fixes
+
+* **android/ui-menu:** scale the popup from the corner of its anchor ([4fb60cf](https://github.com/nativescript-community/ui-native-components/commit/4fb60cf9860bacf86f40571664d2d2c6f316ab36))
+* **android:** read the theme attributes of segmentedbar, toolbar and searchbar by name ([cce4d89](https://github.com/nativescript-community/ui-native-components/commit/cce4d893cdd01bab96bb0e4caa0a39f2f2d917e9))
+* **ui-appbar:** put the floating toolbar above the navigation bar on Android ([779c9df](https://github.com/nativescript-community/ui-native-components/commit/779c9dffd67b127e667b7dd219918348b89c2f08))
+* **ui-bottomsheet:** let the outside tap dismiss an undimmed sheet on iOS ([2a7867f](https://github.com/nativescript-community/ui-native-components/commit/2a7867f20bc3f7773a853eab3a8da75f24445ff3))
+* **ui-floatingactionbutton:** load res:// vector drawables as icon on Android ([83f29e4](https://github.com/nativescript-community/ui-native-components/commit/83f29e44890d6681b743366f70a3daf08340b384))
+* **ui-surface:** read the Android theme colors without the R classes ([cdff719](https://github.com/nativescript-community/ui-native-components/commit/cdff71950f162dd930827d9fe45ca75cec34903b))
+
 ## [1.1.0](https://github.com/nativescript-community/ui-native-components/compare/v1.0.4...v1.1.0) (2026-10-24)
 
 ### Features
