@@ -1,6 +1,6 @@
 import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
 import { Application, FormattedString, ImageSource, Label, Utils, View } from '@nativescript/core';
-import { ContextMenuOptions, MenuItem, MenuPlacement, ShowMenuOptions, splitSections } from './index-common';
+import { ContextMenuOptions, MenuItem, MenuPlacement, ShowMenuOptions, getSections } from './index-common';
 export * from './index-common';
 
 function getIcon(icon: string | ImageSource | FormattedString): UIImage {
@@ -24,8 +24,8 @@ function getIcon(icon: string | ImageSource | FormattedString): UIImage {
  * Native UIMenu: the sections are inline groups, the submenus are nested menus
  */
 function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) => void): UIMenu {
-    const sections = splitSections(items).map((section) => {
-        const elements = section.map((item) => {
+    const sections = getSections(items).map((section) => {
+        const elements = section.items.map((item) => {
             const image = getIcon(item.icon);
             let attributes = 0;
             if (item.destructive) {
@@ -36,7 +36,11 @@ function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) =>
             }
             if (item.items?.length) {
                 const submenu = buildMenu(item.title || '', item.items, onPick);
-                return UIMenu.menuWithTitleImageIdentifierOptionsChildren(item.title || '', image, null, item.destructive ? UIMenuOptions.Destructive : (0 as UIMenuOptions), submenu.children);
+                const nested = UIMenu.menuWithTitleImageIdentifierOptionsChildren(item.title || '', image, null, item.destructive ? UIMenuOptions.Destructive : (0 as UIMenuOptions), submenu.children);
+                if (item.subtitle) {
+                    nested.subtitle = item.subtitle;
+                }
+                return nested;
             }
             const action = UIAction.actionWithTitleImageIdentifierHandler(item.title || '', image, null, () => onPick(item));
             action.attributes = attributes;
@@ -48,7 +52,7 @@ function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) =>
             }
             return action;
         });
-        return UIMenu.menuWithTitleImageIdentifierOptionsChildren('', null, null, UIMenuOptions.DisplayInline, elements as any);
+        return UIMenu.menuWithTitleImageIdentifierOptionsChildren(section.title || '', null, null, UIMenuOptions.DisplayInline, elements as any);
     });
     return UIMenu.menuWithTitleChildren(title || '', sections as any);
 }
