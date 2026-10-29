@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/nativescript-community/ui-material-components/compare/v1.3.0...v1.4.0) (2026-10-29)
+
+### Bug Fixes
+
+* **ui-appbar:** declare ViewPropertyAnimator for the hide on scroll of the Android bar ([c466c65](https://github.com/nativescript-community/ui-material-components/commit/c466c65157381057ac535bba0b552b5f8619ff30))
+
 ## [1.3.0](https://github.com/nativescript-community/ui-material-components/compare/v1.2.0...v1.3.0) (2026-10-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-appbar

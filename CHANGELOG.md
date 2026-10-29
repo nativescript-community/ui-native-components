@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/nativescript-community/ui-native-components/compare/v1.3.0...v1.4.0) (2026-10-29)
+
+### Features
+
+* **ui-menu:** add titled sections and toggle items, draw the Android menu as Material 3 Expressive ([9abfe49](https://github.com/nativescript-community/ui-native-components/commit/9abfe491312687765cf9a24736ea8d0bdbd8be57))
+
+### Bug Fixes
+
+* **android:** follow a theme change with the icons of the app bar and the label of the FAB ([c3668a9](https://github.com/nativescript-community/ui-native-components/commit/c3668a948659a6649e89814fb321a2e1293f678f))
+* **ui-appbar:** declare ViewPropertyAnimator for the hide on scroll of the Android bar ([c466c65](https://github.com/nativescript-community/ui-native-components/commit/c466c65157381057ac535bba0b552b5f8619ff30))
+* **ui-appbar:** let content scroll under translucent bars on iOS ([abfae38](https://github.com/nativescript-community/ui-native-components/commit/abfae381d6c9ab0701f89eaa7b875b4021ae79d9))
+
 ## [1.3.0](https://github.com/nativescript-community/ui-native-components/compare/v1.2.0...v1.3.0) (2026-10-29)
 
 ### Features

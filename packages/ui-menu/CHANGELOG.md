@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/nativescript-community/ui-native-components/compare/v1.3.0...v1.4.0) (2026-10-29)
+
+### Features
+
+* **ui-menu:** add titled sections and toggle items, draw the Android menu as Material 3 Expressive ([9abfe49](https://github.com/nativescript-community/ui-native-components/commit/9abfe491312687765cf9a24736ea8d0bdbd8be57))
+
 ## [1.3.0](https://github.com/nativescript-community/ui-native-components/compare/v1.2.0...v1.3.0) (2026-10-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-menu
