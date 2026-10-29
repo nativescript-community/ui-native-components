@@ -86,7 +86,7 @@ On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text varia
 
 ## Bottom items
 
-`bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, onTap }`, event `bottomItemTap`; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
+`bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, color, onTap }`, event `bottomItemTap`; `color` tints the button (icon and text) on both platforms, e.g. the error color for a delete action; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
 The last items of the `scrollTarget` stay above the Android bar. The icons of the Android bars take the color of the bar (`color` css, else the theme `colorOnSurface`) and follow a dark / light switch.
 
 ```svelte

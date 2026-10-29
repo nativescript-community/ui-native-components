@@ -72,6 +72,10 @@ function findShapeDrawable(drawable: android.graphics.drawable.Drawable): com.go
     return null;
 }
 
+function toColorStateList(value: string | Color) {
+    return android.content.res.ColorStateList.valueOf(toNativeColor(value));
+}
+
 function toNativeColor(value: any): number {
     if (!value) {
         return null;
@@ -1254,7 +1258,7 @@ export class AppPage extends Page {
             if (icon) {
                 menuItem.setIcon(icon);
             }
-            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, onBarList);
+            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, item.color ? toColorStateList(item.color) : onBarList);
             menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
         });
         attachBadges(
@@ -1341,7 +1345,7 @@ export class AppPage extends Page {
             if (icon) {
                 button.setImageDrawable(icon);
             }
-            button.setImageTintList(onBarList);
+            button.setImageTintList(item.color ? toColorStateList(item.color) : onBarList);
             button.setContentDescription(item.text || '');
             button.setBackground(androidx.core.content.ContextCompat.getDrawable(context, ripple.resourceId));
             button.setOnClickListener(
