@@ -1,4 +1,4 @@
-import { ActionBar, ActionItem, ContentView, EventData, FormattedString, GridLayout, ImageSource, ItemSpec, Property, View, ViewBase, isAndroid } from '@nativescript/core';
+import { ActionBar, ActionItem, Color, ContentView, EventData, FormattedString, GridLayout, ImageSource, ItemSpec, Property, View, ViewBase, isAndroid } from '@nativescript/core';
 import { MenuItem, showMenu } from '@nativescript-community/ui-menu';
 
 /** small: standard bar, medium / large: a title that collapses on scroll (M3 collapsing app bar on Android, large title on iOS) */
@@ -90,6 +90,8 @@ export interface AppBarBottomItem {
     badge?: string | number | boolean;
     /** items of a menu shown when the button is tapped (no `onTap`): iOS native menu, Android popup menu above the bar */
     menu?: MenuItem[];
+    /** the tint of the button (a destructive action in red, an accent...): its icon and text, on both platforms. Default: the color of the bar */
+    color?: string | Color;
     /** called when the action is tapped */
     onTap?: (item: AppBarBottomItem) => void;
     [key: string]: any;

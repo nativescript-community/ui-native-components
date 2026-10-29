@@ -322,6 +322,9 @@ export class AppBar extends AppBarBase {
                     : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
             }
             barButtonItem.accessibilityLabel = item.text;
+            if (item.color) {
+                barButtonItem.tintColor = (item.color instanceof Color ? item.color : new Color(item.color)).ios;
+            }
             // iOS 26: each button in its own glass capsule (next to the search field)
             if ('sharesBackground' in barButtonItem) {
                 (barButtonItem as any).sharesBackground = false;
