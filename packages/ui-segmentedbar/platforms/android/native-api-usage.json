@@ -3,6 +3,7 @@
         "android.content.res:Resources",
         "android.graphics.drawable:BitmapDrawable",
         "android.graphics:Bitmap",
+        "android.view:ViewGroup.LayoutParams",
         "android.widget:LinearLayout.LayoutParams",
         "com.google.android.material.button:MaterialButton",
         "com.google.android.material.button:MaterialButtonToggleGroup",
