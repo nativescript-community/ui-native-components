@@ -244,6 +244,10 @@ export class Button extends ButtonBase {
             if (identifier > 0) {
                 this.nativeViewProtected.setIconPadding(0);
                 this.nativeViewProtected.setIcon(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, identifier));
+                // like the other icons: the size of the font (css `font-size`) is the size of the icon
+                if (this.style.fontSize) {
+                    this.nativeViewProtected.setIconSize(Utils.layout.toDevicePixels(this.style.fontSize));
+                }
                 return;
             }
         }
