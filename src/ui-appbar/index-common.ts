@@ -20,7 +20,7 @@ export const scrollBehaviorProperty = new Property<AppBarBase, AppBarScrollBehav
 export type AppBarTitleAlignment = 'center' | 'leading';
 export const titleAlignmentProperty = new Property<AppBarBase, AppBarTitleAlignment>({ name: 'titleAlignment', defaultValue: 'center', valueChanged: changed });
 export const subtitleProperty = new Property<AppBarBase, string>({ name: 'subtitle', valueChanged: changed });
-export const formattedTitleProperty = new Property<AppBarBase, FormattedString>({ name: 'formattedTitle', valueChanged: changed });
+export const formattedTitleProperty = new Property<AppBarBase, FormattedString | object>({ name: 'formattedTitle', valueChanged: changed });
 export const translucentProperty = new Property<AppBarBase, boolean>({ name: 'translucent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: changed });
 export const searchableProperty = new Property<AppBarBase, boolean>({ name: 'searchable', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: changed });
 export const searchHintProperty = new Property<AppBarBase, string>({ name: 'searchHint', valueChanged: changed });
@@ -218,7 +218,8 @@ export class AppBarBase extends ActionBar {
     titleAlignment: AppBarTitleAlignment;
     subtitle: string;
     /** the title with spans (needs `@nativescript-community/text` for the full support) */
-    formattedTitle: FormattedString;
+    /** spans, or a native rich text (`createNativeAttributedString`) used as is */
+    formattedTitle: FormattedString | object;
     /** the content goes under the bar, the bar is see through until the content scrolls */
     translucent: boolean;
     /** the scrolling view (collectionview, scrollview...) that drives the bar. By default the first one found */

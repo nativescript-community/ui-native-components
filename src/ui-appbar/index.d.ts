@@ -21,7 +21,8 @@ export class AppBar extends ActionBar {
     /** iOS 26 and Android */
     subtitle: string;
     /** the title with spans */
-    formattedTitle: FormattedString;
+    /** spans, or a native rich text (`createNativeAttributedString`) used as is */
+    formattedTitle: FormattedString | object;
     /** the content goes under the bar: it is see through until the content scrolls (blur on iOS) */
     translucent: boolean;
     /** Android search style: `collapsible` (default, a search icon in the bar), `bar` (Material 3 SearchBar under the title opening a full screen search, see `AppPage.searchContent`) or `inline` (the SearchBar turns into an editable field in place, your content is filtered from `searchChange`) */

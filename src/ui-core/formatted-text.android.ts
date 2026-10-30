@@ -1,7 +1,7 @@
 import { FormattedString, ImageSource, TextBase, Utils } from '@nativescript/core';
 import { createNativeFormattedTextCommon } from './formatted-text-common';
 
-export function createNativeFormattedText(formatted: FormattedString, owner?: TextBase): android.text.SpannableStringBuilder {
+export function createNativeFormattedText(formatted: FormattedString | object, owner?: TextBase): android.text.SpannableStringBuilder {
     return createNativeFormattedTextCommon(formatted, owner, Utils.layout.getDisplayDensity());
 }
 
