@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-switch",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "Switch augmented with onBackgroundColor. Material on Android, native UISwitch on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,6 +44,6 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.4.1"
+        "@nativescript-community/ui-core": "^1.4.2"
     }
 }
