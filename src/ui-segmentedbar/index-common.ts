@@ -1,5 +1,5 @@
 import { renderFormattedTextToImageSource } from '@nativescript-community/ui-core/formatted-text';
-import { Color, FormattedString, ImageSource, Label, Property, Span, Utils } from '@nativescript/core';
+import { Color, FormattedString, ImageSource, Label, Property, Span, Utils, booleanConverter } from '@nativescript/core';
 import { SegmentedBarBase, SegmentedBarItemBase } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
 
 export { SegmentedBarBase, SegmentedBarItemBase };
@@ -10,6 +10,7 @@ export { SegmentedBarBase, SegmentedBarItemBase };
  */
 export class SegmentedBarItem extends SegmentedBarItemBase {
     src: string | ImageSource | FormattedString;
+    width: number;
     /**
      * @internal true for the icons drawn from spans: they keep their colors
      */
@@ -102,3 +103,17 @@ export const srcProperty = new Property<SegmentedBarItem, string | ImageSource |
     }
 });
 srcProperty.register(SegmentedBarItem);
+
+export const widthProperty = new Property<SegmentedBarItem, number>({
+    name: 'width',
+    valueConverter: parseFloat,
+    valueChanged: (target) => target._update()
+});
+widthProperty.register(SegmentedBarItem);
+
+export const apportionsSegmentWidthsByContentProperty = new Property<SegmentedBarBase, boolean>({
+    name: 'apportionsSegmentWidthsByContent',
+    defaultValue: true,
+    valueConverter: booleanConverter
+});
+apportionsSegmentWidthsByContentProperty.register(SegmentedBarBase);

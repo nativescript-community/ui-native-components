@@ -1,7 +1,7 @@
 import { createNativeFormattedText, renderAttributedStringToImage } from '@nativescript-community/ui-core/formatted-text';
 import { SegmentedBar as CoreSegmentedBar } from '@nativescript/core';
 import { itemsProperty, selectedIndexProperty } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
-import { SegmentedBarItem } from './index-common';
+import { SegmentedBarItem, apportionsSegmentWidthsByContentProperty } from './index-common';
 
 export { SegmentedBarItem };
 
@@ -29,10 +29,23 @@ function applyItem(control: UISegmentedControl, item: SegmentedBarItem, index: n
     } else if (insert) {
         control.insertSegmentWithTitleAtIndexAnimated('', index, false);
     }
+    // 0 is the automatic width
+    control.setWidthForSegmentAtIndex(item.width > 0 ? item.width : 0, index);
 }
 
 export class SegmentedBar extends CoreSegmentedBar {
     items: SegmentedBarItem[];
+    apportionsSegmentWidthsByContent: boolean;
+
+    initNativeView() {
+        super.initNativeView();
+        // the default is not applied by the property
+        (this.ios as UISegmentedControl).apportionsSegmentWidthsByContent = this.apportionsSegmentWidthsByContent;
+    }
+
+    [apportionsSegmentWidthsByContentProperty.setNative](value: boolean) {
+        (this.ios as UISegmentedControl).apportionsSegmentWidthsByContent = value;
+    }
 
     updateItem(item: SegmentedBarItem) {
         const index = this.items?.indexOf(item) ?? -1;

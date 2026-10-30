@@ -1,7 +1,7 @@
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { Utils } from '@nativescript/core';
 import { itemsProperty, selectedIndexProperty } from '@nativescript/core/ui/segmented-bar/segmented-bar-common';
-import { SegmentedBarBase, SegmentedBarItem } from './index-common';
+import { SegmentedBarBase, SegmentedBarItem, apportionsSegmentWidthsByContentProperty } from './index-common';
 
 export { SegmentedBarItem };
 
@@ -16,6 +16,7 @@ const SEGMENT_HEIGHT = 40;
 export class SegmentedBar extends SegmentedBarBase {
     declare nativeViewProtected: ToggleGroup;
     items: SegmentedBarItem[];
+    apportionsSegmentWidthsByContent: boolean;
 
     public createNativeView() {
         return new com.google.android.material.button.MaterialButtonToggleGroup(this._context);
@@ -76,7 +77,26 @@ export class SegmentedBar extends SegmentedBarBase {
         const button = index >= 0 ? (this.nativeViewProtected?.getChildAt(index) as com.google.android.material.button.MaterialButton) : null;
         if (button) {
             this.applyItem(button, item);
+            button.setLayoutParams(this.createLayoutParams(item));
         }
+    }
+
+    private createLayoutParams(item: SegmentedBarItem) {
+        const height = Utils.layout.toDevicePixels(SEGMENT_HEIGHT);
+        if (item.width > 0) {
+            return new android.widget.LinearLayout.LayoutParams(Utils.layout.toDevicePixels(item.width), height);
+        }
+        // by content a segment is never narrower than its text, otherwise all the segments get an equal share.
+        // The weight shares the extra width of a stretched group
+        const width = this.apportionsSegmentWidthsByContent ? android.view.ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+        return new android.widget.LinearLayout.LayoutParams(width, height, 1);
+    }
+
+    [apportionsSegmentWidthsByContentProperty.setNative](value: boolean) {
+        const nativeView = this.nativeViewProtected;
+        // equal segments are as wide as the widest, like UISegmentedControl
+        nativeView.setMeasureWithLargestChildEnabled(!value);
+        this.items?.forEach((item, index) => nativeView.getChildAt(index)?.setLayoutParams(this.createLayoutParams(item)));
     }
 
     private insertItem(item: SegmentedBarItem) {
@@ -90,9 +110,7 @@ export class SegmentedBar extends SegmentedBarBase {
         button.setMinHeight(height);
         button.setMinimumHeight(height);
         this.applyItem(button, item);
-        // a segment is never narrower than its content (a width of 0 gets an equal share that can ellipsize the text),
-        // the weight shares the extra width of a stretched group
-        this.nativeViewProtected.addView(button, new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, height, 1));
+        this.nativeViewProtected.addView(button, this.createLayoutParams(item));
     }
 
     [selectedIndexProperty.getDefault](): number {
