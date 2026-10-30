@@ -21,7 +21,8 @@
     },
     "dependencies": {
         "@mdi/font": "6.5.95",
-        "@nativescript-community/gesturehandler": "^2.0.45",
+        "@nativescript-community/gesturehandler": "^2.1.0",
+        "@nativescript-community/text": "^1.6.25",
         "@nativescript-community/ui-activityindicator": "*",
         "@nativescript-community/ui-appbar": "*",
         "@nativescript-community/ui-bottom-navigation": "*",
@@ -30,7 +31,7 @@
         "@nativescript-community/ui-button": "*",
         "@nativescript-community/ui-card": "*",
         "@nativescript-community/ui-checkbox": "*",
-        "@nativescript-community/ui-collectionview": "^6.0.29",
+        "@nativescript-community/ui-collectionview": "^6.0.35",
         "@nativescript-community/ui-core": "*",
         "@nativescript-community/ui-core-tabs": "*",
         "@nativescript-community/ui-datetimepicker": "*",
