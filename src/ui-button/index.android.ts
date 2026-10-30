@@ -13,6 +13,7 @@ import {
     androidElevationProperty,
     backgroundInternalProperty,
     colorProperty,
+    fontSizeProperty,
     profile
 } from '@nativescript/core';
 import { textAlignmentProperty, textTransformProperty } from '@nativescript/core/ui/text-base';
@@ -209,6 +210,7 @@ export class Button extends ButtonBase {
     }
 
     settingImageSourceAsIcon = false;
+    hasResIcon = false;
     [imageSourceProperty.setNative](value: ImageSource) {
         const nativeView = this.nativeViewProtected;
         if (value && value.android) {
@@ -244,10 +246,22 @@ export class Button extends ButtonBase {
             if (identifier > 0) {
                 this.nativeViewProtected.setIconPadding(0);
                 this.nativeViewProtected.setIcon(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, identifier));
+                this.hasResIcon = true;
+                // like the other icons: the size of the font (css `font-size`) is the size of the icon
+                if (this.style.fontSize) {
+                    this.nativeViewProtected.setIconSize(Utils.layout.toDevicePixels(this.style.fontSize));
+                }
                 return;
             }
         }
+        this.hasResIcon = false;
         this._createImageSourceFromSrc(value);
+    }
+    [fontSizeProperty.setNative](value) {
+        super[fontSizeProperty.setNative](value);
+        if (this.hasResIcon && typeof value === 'number') {
+            this.nativeViewProtected.setIconSize(Utils.layout.toDevicePixels(value));
+        }
     }
     [colorProperty.setNative](value) {
         const color = value instanceof Color ? value.android : value;
