@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-dialogs",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Dialogs with custom views and buttons. Material on Android, native UIAlertController on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,7 +44,7 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.4.0",
-        "@nativescript-community/ui-textfield": "^1.4.0"
+        "@nativescript-community/ui-core": "^1.4.1",
+        "@nativescript-community/ui-textfield": "^1.4.1"
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-tabs",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Tabs with a strip and swipeable content. Material 3 TabLayout on Android, native segmented control and page view controller on iOS.",
     "main": "./index",
     "sideEffects": false,
@@ -44,7 +44,7 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.4.0",
-        "@nativescript-community/ui-core-tabs": "^1.4.0"
+        "@nativescript-community/ui-core": "^1.4.1",
+        "@nativescript-community/ui-core-tabs": "^1.4.1"
     }
 }

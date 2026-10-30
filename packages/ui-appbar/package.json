@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-appbar",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "App bar and page: Material top app bar (collapsing, lift on scroll) on Android, native navigation bar on iOS",
     "main": "./index",
     "sideEffects": false,
@@ -43,7 +43,7 @@
     },
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/ui-core": "^1.4.0",
-        "@nativescript-community/ui-menu": "^1.4.0"
+        "@nativescript-community/ui-core": "^1.4.1",
+        "@nativescript-community/ui-menu": "^1.4.1"
     }
 }

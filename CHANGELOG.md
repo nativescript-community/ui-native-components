@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/nativescript-community/ui-native-components/compare/v1.4.0...v1.4.1) (2026-10-30)
+
+### Features
+
+* **ui-core:** accept a native rich text where a formatted text is expected ([f307532](https://github.com/nativescript-community/ui-native-components/commit/f307532feadd3c848377045772a92e2815f7c5cf))
+
+### Bug Fixes
+
+* **ui-button:** size the `res://` icon of an Android button with its font size ([b09d64e](https://github.com/nativescript-community/ui-native-components/commit/b09d64e329c3b31e5b10b3707458ef2c8cd7d4b2))
+* **ui-button:** update the size of the `res://` icon when the font size changes ([16c3192](https://github.com/nativescript-community/ui-native-components/commit/16c3192e1b6a1764d01fe1014f19ccbeffb56a85))
+
 ## [1.4.0](https://github.com/nativescript-community/ui-native-components/compare/v1.3.0...v1.4.0) (2026-10-29)
 
 ### Features
