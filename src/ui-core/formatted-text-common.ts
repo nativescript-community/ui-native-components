@@ -18,9 +18,13 @@ export function getTextLib(): { createNativeAttributedString?: (...args: any[]) 
     return textLib;
 }
 
-export function createNativeFormattedTextCommon(formatted: FormattedString, owner?: TextBase, density?: number) {
+export function createNativeFormattedTextCommon(formatted: FormattedString | object, owner?: TextBase, density?: number) {
     if (!formatted) {
         return null;
+    }
+    // already native (`createNativeAttributedString` of `@nativescript-community/text`...): used as is
+    if (!(formatted instanceof FormattedString)) {
+        return formatted;
     }
     // the owner gives the default font and color of the spans
     owner = owner || new Label();
