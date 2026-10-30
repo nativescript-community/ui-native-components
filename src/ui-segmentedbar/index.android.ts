@@ -90,8 +90,9 @@ export class SegmentedBar extends SegmentedBarBase {
         button.setMinHeight(height);
         button.setMinimumHeight(height);
         this.applyItem(button, item);
-        // the segments share the width of the group
-        this.nativeViewProtected.addView(button, new android.widget.LinearLayout.LayoutParams(0, height, 1));
+        // a segment is never narrower than its content (a width of 0 gets an equal share that can ellipsize the text),
+        // the weight shares the extra width of a stretched group
+        this.nativeViewProtected.addView(button, new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, height, 1));
     }
 
     [selectedIndexProperty.getDefault](): number {
