@@ -5,7 +5,7 @@
  * @module @nativescript-community/ui-appbar
  */
 
-import { ActionBar, ActionItem, ContentView, FormattedString, GridLayout, Page, View } from '@nativescript/core';
+import { ActionBar, Color, ActionItem, ContentView, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
 import { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment } from './index-common';
 export { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment };
@@ -39,6 +39,14 @@ export class AppBar extends ActionBar {
     bottomItems: AppBarBottomItem[];
     /** Android: the look of the `bottomItems`, a Material 3 `floating` toolbar (default) or a full width `bottomAppBar`. iOS: ignored */
     bottomBarStyle: AppBarBottomBarStyle;
+    /** Android: the color of the bottom bar container (floating toolbar or `BottomAppBar`), e.g. for a dark screen in a light theme.
+     * @default the theme surface color
+     */
+    bottomBarBackgroundColor: string | Color;
+    /** Android: the default color of the `bottomItems` (an item `color` wins).
+     * @default the color of the bar
+     */
+    bottomBarColor: string | Color;
     /** raised when a bottom item is tapped (`item`) */
     static bottomItemTapEvent: string;
     /** the scrolling view the bar follows. iOS: `setContentScrollView`. By default the first scrolling view found */
@@ -61,6 +69,10 @@ export class AppBarItem extends ActionItem {
     prominent: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot (iOS 26 and Android) */
     badge: string | number | boolean;
+    /** `false` greys the action out and ignores the taps. Can change at runtime
+     * @default true
+     */
+    isEnabled: boolean;
 }
 
 /**

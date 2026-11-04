@@ -167,6 +167,7 @@ export class AppBar extends AppBarBase {
             barButtonItem = super.createBarButtonItem(item);
         }
         if (item instanceof AppBarItem && barButtonItem) {
+            barButtonItem.enabled = item.isEnabled !== false;
             applyBadge(barButtonItem, item.badge);
         }
         if (item instanceof AppBarItem && item.prominent && barButtonItem && 'style' in barButtonItem) {
@@ -210,17 +211,16 @@ export class AppBar extends AppBarBase {
         const barColor = standard.backgroundColor;
         const tinted = barColor ? barColor.colorWithAlphaComponent(0.4) : null;
         if (this.translucent) {
-            // the content scrolls under the bar: a blur tinted with the color of the bar, at the top too
-            for (const appearance of [standard, edge]) {
-                appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
-                appearance.backgroundColor = tinted;
-            }
+            // the content scrolls under the bar: a blur tinted with the color of the bar, see through at the top
+            standard.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
+            standard.backgroundColor = tinted;
+            edge.configureWithTransparentBackground();
             edge.shadowColor = UIColor.clearColor;
         } else if (behavior === 'lift') {
             edge.shadowColor = UIColor.clearColor;
         }
         // css font of the bar (font-size, font-weight, font-family) for the title
-        if (this.style.fontSize || this.style.fontWeight || this.style.fontFamily) {
+        if (this.style.fontInternal && (this.style.fontSize || this.style.fontWeight || this.style.fontFamily)) {
             const font = this.style.fontInternal.getUIFont(UIFont.systemFontOfSize(17));
             for (const appearance of [standard, edge]) {
                 const attributes = NSMutableDictionary.dictionaryWithDictionary((appearance.titleTextAttributes ?? NSDictionary.new()) as any);
@@ -325,6 +325,11 @@ export class AppBar extends AppBarBase {
                     : UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, handler, 'tap');
             }
             barButtonItem.accessibilityLabel = item.text;
+            barButtonItem.enabled = item.enabled !== false;
+            // iOS 26: the tinted Liquid Glass button of the main action
+            if (item.prominent && 'style' in barButtonItem) {
+                barButtonItem.style = 2; // UIBarButtonItemStyle.Prominent
+            }
             if (item.color) {
                 barButtonItem.tintColor = (item.color instanceof Color ? item.color : new Color(item.color)).ios;
             }
