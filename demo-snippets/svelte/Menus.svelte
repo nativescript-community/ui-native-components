@@ -19,6 +19,13 @@
     function items() {
         return [
             { id: 'copy', title: 'Copy', subtitle: 'to the clipboard', icon: __IOS__ ? 'sys://doc.on.doc' : 'res://ic_add' },
+            {
+                id: 'folder',
+                title: 'Export folder',
+                subtitle: 'Documents/scans',
+                icon: __IOS__ ? 'sys://folder' : 'res://ic_add',
+                trailingAction: { icon: __IOS__ ? 'sys://arrow.counterclockwise' : 'res://ic_star', title: 'Reset folder', onSelect: () => (result = 'folder reset') }
+            },
             { id: 'star', title: 'Starred', icon: __IOS__ ? 'sys://star' : 'res://ic_star', checked: compact },
             {
                 title: 'Share as',

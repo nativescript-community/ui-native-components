@@ -25,7 +25,7 @@ function getIcon(icon: string | ImageSource | FormattedString): UIImage {
  */
 function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) => void): UIMenu {
     const sections = getSections(items).map((section) => {
-        const elements = section.items.map((item) => {
+        const elements = section.items.flatMap((item): UIMenuElement[] => {
             const image = getIcon(item.icon);
             let attributes = 0;
             if (item.destructive) {
@@ -40,7 +40,7 @@ function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) =>
                 if (item.subtitle) {
                     nested.subtitle = item.subtitle;
                 }
-                return nested;
+                return [nested];
             }
             const action = UIAction.actionWithTitleImageIdentifierHandler(item.title || '', image, null, () => onPick(item));
             action.attributes = attributes;
@@ -50,7 +50,11 @@ function buildMenu(title: string, items: MenuItem[], onPick: (item: MenuItem) =>
             if (item.subtitle) {
                 action.subtitle = item.subtitle;
             }
-            return action;
+            if (item.trailingAction) {
+                const trailing = item.trailingAction;
+                return [action, UIAction.actionWithTitleImageIdentifierHandler(trailing.title, getIcon(trailing.icon), null, () => trailing.onSelect())];
+            }
+            return [action];
         });
         return UIMenu.menuWithTitleImageIdentifierOptionsChildren(section.title || '', null, null, UIMenuOptions.DisplayInline, elements as any);
     });
@@ -115,6 +119,15 @@ function showActionSheet(options: ShowMenuOptions, resolve: (item: MenuItem | un
             });
             action.enabled = !item.disabled;
             sheet.addAction(action);
+            if (item.trailingAction) {
+                const trailing = item.trailingAction;
+                sheet.addAction(
+                    UIAlertAction.actionWithTitleStyleHandler(trailing.title, UIAlertActionStyle.Default, () => {
+                        resolve(undefined);
+                        trailing.onSelect();
+                    })
+                );
+            }
         });
     };
     addItems(options.items);

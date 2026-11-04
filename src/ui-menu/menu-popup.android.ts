@@ -132,11 +132,13 @@ interface RowOptions {
     count: number;
     colors: Record<keyof MenuColors, number>;
     onTap: () => void;
+    /** called when the trailing action of the item is tapped */
+    onTrailingTap?: () => void;
     /** icon name of the trailing element, instead of the state of the item (back row of a submenu) */
     leadingBack?: boolean;
 }
 
-function createRow(context: android.content.Context, { item, position, count, colors, onTap, leadingBack }: RowOptions, getIcon: (icon: MenuItem['icon']) => android.graphics.drawable.Drawable) {
+function createRow(context: android.content.Context, { item, position, count, colors, onTap, onTrailingTap, leadingBack }: RowOptions, getIcon: (icon: MenuItem['icon']) => android.graphics.drawable.Drawable) {
     const selected = !!item.checked && !item.toggle;
     const first = position === 0;
     const last = position === count - 1;
@@ -186,7 +188,7 @@ function createRow(context: android.content.Context, { item, position, count, co
     } else {
         text.setText(title);
     }
-    text.setLayoutParams(new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+    text.setLayoutParams(new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
     row.addView(text);
 
     let trailing: android.view.View;
@@ -200,6 +202,34 @@ function createRow(context: android.content.Context, { item, position, count, co
     if (trailing) {
         (trailing.getLayoutParams() as android.widget.LinearLayout.LayoutParams).setMargins(dp(12), 0, 0, 0);
         row.addView(trailing);
+    }
+
+    const action = item.trailingAction;
+    const actionIcon = action?.icon ? getIcon(action.icon) : null;
+    if (actionIcon) {
+        if (typeof action.icon === 'string') {
+            actionIcon.mutate().setTint(colors.onSurfaceVariant);
+        }
+        const button = new android.widget.ImageView(context);
+        button.setImageDrawable(actionIcon);
+        button.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
+        button.setPadding(dp(8), dp(8), dp(8), dp(8));
+        button.setContentDescription(action.title);
+        button.setBackground(
+            new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(withAlpha(colors.onSurfaceVariant, 0.12)),
+                null,
+                roundedDrawable(android.graphics.Color.WHITE, [20, 20, 20, 20])
+            )
+        );
+        const buttonParams = new android.widget.LinearLayout.LayoutParams(dp(40), dp(40));
+        // the 40dp target overlaps the end padding of the row, the icon stays 16dp from the edge
+        buttonParams.setMargins(dp(4), 0, -dp(8), 0);
+        button.setLayoutParams(buttonParams);
+        if (!item.disabled) {
+            button.setOnClickListener(new android.view.View.OnClickListener({ onClick: () => onTrailingTap?.() }));
+        }
+        row.addView(button);
     }
 
     if (item.disabled) {
@@ -244,14 +274,21 @@ export function showPopup({ anchor, items, placement, getIcon, onSelect, onDismi
     popup.setOutsideTouchable(true);
     const horizontal = placement?.horizontal === 'end' ? 'end' : 'start';
 
-    const maxWidth = Math.min(dp(280), screen.widthPixels - 2 * margin);
+    const maxWidth = Math.min(dp(360), screen.widthPixels - 2 * margin);
     let anchorLocation: number[];
     const place = () => {
+        // the width of the widest row as it wants to be (the rows are measured without any limit), then the popup is measured at that width
+        let natural = 0;
+        for (let index = 0; index < content.getChildCount(); index++) {
+            const row = content.getChildAt(index);
+            row.measure(android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED), android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED));
+            natural = Math.max(natural, row.getMeasuredWidth());
+        }
+        const width = Math.min(Math.max(natural + content.getPaddingLeft() + content.getPaddingRight(), dp(240)), maxWidth);
         scroll.measure(
-            android.view.View.MeasureSpec.makeMeasureSpec(maxWidth, android.view.View.MeasureSpec.AT_MOST),
+            android.view.View.MeasureSpec.makeMeasureSpec(width, android.view.View.MeasureSpec.EXACTLY),
             android.view.View.MeasureSpec.makeMeasureSpec(screen.heightPixels - 2 * margin, android.view.View.MeasureSpec.AT_MOST)
         );
-        const width = Math.max(scroll.getMeasuredWidth(), dp(180));
         const fullHeight = scroll.getMeasuredHeight();
         const spaceBelow = screen.heightPixels - (anchorLocation[1] + anchor.getHeight()) - margin;
         const spaceAbove = anchorLocation[1] - margin;
@@ -295,6 +332,10 @@ export function showPopup({ anchor, items, placement, getIcon, onSelect, onDismi
                                     return;
                                 }
                                 onSelect(item);
+                                popup.dismiss();
+                            },
+                            onTrailingTap: () => {
+                                item.trailingAction?.onSelect();
                                 popup.dismiss();
                             }
                         },
