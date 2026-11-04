@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/nativescript-community/ui-material-components/compare/v1.4.2...v1.5.0) (2026-11-04)
+
+### Features
+
+* **ui-appbar:** add bottomBarColor, bottomBarBackgroundColor and isEnabled ([68bd368](https://github.com/nativescript-community/ui-material-components/commit/68bd368bf1ee63e21624b2c91ea277264bdb6779))
+
 ## [1.4.2](https://github.com/nativescript-community/ui-material-components/compare/v1.4.1...v1.4.2) (2026-10-30)
 
 **Note:** Version bump only for package @nativescript-community/ui-appbar

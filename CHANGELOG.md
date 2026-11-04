@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/nativescript-community/ui-native-components/compare/v1.4.2...v1.5.0) (2026-11-04)
+
+### Features
+
+* **ui-appbar:** add bottomBarColor, bottomBarBackgroundColor and isEnabled ([68bd368](https://github.com/nativescript-community/ui-native-components/commit/68bd368bf1ee63e21624b2c91ea277264bdb6779))
+* **ui-bottomsheet:** add keepStatusBarStyle on Android ([6ad4813](https://github.com/nativescript-community/ui-native-components/commit/6ad48139bc40668a5c1344ea23c2f04a1ece6a6c))
+* **ui-menu:** add a trailing action to menu items ([0231789](https://github.com/nativescript-community/ui-native-components/commit/0231789608ffd34b6ca18b7726d0e5934ce529bd))
+* **ui-segmentedbar:** add apportionsSegmentWidthsByContent and item width ([67264b9](https://github.com/nativescript-community/ui-native-components/commit/67264b9fc96e712e42e305df0619ebb5583bba0f))
+
+### Bug Fixes
+
+* **ui-segmentedbar:** size the Android segments to their content ([2adada4](https://github.com/nativescript-community/ui-native-components/commit/2adada421220dd12c868ef83d198ea296f029136))
+
 ## [1.4.2](https://github.com/nativescript-community/ui-native-components/compare/v1.4.1...v1.4.2) (2026-10-30)
 
 **Note:** Version bump only for package @nativescript-community/ui-native-components

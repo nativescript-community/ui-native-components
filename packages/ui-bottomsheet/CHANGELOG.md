@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/nativescript-community/ui-native-components/compare/v1.4.2...v1.5.0) (2026-11-04)
+
+### Features
+
+* **ui-bottomsheet:** add keepStatusBarStyle on Android ([6ad4813](https://github.com/nativescript-community/ui-native-components/commit/6ad48139bc40668a5c1344ea23c2f04a1ece6a6c))
+
 ## [1.4.2](https://github.com/nativescript-community/ui-native-components/compare/v1.4.1...v1.4.2) (2026-10-30)
 
 **Note:** Version bump only for package @nativescript-community/ui-bottomsheet

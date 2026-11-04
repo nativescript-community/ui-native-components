@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/nativescript-community/ui-native-components/compare/v1.4.2...v1.5.0) (2026-11-04)
+
+### Features
+
+* **ui-segmentedbar:** add apportionsSegmentWidthsByContent and item width ([67264b9](https://github.com/nativescript-community/ui-native-components/commit/67264b9fc96e712e42e305df0619ebb5583bba0f))
+
+### Bug Fixes
+
+* **ui-segmentedbar:** size the Android segments to their content ([2adada4](https://github.com/nativescript-community/ui-native-components/commit/2adada421220dd12c868ef83d198ea296f029136))
+
 ## [1.4.2](https://github.com/nativescript-community/ui-native-components/compare/v1.4.1...v1.4.2) (2026-10-30)
 
 **Note:** Version bump only for package @nativescript-community/ui-segmentedbar
