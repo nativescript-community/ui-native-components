@@ -72,8 +72,11 @@ function findShapeDrawable(drawable: android.graphics.drawable.Drawable): com.go
     return null;
 }
 
-function toColorStateList(value: string | Color) {
-    return android.content.res.ColorStateList.valueOf(toNativeColor(value));
+const DISABLED_ALPHA = 97;
+
+/** a disabled action is greyed out: the tint loses its alpha */
+function tintList(color: number, enabled = true) {
+    return android.content.res.ColorStateList.valueOf(enabled ? color : androidx.core.graphics.ColorUtils.setAlphaComponent(color, DISABLED_ALPHA));
 }
 
 function toNativeColor(value: any): number {
@@ -153,17 +156,44 @@ export class AppBar extends AppBarBase {
         }
         const tint = this.getOnBarColor();
         toolbar.setNavigationIconTint(tint);
-        const list = android.content.res.ColorStateList.valueOf(tint);
         const menu = toolbar.getMenu();
+        const disabledIds = new Set(
+            (((this.actionItems as any)?.getVisibleItems() ?? []) as AppBarItem[]).filter((item) => item.isEnabled === false).map((item) => (item as any)._getItemId())
+        );
         for (let i = 0; i < menu.size(); i++) {
-            androidx.core.view.MenuItemCompat.setIconTintList(menu.getItem(i), list);
+            const menuItem = menu.getItem(i);
+            const enabled = !disabledIds.has(menuItem.getItemId());
+            menuItem.setEnabled(enabled);
+            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, tintList(tint, enabled));
         }
+        this.applyActionTextColors(toolbar, tint, disabledIds);
         const overflow = toolbar.getOverflowIcon();
         if (overflow) {
             const wrapped = androidx.core.graphics.drawable.DrawableCompat.wrap(overflow.mutate());
             androidx.core.graphics.drawable.DrawableCompat.setTint(wrapped, tint);
             toolbar.setOverflowIcon(wrapped);
         }
+    }
+
+    /** the text of a text only action uses the theme color: it follows the color of the bar */
+    private applyActionTextColors(toolbar: androidx.appcompat.widget.Toolbar, tint: number, disabledIds: Set<number>) {
+        const paint = () => {
+            for (let i = 0; i < toolbar.getChildCount(); i++) {
+                const menuView = toolbar.getChildAt(i);
+                if (!(menuView instanceof androidx.appcompat.widget.ActionMenuView)) {
+                    continue;
+                }
+                for (let j = 0; j < menuView.getChildCount(); j++) {
+                    const child = menuView.getChildAt(j);
+                    if (child instanceof androidx.appcompat.view.menu.ActionMenuItemView) {
+                        const enabled = !disabledIds.has(child.getItemData().getItemId());
+                        child.setTextColor(enabled ? tint : androidx.core.graphics.ColorUtils.setAlphaComponent(tint, DISABLED_ALPHA));
+                    }
+                }
+            }
+        };
+        paint();
+        toolbar.post(new java.lang.Runnable({ run: paint }));
     }
 
     // the back arrow and the close icon of the core are the old holo ones: use the Material (appcompat) ones
@@ -1196,8 +1226,9 @@ export class AppPage extends Page {
             const item = source.getItem(index);
             const copy = menu.add(item.getGroupId(), item.getItemId(), item.getOrder(), item.getTitle());
             copy.setIcon(item.getIcon());
+            copy.setEnabled(item.isEnabled());
             copy.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
-            androidx.core.view.MenuItemCompat.setIconTintList(copy, tint);
+            androidx.core.view.MenuItemCompat.setIconTintList(copy, item.isEnabled() ? tint : tintList(appBar.getOnBarColor(), false));
         }
         searchBar.setOnMenuItemClickListener(
             new androidx.appcompat.widget.Toolbar.OnMenuItemClickListener({
@@ -1258,17 +1289,23 @@ export class AppPage extends Page {
         const bar = this._bottomBar;
         bar.setVisibility(android.view.View.VISIBLE);
         bar.setHideOnScroll(behavior === 'hide');
+        const barBackground = toNativeColor(appBar.bottomBarBackgroundColor);
+        if (barBackground !== null) {
+            bar.setBackgroundTint(android.content.res.ColorStateList.valueOf(barBackground));
+        }
         const menu = bar.getMenu();
         menu.clear();
         const owner = new WeakRef(appBar);
-        const onBarList = android.content.res.ColorStateList.valueOf(appBar.getOnBarColor());
+        const onBarColor = toNativeColor(appBar.bottomBarColor) ?? appBar.getOnBarColor();
         items.forEach((item, index) => {
             const menuItem = menu.add(0, index, index, item.text || '');
             const icon = item.icon ? getNativeIcon(item.icon) : null;
             if (icon) {
                 menuItem.setIcon(icon);
             }
-            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, item.color ? toColorStateList(item.color) : onBarList);
+            const enabled = item.enabled !== false;
+            menuItem.setEnabled(enabled);
+            androidx.core.view.MenuItemCompat.setIconTintList(menuItem, tintList(item.color ? toNativeColor(item.color) : onBarColor, enabled));
             menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
         });
         attachBadges(
@@ -1334,7 +1371,9 @@ export class AppPage extends Page {
         bar.setVisibility(android.view.View.VISIBLE);
         const background = bar.getBackground();
         if (background instanceof com.google.android.material.shape.MaterialShapeDrawable) {
-            background.setFillColor(android.content.res.ColorStateList.valueOf(getThemeColor(bar, 'colorSurfaceContainer', getThemeColor(bar, 'colorSurface', android.graphics.Color.WHITE))));
+            background.setFillColor(
+                android.content.res.ColorStateList.valueOf(toNativeColor(appBar.bottomBarBackgroundColor) ?? getThemeColor(bar, 'colorSurfaceContainer', getThemeColor(bar, 'colorSurface', android.graphics.Color.WHITE)))
+            );
         }
         holder.removeAllViews();
         const customView = appBar.bottomView?.nativeViewProtected as android.view.View;
@@ -1348,14 +1387,16 @@ export class AppPage extends Page {
         const ripple = new android.util.TypedValue();
         context.getTheme().resolveAttribute(16843868 /* android.R.attr.selectableItemBackgroundBorderless */, ripple, true);
         const size = Math.round(48 * density);
-        const onBarList = android.content.res.ColorStateList.valueOf(appBar.getOnBarColor());
+        const onBarColor = toNativeColor(appBar.bottomBarColor) ?? appBar.getOnBarColor();
         items.forEach((item) => {
             const button = new android.widget.ImageButton(context);
             const icon = item.icon ? getNativeIcon(item.icon) : null;
             if (icon) {
                 button.setImageDrawable(icon);
             }
-            button.setImageTintList(item.color ? toColorStateList(item.color) : onBarList);
+            const enabled = item.enabled !== false;
+            button.setEnabled(enabled);
+            button.setImageTintList(tintList(item.color ? toNativeColor(item.color) : onBarColor, enabled));
             button.setContentDescription(item.text || '');
             button.setBackground(androidx.core.content.ContextCompat.getDrawable(context, ripple.resourceId));
             button.setOnClickListener(

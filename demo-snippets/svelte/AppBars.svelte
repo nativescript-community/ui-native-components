@@ -30,10 +30,14 @@
         // the button hides when the list scrolls down
         fab.nativeView.hideOnScroll = list.nativeView;
     });
-    const bottomItems = [
+    let canUndo = false;
+    let canSave = false;
+    $: bottomItems = [
         { text: 'Home', badge: 'new', icon: icon('house', 'ic_star'), onTap: () => (log = 'bottom: home') },
+        { text: 'Full', enabled: canSave, onTap: () => (log = 'bottom: full image') },
         { spacer: true },
-        { text: 'Add', icon: icon('plus', 'ic_add'), onTap: () => (log = 'bottom: add') }
+        { text: 'Save', prominent: true, color: '#2e7d32', enabled: canSave, onTap: () => (log = 'bottom: save') },
+        { text: 'Add', icon: icon('plus', 'ic_add'), prominent: true, onTap: () => (log = 'bottom: add') }
     ];
     let log = 'size / behavior / translucent: use the buttons';
 
@@ -58,12 +62,14 @@
 </script>
 
 <appPage>
-    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} {searchPlacement} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
+    <appBar bind:this={bar} title="App bar" subtitle="{size} / {behavior}{translucent ? " / translucent" : ""}" {size} scrollBehavior={behavior} {translucent} {bottomItems} bottomBarBackgroundColor="#0E0E10" bottomBarColor="#ffffff" formattedTitle={spans ? formatted : null} searchable searchHint="Filter rows" {searchMode} {searchPlacement} on:searchChange={(e) => (query = e.text)} on:searchCancel={() => (query = '')}>
         <navigationButton text="Back" android.systemIcon="ic_menu_back" on:tap={() => Frame.topmost().goBack()} />
         <appBarItem text="More" badge={3} icon={icon('ellipsis', 'ic_add')} ios.position="right" android.position="actionBar" {menu} />
         <appBarItem ios.position="right" android.position="actionBar">
             <uibutton text="Go" variant="text" on:tap={() => (log = 'custom button tapped')} />
         </appBarItem>
+        <appBarItem text="Undo" icon={icon('arrow.uturn.backward', 'ic_star')} isEnabled={canUndo} ios.position="left" android.position="actionBar" on:tap={() => (log = 'undo tapped')} />
+        <appBarItem text="Save" android.position="actionBar" on:tap={() => (log = 'save tapped')} />
         <appBarItem text="Edit" prominent ios.position="right" android.position="popup" on:tap={() => (log = 'edit tapped')} />
     </appBar>
     <collectionview bind:this={list} {items} rowHeight="56">
@@ -79,6 +85,7 @@
         <stackLayout verticalAlignment="bottom" marginBottom="90" backgroundColor="rgba(255,255,255,0.92)" padding="8 8 8 8">
             <label text={log} on:loaded={attachPan} padding="8" backgroundColor="#c8e6c9" />
             <wrapLayout>
+                <uibutton text="toggle enabled" on:tap={() => ((canUndo = !canUndo), (canSave = !canSave))} />
                 <uibutton text="small" on:tap={() => (size = 'small')} />
                 <uibutton text="medium" on:tap={() => (size = 'medium')} />
                 <uibutton text="large" on:tap={() => (size = 'large')} />

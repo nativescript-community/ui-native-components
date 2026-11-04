@@ -33,13 +33,16 @@ function itemChanged(target: AppBarItem) {
 export const badgeProperty = new Property<AppBarItem, string | number | boolean>({ name: 'badge', valueChanged: itemChanged });
 export const menuProperty = new Property<AppBarItem, MenuItem[]>({ name: 'menu', valueChanged: itemChanged });
 export const prominentProperty = new Property<AppBarItem, boolean>({ name: 'prominent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: itemChanged });
+export const isEnabledProperty = new Property<AppBarItem, boolean>({ name: 'isEnabled', defaultValue: true, valueConverter: (v: any) => v !== false && v !== 'false', valueChanged: itemChanged });
 
 /**
  * An action of the bar. In addition to the core `ActionItem` (text, icon, `actionView`, `android.position`...):
  * - `menu`: items of a menu shown when the action is tapped (iOS: native menu of the bar button, Android: popup menu)
  * - `prominent`: iOS 26 tinted Liquid Glass button
+ * - `isEnabled`: `false` greys the action out and ignores the taps
  */
 export class AppBarItem extends ActionItem {
+    isEnabled: boolean;
     menu: MenuItem[];
     prominent: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot. iOS 26 and Android */
@@ -70,6 +73,7 @@ export class AppBarItem extends ActionItem {
 menuProperty.register(AppBarItem);
 badgeProperty.register(AppBarItem);
 prominentProperty.register(AppBarItem);
+isEnabledProperty.register(AppBarItem);
 
 export interface AppBarSearchEventData extends EventData {
     text: string;
@@ -88,10 +92,14 @@ export interface AppBarBottomItem {
     search?: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot */
     badge?: string | number | boolean;
+    /** iOS 26: the tinted Liquid Glass button of the main action. Android: ignored */
+    prominent?: boolean;
     /** items of a menu shown when the button is tapped (no `onTap`): iOS native menu, Android popup menu above the bar */
     menu?: MenuItem[];
     /** the tint of the button (a destructive action in red, an accent...): its icon and text, on both platforms. Default: the color of the bar */
     color?: string | Color;
+    /** `false` greys the button out and ignores the taps. Default: true */
+    enabled?: boolean;
     /** called when the action is tapped */
     onTap?: (item: AppBarBottomItem) => void;
     [key: string]: any;
@@ -114,6 +122,9 @@ export const searchPlacementProperty = new Property<AppBarBase, AppBarSearchPlac
 export type AppBarBottomBarStyle = 'floating' | 'bottomAppBar';
 export const bottomBarStyleProperty = new Property<AppBarBase, AppBarBottomBarStyle>({ name: 'bottomBarStyle', valueChanged: changed });
 
+export const bottomBarBackgroundColorProperty = new Property<AppBarBase, string | Color>({ name: 'bottomBarBackgroundColor', valueChanged: changed });
+export const bottomBarColorProperty = new Property<AppBarBase, string | Color>({ name: 'bottomBarColor', valueChanged: changed });
+
 export const bottomItemsProperty = new Property<AppBarBase, AppBarBottomItem[]>({ name: 'bottomItems', valueChanged: changed });
 
 /**
@@ -132,6 +143,10 @@ export class AppBarBase extends ActionBar {
     bottomItems: AppBarBottomItem[];
     /** Android: the look of the `bottomItems`, a `floating` toolbar (default) or a `bottomAppBar` (badges are only shown by the bottomAppBar) */
     bottomBarStyle: AppBarBottomBarStyle;
+    /** Android: the color of the bottom bar container. Default: the theme */
+    bottomBarBackgroundColor: string | Color;
+    /** Android: the default color of the `bottomItems` (an item `color` wins). Default: the color of the bar */
+    bottomBarColor: string | Color;
 
     /** raised when the text of the search changes */
     static searchChangeEvent = 'searchChange';
@@ -253,6 +268,8 @@ searchableProperty.register(AppBarBase);
 searchHintProperty.register(AppBarBase);
 bottomItemsProperty.register(AppBarBase);
 bottomBarStyleProperty.register(AppBarBase);
+bottomBarBackgroundColorProperty.register(AppBarBase);
+bottomBarColorProperty.register(AppBarBase);
 searchModeProperty.register(AppBarBase);
 searchPlacementProperty.register(AppBarBase);
 

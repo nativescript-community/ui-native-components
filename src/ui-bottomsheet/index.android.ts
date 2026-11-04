@@ -324,6 +324,13 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
                     if (creationOptions.disableDimBackground === true) {
                         dialog.getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     }
+                    if (creationOptions.keepStatusBarStyle === true) {
+                        // before the dialog is attached: material reads the style of the window then, to restore it when the sheet is under the status bar
+                        const activityWindow = fragment.getActivity().getWindow();
+                        const light = androidx.core.view.WindowCompat.getInsetsController(activityWindow, activityWindow.getDecorView()).isAppearanceLightStatusBars();
+                        const dialogWindow = dialog.getWindow();
+                        androidx.core.view.WindowCompat.getInsetsController(dialogWindow, dialogWindow.getDecorView()).setAppearanceLightStatusBars(light);
+                    }
                 }
                 return dialog;
             },

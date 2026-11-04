@@ -23,6 +23,8 @@
         "android.widget:ScrollView",
         "androidx.appcompat.app:AppCompatActivity",
         "androidx.core.view:ViewCompat",
+        "androidx.core.view:WindowCompat",
+        "androidx.core.view:WindowInsetsControllerCompat",
         "com.google.android.material.bottomsheet:BottomSheetBehavior",
         "com.google.android.material.bottomsheet:BottomSheetBehavior.BottomSheetCallback",
         "com.google.android.material.bottomsheet:BottomSheetDialogFragment",

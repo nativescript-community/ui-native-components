@@ -1,5 +1,13 @@
 import type { FormattedString, ImageSource, View } from '@nativescript/core';
 
+export interface MenuTrailingAction {
+    /** same formats as `MenuItem.icon` (Android: the icon is tinted for a string) */
+    icon: string;
+    /** accessibility label (Android), title of the entry (iOS) */
+    title: string;
+    onSelect: () => void;
+}
+
 /**
  * An entry of a menu.
  * Use `{ separator: true, title?: string }` to start a new section, with an optional title above it (a segment on Android, an inline group on iOS).
@@ -23,6 +31,11 @@ export interface MenuItem {
     items?: MenuItem[];
     /** starts a new section, `title` is the label of the section */
     separator?: boolean;
+    /**
+     * A secondary action of the item, shown as an icon button at the end of the row (Android). Tapping it closes the menu and calls its `onSelect`, not the one of the item.
+     * iOS: a menu can not host a trailing control, the action is a separate entry placed directly after the item.
+     */
+    trailingAction?: MenuTrailingAction;
     /** called when the item is selected */
     onSelect?: (item: MenuItem) => void;
     /** free data */
