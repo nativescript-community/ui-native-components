@@ -441,7 +441,6 @@ export class AppBar extends AppBarBase {
 
     private _inlineTitleTarget: View;
     private _inlineTitleListener: () => void;
-    private _expandedBarHeight = 0;
     private _inlineTitleShown = false;
 
     /**
@@ -468,9 +467,10 @@ export class AppBar extends AppBarBase {
         if (!navigationItem || !navigationBar || this.titleView || this.size === 'small' || navigationItem.largeTitleDisplayMode !== UINavigationItemLargeTitleDisplayMode.Always) {
             return;
         }
-        const height = navigationBar.frame.size.height;
-        this._expandedBarHeight = Math.max(this._expandedBarHeight, height);
-        const collapsed = height < this._expandedBarHeight - 20;
+        // collapsed from how far the content is scrolled, not from the height of the bar: it gets stretched while the content bounces at the top
+        const scrollView = findScrollView(this._inlineTitleTarget);
+        const scrolled = scrollView ? scrollView.contentOffset.y + scrollView.adjustedContentInset.top : 0;
+        const collapsed = this._inlineTitleShown ? scrolled > 4 : scrolled > 36;
         if (collapsed === this._inlineTitleShown) {
             return;
         }
