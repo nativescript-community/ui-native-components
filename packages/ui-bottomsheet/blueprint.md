@@ -54,7 +54,7 @@ Options of `showBottomSheet`:
 | `grabber`, `cornerRadius`, `transparent`, `backgroundOpacity`, `disableDimBackground`, `canTouchBehind` | look |
 | `peekHeight`, `skipCollapsedState` | legacy: use `detents` |
 | `scrollExpands`, `edgeAttachedInCompactHeight` | iOS only |
-| `trackingScrollView`, `windowSoftInputMode` | Android only |
+| `trackingScrollView`, `windowSoftInputMode`, `keepStatusBarStyle` | Android only |
 
 A scrollable content (`ScrollView`, `ListView`, `@nativescript-community/ui-collectionview`) scrolls before the sheet moves on both platforms.
 

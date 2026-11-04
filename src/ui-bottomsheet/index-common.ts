@@ -59,6 +59,7 @@ export interface BottomSheetOptions {
     onChangeState?: onChangeStateBottomSheet; // One works to be called on the scroll of the sheet. Parameters: state (CLOSED, DRAGGING, DRAGGING, COLLAPSED) and slideOffset is the new offset of this bottom sheet within [-1,1] range. Offset increases as this bottom sheet is moving upward. From 0 to 1 the sheet is between collapsed and expanded states and from -1 to 0 it is between hidden and collapsed states.
     canTouchBehind?: boolean; //(Android only) allows to interact with the screen behind the sheet. For it to work properly need dismissOnBackgroundTap set to true
     windowSoftInputMode?: number; //(Android only) window softInputMode
+    keepStatusBarStyle?: boolean; //(Android only) the status bar icons keep the style of the activity while the sheet is shown, instead of the one of the sheet theme. Default: false
     detents?: BottomSheetDetent[]; // the heights the sheet can rest at, from the smallest to the largest. Replaces peekHeight/skipCollapsedState
     initialDetentIndex?: number; // index in `detents` of the detent the sheet opens at. Default: the first one
     onDetentChange?: (index: number) => void; // called when the sheet rests at another detent
