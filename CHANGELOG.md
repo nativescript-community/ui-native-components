@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.2](https://github.com/nativescript-community/ui-native-components/compare/v1.5.1...v1.5.2) (2026-11-06)
+
+### Bug Fixes
+
+* **ui-appbar:** pin the scroll target of the page under the bars on iOS ([afc9f31](https://github.com/nativescript-community/ui-native-components/commit/afc9f31d1c0fb6d8bd7e6eaebba55fae33d9f0aa))
+
 ## [1.5.1](https://github.com/nativescript-community/ui-native-components/compare/v1.5.0...v1.5.1) (2026-11-06)
 
 ### Bug Fixes
