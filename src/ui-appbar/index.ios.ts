@@ -503,6 +503,38 @@ export class AppBar extends AppBarBase {
         effects.bottomEdgeEffect.hidden = this.translucent;
     }
 
+    /**
+     * The scrolling view covers the whole page, under the bars, and UIKit insets its content for them.
+     * NativeScript would otherwise lay it out in the safe area, which follows the large title while the content scrolls:
+     * it was laid out again while UIKit adjusted its inset, so the content jumped when the large title came back.
+     */
+    private pinScrollTarget(target: View, scrollView: UIScrollView, viewController: UIViewController) {
+        if (target['_appBarPinned'] || target.nativeViewProtected !== scrollView) {
+            return;
+        }
+        target['_appBarPinned'] = true;
+        if (scrollView.contentInsetAdjustmentBehavior === UIScrollViewContentInsetAdjustmentBehavior.Never) {
+            scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Automatic;
+        }
+        // only the sides keep the layout of NativeScript. The frame is set once: NativeScript first sets the one it computed, which resets the content offset
+        const modifyFrame = (target as any)._modifyNativeViewFrame.bind(target);
+        (target as any)._modifyNativeViewFrame = (nativeView: UIView, frame: CGRect) => {
+            const parent = nativeView.superview;
+            const root = viewController.view;
+            if (!parent || !root?.window) {
+                modifyFrame(nativeView, frame);
+                return;
+            }
+            const full = parent.convertRectFromView(root.bounds, root);
+            const pinned = CGRectMake(frame.origin.x, full.origin.y, frame.size.width, full.size.height);
+            if (!CGRectEqualToRect(nativeView.frame, pinned)) {
+                nativeView.frame = pinned;
+            }
+        };
+        (target as any)._cachedFrame = null;
+        target.requestLayout();
+    }
+
     private applyScrollTarget(viewController: UIViewController) {
         const target = this.getScrollTarget();
         if (!target) {
@@ -515,6 +547,7 @@ export class AppBar extends AppBarBase {
             // the bottom toolbar follows the same scrolling view (scroll edge effect under the glass buttons)
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
             this.observeInlineTitle(target);
+            this.pinScrollTarget(target, scrollView, viewController);
         } else if (!this._scrollTargetLoadedHandler) {
             // not created yet
             this._scrollTargetLoadedHandler = () => {
