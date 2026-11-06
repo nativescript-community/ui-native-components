@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/nativescript-community/ui-native-components/compare/v1.5.0...v1.5.1) (2026-11-06)
+
+### Bug Fixes
+
+* **ui-appbar:** show the inline title from the scroll offset on iOS ([ef2f1d4](https://github.com/nativescript-community/ui-native-components/commit/ef2f1d4aca563b5db69d9913527b46d98f09f362))
+
 ## [1.5.0](https://github.com/nativescript-community/ui-native-components/compare/v1.4.2...v1.5.0) (2026-11-04)
 
 ### Features
