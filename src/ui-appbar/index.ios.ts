@@ -27,6 +27,24 @@ function findScrollView(view: View): UIScrollView {
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
 }
 
+@NativeClass
+class OffsetObserver extends NSObject {
+    private onChange: () => void;
+
+    static initWithCallback(onChange: () => void) {
+        const observer = OffsetObserver.new() as OffsetObserver;
+        observer.onChange = onChange;
+        return observer;
+    }
+
+    observeValueForKeyPathOfObjectChangeContext() {
+        this.onChange?.();
+    }
+}
+
+// how far above its top the content is pulled at the first layout of a pushed page with a large title and a subtitle (the bar ends up taller than UIKit first expects: 26 and 42 pt measured)
+const LARGE_SUBTITLE_EXTRA_INSET = 60;
+
 const toolbarDefaults = new WeakMap<UIToolbar, { standard: UIToolbarAppearance; edge: UIToolbarAppearance }>();
 
 @NativeClass
@@ -535,6 +553,66 @@ export class AppBar extends AppBarBase {
         target.requestLayout();
     }
 
+    /**
+     * On a pushed page UIKit takes the collapse of the large title from the offset of the scroll view, compared to the inset it expects.
+     * At the first layout the inset is the one of a large bar without subtitle: with a subtitle the bar is taller, the offset then looks scrolled and the title collapses
+     * for the whole push (it comes back at the end). The content is pulled above its top before UIKit reads it, and put back at the exact top with the final inset.
+     * Only for a bar with a subtitle: without it the first inset is the right one.
+     */
+    private keepLargeTitle(target: View, scrollView: UIScrollView, viewController: UIViewController) {
+        if (this.size === 'small' || !this.subtitle || target['_appBarLargeTitleKept']) {
+            return;
+        }
+        // pushed from a large bar with a subtitle: the first inset is the one of that bar, not too small
+        const controllers = viewController.navigationController.viewControllers;
+        const previous = controllers.objectAtIndex(controllers.indexOfObject(viewController) - 1).navigationItem;
+        if (previous.largeTitleDisplayMode !== UINavigationItemLargeTitleDisplayMode.Never && previous.subtitle) {
+            return;
+        }
+        target['_appBarLargeTitleKept'] = true;
+        const page = this.page;
+        const watch = () => {
+            let inset = scrollView.adjustedContentInset.top;
+            let state: 'watching' | 'pulled' | 'done' = 'watching';
+            let moving = false;
+            const moveTo = (offset: number) => {
+                moving = true;
+                scrollView.setContentOffsetAnimated(CGPointMake(scrollView.contentOffset.x, offset), false);
+                moving = false;
+            };
+            const observer = OffsetObserver.initWithCallback(() => {
+                if (moving) {
+                    return;
+                }
+                const previousInset = inset;
+                inset = scrollView.adjustedContentInset.top;
+                if (state === 'watching' && Math.abs(scrollView.contentOffset.y + inset) < 1 && !scrollView.dragging) {
+                    state = 'pulled';
+                    moveTo(-inset - LARGE_SUBTITLE_EXTRA_INSET);
+                } else if (state === 'pulled' && inset > previousInset) {
+                    // the final inset: the exact top
+                    state = 'done';
+                    moveTo(-inset);
+                }
+            });
+            (scrollView as any).addObserverForKeyPathOptionsContext(observer, 'contentOffset', 0, null);
+            // end of the push: the bar has its final size
+            page.once('navigatedTo', () => {
+                (scrollView as any).removeObserverForKeyPath(observer, 'contentOffset');
+                if (scrollView.contentOffset.y + scrollView.adjustedContentInset.top < 0 && !scrollView.dragging) {
+                    moveTo(-scrollView.adjustedContentInset.top);
+                }
+            });
+        };
+        const onLayout = () => {
+            if (scrollView.window) {
+                target.off('layoutChanged', onLayout);
+                watch();
+            }
+        };
+        target.on('layoutChanged', onLayout);
+    }
+
     private applyScrollTarget(viewController: UIViewController) {
         const target = this.getScrollTarget();
         if (!target) {
@@ -548,6 +626,9 @@ export class AppBar extends AppBarBase {
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
             this.observeInlineTitle(target);
             this.pinScrollTarget(target, scrollView, viewController);
+            if (viewController.navigationController?.viewControllers.indexOfObject(viewController) > 0) {
+                this.keepLargeTitle(target, scrollView, viewController);
+            }
         } else if (!this._scrollTargetLoadedHandler) {
             // not created yet
             this._scrollTargetLoadedHandler = () => {
