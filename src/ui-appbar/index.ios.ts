@@ -250,13 +250,18 @@ export class AppBar extends AppBarBase {
         for (const appearance of [standard, edge]) {
             const attributes = appearance.titleTextAttributes;
             if (attributes) {
+                const color = attributes.objectForKey(NSForegroundColorAttributeName);
+                // the subtitle has the color of the title but not its font: the css font of the bar is the one of the title
+                const subtitleAttributes: Record<string, unknown> = { [NSFontAttributeName]: UIFont.systemFontOfSize(17) };
+                if (color) {
+                    subtitleAttributes[NSForegroundColorAttributeName] = color;
+                }
                 for (const key of ['subtitleTextAttributes', 'largeSubtitleTextAttributes']) {
                     if (key in (appearance as any)) {
-                        (appearance as any)[key] = attributes;
+                        (appearance as any)[key] = subtitleAttributes;
                     }
                 }
                 // the large title has the color of the title
-                const color = attributes.objectForKey(NSForegroundColorAttributeName);
                 if (color) {
                     const large = NSMutableDictionary.dictionaryWithDictionary((appearance.largeTitleTextAttributes ?? NSDictionary.new()) as any);
                     large.setObjectForKey(color, NSForegroundColorAttributeName);
