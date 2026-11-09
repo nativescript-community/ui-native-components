@@ -309,29 +309,38 @@ export class AppBar extends AppBarBase {
     }
 
     private _bottomHandlers: BottomItemHandler[] = [];
+    private hideBottomItems(viewController: UIViewController, navController: UINavigationController) {
+        if (!navController.toolbarHidden) {
+            navController.setToolbarHiddenAnimated(true, false);
+        }
+        viewController.setToolbarItemsAnimated(null, false);
+        this._bottomHandlers = [];
+    }
     /** the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26) */
     private applyBottomItems(viewController: UIViewController, navController: UINavigationController) {
         const items = this.bottomItems;
         if (!items?.length) {
-            if (!navController.toolbarHidden) {
-                navController.setToolbarHiddenAnimated(true, false);
-            }
-            viewController.setToolbarItemsAnimated(null, false);
-            this._bottomHandlers = [];
+            this.hideBottomItems(viewController, navController);
             return;
         }
         const handlers: BottomItemHandler[] = [];
         const badges: [UIBarButtonItem, string | number | boolean][] = [];
         const barButtonItems = NSMutableArray.new<UIBarButtonItem>();
+        const flexibleSpace = () => UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null);
+        let nbButtons = 0;
         for (const item of items) {
             if (item.spacer) {
-                barButtonItems.addObject(UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null));
+                barButtonItems.addObject(flexibleSpace());
                 continue;
             }
             if (item.search) {
                 const searchItem = (viewController.navigationItem as any).searchBarPlacementBarButtonItem;
                 if (searchItem) {
+                    nbButtons++;
                     barButtonItems.addObject(searchItem);
+                } else {
+                    // before iOS 26 the search is in the bar at the top: its place keeps the other buttons at the end
+                    barButtonItems.addObject(flexibleSpace());
                 }
                 continue;
             }
@@ -362,6 +371,12 @@ export class AppBar extends AppBarBase {
             }
             badges.push([barButtonItem, item.badge]);
             barButtonItems.addObject(barButtonItem);
+            nbButtons++;
+        }
+        if (!nbButtons) {
+            // nothing to show (the search item does not exist before iOS 26): an empty toolbar is a visible bar before iOS 26
+            this.hideBottomItems(viewController, navController);
+            return;
         }
         // the handlers must stay alive
         this._bottomHandlers = handlers;
@@ -405,7 +420,14 @@ export class AppBar extends AppBarBase {
         if (!toolbarDefaults.has(toolbar)) {
             toolbarDefaults.set(toolbar, { standard: toolbar.standardAppearance?.copy(), edge: toolbar.scrollEdgeAppearance?.copy() });
         }
-        if (this.translucent) {
+        if (this.translucent && Utils.SDK_VERSION < 26) {
+            // before iOS 26 there are no glass buttons: the buttons float over the page, without a full width bar
+            const appearance = UIToolbarAppearance.new();
+            appearance.configureWithTransparentBackground();
+            toolbar.standardAppearance = appearance;
+            toolbar.scrollEdgeAppearance = appearance;
+            toolbar.compactAppearance = appearance;
+        } else if (this.translucent) {
             const appearance = UIToolbarAppearance.new();
             appearance.configureWithDefaultBackground();
             appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
