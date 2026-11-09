@@ -348,7 +348,9 @@ export class AppBar extends AppBarBase {
             handlers.push(handler);
             const image = item.icon ? getNativeIcon(item.icon) : null;
             let barButtonItem: UIBarButtonItem;
-            if (item.menu?.length) {
+            if (Utils.SDK_VERSION < 26) {
+                barButtonItem = this.createLegacyBottomButton(item, image, handler);
+            } else if (item.menu?.length) {
                 const menu = createNativeMenu(item.menu);
                 barButtonItem = image ? UIBarButtonItem.alloc().initWithImageMenu(image, menu) : UIBarButtonItem.alloc().initWithTitleMenu(item.text + '', menu);
             } else {
@@ -384,6 +386,39 @@ export class AppBar extends AppBarBase {
         navController.setToolbarHiddenAnimated(false, false);
         // the badge is set once the items are in the toolbar
         badges.forEach(([barButtonItem, badge]) => applyBadge(barButtonItem, badge));
+    }
+
+    /**
+     * Before iOS 26 there are no glass buttons and the toolbar has no background: a button in the tint of the app is lost over the page.
+     * It is a capsule on a blur in the color of the bar, the main action is filled.
+     */
+    private createLegacyBottomButton(item: AppBarBottomItem, image: UIImage, handler: BottomItemHandler) {
+        const color = item.color ?? this.color;
+        const nativeColor = color ? (color instanceof Color ? color : new Color(color as any)).ios : null;
+        const configuration = item.prominent ? UIButtonConfiguration.filledButtonConfiguration() : UIButtonConfiguration.plainButtonConfiguration();
+        configuration.cornerStyle = UIButtonConfigurationCornerStyle.Capsule;
+        configuration.contentInsets = { top: 10, leading: 14, bottom: 10, trailing: 14 };
+        if (image) {
+            configuration.image = image;
+        } else {
+            configuration.title = item.text + '';
+        }
+        if (item.prominent) {
+            configuration.baseBackgroundColor = nativeColor;
+        } else {
+            configuration.baseForegroundColor = nativeColor;
+            configuration.background.visualEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
+        }
+        const button = UIButton.buttonWithConfigurationPrimaryAction(configuration, null);
+        if (item.menu?.length) {
+            button.menu = createNativeMenu(item.menu);
+            button.showsMenuAsPrimaryAction = true;
+        } else {
+            button.addTargetActionForControlEvents(handler, 'tap', UIControlEvents.TouchUpInside);
+        }
+        button.accessibilityLabel = item.text;
+        button.enabled = item.enabled !== false;
+        return UIBarButtonItem.alloc().initWithCustomView(button);
     }
 
     private _overflowViews: View[] = [];
