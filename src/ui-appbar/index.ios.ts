@@ -1,4 +1,5 @@
 import { Color, GridLayout, ItemSpec, Page, Utils, View } from '@nativescript/core';
+import { colorProperty } from '@nativescript/core/ui/styling/style-properties';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
 import {
@@ -164,6 +165,14 @@ export class AppBar extends AppBarBase {
         this.applyAppBar();
     }
 
+    // @ts-ignore
+    [colorProperty.setNative](color: Color) {
+        // @ts-ignore
+        super[colorProperty.setNative](color);
+        // the title colors of the page are in its own appearance, not only in the one of the navigation bar
+        this.applyAppBar();
+    }
+
     focusSearch() {
         if (!this._searchController) {
             return false;
@@ -243,6 +252,15 @@ export class AppBar extends AppBarBase {
             for (const appearance of [standard, edge]) {
                 const attributes = NSMutableDictionary.dictionaryWithDictionary((appearance.titleTextAttributes ?? NSDictionary.new()) as any);
                 attributes.setObjectForKey(font, NSFontAttributeName);
+                appearance.titleTextAttributes = attributes as any;
+            }
+        }
+        // the color of the bar for the title: the one of the navigation bar is only updated after this, the title would follow one change late
+        if (this.color) {
+            const titleColor = (this.color instanceof Color ? this.color : new Color(this.color as any)).ios;
+            for (const appearance of [standard, edge]) {
+                const attributes = NSMutableDictionary.dictionaryWithDictionary((appearance.titleTextAttributes ?? NSDictionary.new()) as any);
+                attributes.setObjectForKey(titleColor, NSForegroundColorAttributeName);
                 appearance.titleTextAttributes = attributes as any;
             }
         }
