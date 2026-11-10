@@ -27,6 +27,24 @@ function findScrollView(view: View): UIScrollView {
     return native.scrollView instanceof UIScrollView ? native.scrollView : null;
 }
 
+@NativeClass
+class OffsetObserver extends NSObject {
+    private onChange: () => void;
+
+    static initWithCallback(onChange: () => void) {
+        const observer = OffsetObserver.new() as OffsetObserver;
+        observer.onChange = onChange;
+        return observer;
+    }
+
+    observeValueForKeyPathOfObjectChangeContext() {
+        this.onChange?.();
+    }
+}
+
+// how far above its top the content is pulled at the first layout of a pushed page with a large title and a subtitle (the bar ends up taller than UIKit first expects: 26 and 42 pt measured)
+const LARGE_SUBTITLE_EXTRA_INSET = 60;
+
 const toolbarDefaults = new WeakMap<UIToolbar, { standard: UIToolbarAppearance; edge: UIToolbarAppearance }>();
 
 @NativeClass
@@ -232,13 +250,18 @@ export class AppBar extends AppBarBase {
         for (const appearance of [standard, edge]) {
             const attributes = appearance.titleTextAttributes;
             if (attributes) {
+                const color = attributes.objectForKey(NSForegroundColorAttributeName);
+                // the subtitle has the color of the title but not its font: the css font of the bar is the one of the title
+                const subtitleAttributes: Record<string, unknown> = { [NSFontAttributeName]: UIFont.systemFontOfSize(17) };
+                if (color) {
+                    subtitleAttributes[NSForegroundColorAttributeName] = color;
+                }
                 for (const key of ['subtitleTextAttributes', 'largeSubtitleTextAttributes']) {
                     if (key in (appearance as any)) {
-                        (appearance as any)[key] = attributes;
+                        (appearance as any)[key] = subtitleAttributes;
                     }
                 }
                 // the large title has the color of the title
-                const color = attributes.objectForKey(NSForegroundColorAttributeName);
                 if (color) {
                     const large = NSMutableDictionary.dictionaryWithDictionary((appearance.largeTitleTextAttributes ?? NSDictionary.new()) as any);
                     large.setObjectForKey(color, NSForegroundColorAttributeName);
@@ -286,29 +309,38 @@ export class AppBar extends AppBarBase {
     }
 
     private _bottomHandlers: BottomItemHandler[] = [];
+    private hideBottomItems(viewController: UIViewController, navController: UINavigationController) {
+        if (!navController.toolbarHidden) {
+            navController.setToolbarHiddenAnimated(true, false);
+        }
+        viewController.setToolbarItemsAnimated(null, false);
+        this._bottomHandlers = [];
+    }
     /** the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26) */
     private applyBottomItems(viewController: UIViewController, navController: UINavigationController) {
         const items = this.bottomItems;
         if (!items?.length) {
-            if (!navController.toolbarHidden) {
-                navController.setToolbarHiddenAnimated(true, false);
-            }
-            viewController.setToolbarItemsAnimated(null, false);
-            this._bottomHandlers = [];
+            this.hideBottomItems(viewController, navController);
             return;
         }
         const handlers: BottomItemHandler[] = [];
         const badges: [UIBarButtonItem, string | number | boolean][] = [];
         const barButtonItems = NSMutableArray.new<UIBarButtonItem>();
+        const flexibleSpace = () => UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null);
+        let nbButtons = 0;
         for (const item of items) {
             if (item.spacer) {
-                barButtonItems.addObject(UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(UIBarButtonSystemItem.FlexibleSpace, null, null));
+                barButtonItems.addObject(flexibleSpace());
                 continue;
             }
             if (item.search) {
                 const searchItem = (viewController.navigationItem as any).searchBarPlacementBarButtonItem;
                 if (searchItem) {
+                    nbButtons++;
                     barButtonItems.addObject(searchItem);
+                } else {
+                    // before iOS 26 the search is in the bar at the top: its place keeps the other buttons at the end
+                    barButtonItems.addObject(flexibleSpace());
                 }
                 continue;
             }
@@ -316,7 +348,9 @@ export class AppBar extends AppBarBase {
             handlers.push(handler);
             const image = item.icon ? getNativeIcon(item.icon) : null;
             let barButtonItem: UIBarButtonItem;
-            if (item.menu?.length) {
+            if (Utils.SDK_VERSION < 26) {
+                barButtonItem = this.createLegacyBottomButton(item, image, handler);
+            } else if (item.menu?.length) {
                 const menu = createNativeMenu(item.menu);
                 barButtonItem = image ? UIBarButtonItem.alloc().initWithImageMenu(image, menu) : UIBarButtonItem.alloc().initWithTitleMenu(item.text + '', menu);
             } else {
@@ -339,6 +373,12 @@ export class AppBar extends AppBarBase {
             }
             badges.push([barButtonItem, item.badge]);
             barButtonItems.addObject(barButtonItem);
+            nbButtons++;
+        }
+        if (!nbButtons) {
+            // nothing to show (the search item does not exist before iOS 26): an empty toolbar is a visible bar before iOS 26
+            this.hideBottomItems(viewController, navController);
+            return;
         }
         // the handlers must stay alive
         this._bottomHandlers = handlers;
@@ -346,6 +386,39 @@ export class AppBar extends AppBarBase {
         navController.setToolbarHiddenAnimated(false, false);
         // the badge is set once the items are in the toolbar
         badges.forEach(([barButtonItem, badge]) => applyBadge(barButtonItem, badge));
+    }
+
+    /**
+     * Before iOS 26 there are no glass buttons and the toolbar has no background: a button in the tint of the app is lost over the page.
+     * It is a capsule on a blur in the color of the bar, the main action is filled.
+     */
+    private createLegacyBottomButton(item: AppBarBottomItem, image: UIImage, handler: BottomItemHandler) {
+        const color = item.color ?? this.color;
+        const nativeColor = color ? (color instanceof Color ? color : new Color(color as any)).ios : null;
+        const configuration = item.prominent ? UIButtonConfiguration.filledButtonConfiguration() : UIButtonConfiguration.plainButtonConfiguration();
+        configuration.cornerStyle = UIButtonConfigurationCornerStyle.Capsule;
+        configuration.contentInsets = { top: 10, leading: 14, bottom: 10, trailing: 14 };
+        if (image) {
+            configuration.image = image;
+        } else {
+            configuration.title = item.text + '';
+        }
+        if (item.prominent) {
+            configuration.baseBackgroundColor = nativeColor;
+        } else {
+            configuration.baseForegroundColor = nativeColor;
+            configuration.background.visualEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
+        }
+        const button = UIButton.buttonWithConfigurationPrimaryAction(configuration, null);
+        if (item.menu?.length) {
+            button.menu = createNativeMenu(item.menu);
+            button.showsMenuAsPrimaryAction = true;
+        } else {
+            button.addTargetActionForControlEvents(handler, 'tap', UIControlEvents.TouchUpInside);
+        }
+        button.accessibilityLabel = item.text;
+        button.enabled = item.enabled !== false;
+        return UIBarButtonItem.alloc().initWithCustomView(button);
     }
 
     private _overflowViews: View[] = [];
@@ -382,7 +455,14 @@ export class AppBar extends AppBarBase {
         if (!toolbarDefaults.has(toolbar)) {
             toolbarDefaults.set(toolbar, { standard: toolbar.standardAppearance?.copy(), edge: toolbar.scrollEdgeAppearance?.copy() });
         }
-        if (this.translucent) {
+        if (this.translucent && Utils.SDK_VERSION < 26) {
+            // before iOS 26 there are no glass buttons: the buttons float over the page, without a full width bar
+            const appearance = UIToolbarAppearance.new();
+            appearance.configureWithTransparentBackground();
+            toolbar.standardAppearance = appearance;
+            toolbar.scrollEdgeAppearance = appearance;
+            toolbar.compactAppearance = appearance;
+        } else if (this.translucent) {
             const appearance = UIToolbarAppearance.new();
             appearance.configureWithDefaultBackground();
             appearance.backgroundEffect = UIBlurEffect.effectWithStyle(UIBlurEffectStyle.SystemThinMaterial);
@@ -535,6 +615,66 @@ export class AppBar extends AppBarBase {
         target.requestLayout();
     }
 
+    /**
+     * On a pushed page UIKit takes the collapse of the large title from the offset of the scroll view, compared to the inset it expects.
+     * At the first layout the inset is the one of a large bar without subtitle: with a subtitle the bar is taller, the offset then looks scrolled and the title collapses
+     * for the whole push (it comes back at the end). The content is pulled above its top before UIKit reads it, and put back at the exact top with the final inset.
+     * Only for a bar with a subtitle: without it the first inset is the right one.
+     */
+    private keepLargeTitle(target: View, scrollView: UIScrollView, viewController: UIViewController) {
+        if (this.size === 'small' || !this.subtitle || target['_appBarLargeTitleKept']) {
+            return;
+        }
+        // pushed from a large bar with a subtitle: the first inset is the one of that bar, not too small
+        const controllers = viewController.navigationController.viewControllers;
+        const previous = controllers.objectAtIndex(controllers.indexOfObject(viewController) - 1).navigationItem;
+        if (previous.largeTitleDisplayMode !== UINavigationItemLargeTitleDisplayMode.Never && previous.subtitle) {
+            return;
+        }
+        target['_appBarLargeTitleKept'] = true;
+        const page = this.page;
+        const watch = () => {
+            let inset = scrollView.adjustedContentInset.top;
+            let state: 'watching' | 'pulled' | 'done' = 'watching';
+            let moving = false;
+            const moveTo = (offset: number) => {
+                moving = true;
+                scrollView.setContentOffsetAnimated(CGPointMake(scrollView.contentOffset.x, offset), false);
+                moving = false;
+            };
+            const observer = OffsetObserver.initWithCallback(() => {
+                if (moving) {
+                    return;
+                }
+                const previousInset = inset;
+                inset = scrollView.adjustedContentInset.top;
+                if (state === 'watching' && Math.abs(scrollView.contentOffset.y + inset) < 1 && !scrollView.dragging) {
+                    state = 'pulled';
+                    moveTo(-inset - LARGE_SUBTITLE_EXTRA_INSET);
+                } else if (state === 'pulled' && inset > previousInset) {
+                    // the final inset: the exact top
+                    state = 'done';
+                    moveTo(-inset);
+                }
+            });
+            (scrollView as any).addObserverForKeyPathOptionsContext(observer, 'contentOffset', 0, null);
+            // end of the push: the bar has its final size
+            page.once('navigatedTo', () => {
+                (scrollView as any).removeObserverForKeyPath(observer, 'contentOffset');
+                if (scrollView.contentOffset.y + scrollView.adjustedContentInset.top < 0 && !scrollView.dragging) {
+                    moveTo(-scrollView.adjustedContentInset.top);
+                }
+            });
+        };
+        const onLayout = () => {
+            if (scrollView.window) {
+                target.off('layoutChanged', onLayout);
+                watch();
+            }
+        };
+        target.on('layoutChanged', onLayout);
+    }
+
     private applyScrollTarget(viewController: UIViewController) {
         const target = this.getScrollTarget();
         if (!target) {
@@ -548,6 +688,9 @@ export class AppBar extends AppBarBase {
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
             this.observeInlineTitle(target);
             this.pinScrollTarget(target, scrollView, viewController);
+            if (viewController.navigationController?.viewControllers.indexOfObject(viewController) > 0) {
+                this.keepLargeTitle(target, scrollView, viewController);
+            }
         } else if (!this._scrollTargetLoadedHandler) {
             // not created yet
             this._scrollTargetLoadedHandler = () => {
