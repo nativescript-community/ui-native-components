@@ -19,6 +19,20 @@ export const scrollBehaviorProperty = new Property<AppBarBase, AppBarScrollBehav
 /** iOS: `leading` aligns the inline title of a small bar to the left (navigation item style `browser`), `center` is the system default. Android: the title of a small bar is always at the start */
 export type AppBarTitleAlignment = 'center' | 'leading';
 export const titleAlignmentProperty = new Property<AppBarBase, AppBarTitleAlignment>({ name: 'titleAlignment', defaultValue: 'center', valueChanged: changed });
+/**
+ * Duration in ms of the cross dissolve (iOS) / fade (Android) of the title, the subtitle and the buttons when their text, color or font change while the bar is shown.
+ * 0 (default): the change is immediate
+ */
+export const transitionDurationProperty = new Property<AppBarBase, number>({ name: 'transitionDuration', defaultValue: 0, valueConverter: (v: any) => Number(v) || 0 });
+/** the font of the title (the inline and the large / expanded one) and of the subtitle: they win over the css font of the bar */
+export type AppBarFontWeight = '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | 'normal' | 'bold' | number;
+const fontSizeConverter = (v: any) => (v === null || v === undefined || v === '' ? undefined : Number(v) || undefined);
+export const titleFontFamilyProperty = new Property<AppBarBase, string>({ name: 'titleFontFamily', valueChanged: changed });
+export const titleFontSizeProperty = new Property<AppBarBase, number>({ name: 'titleFontSize', valueConverter: fontSizeConverter, valueChanged: changed });
+export const titleFontWeightProperty = new Property<AppBarBase, AppBarFontWeight>({ name: 'titleFontWeight', valueChanged: changed });
+export const subtitleFontFamilyProperty = new Property<AppBarBase, string>({ name: 'subtitleFontFamily', valueChanged: changed });
+export const subtitleFontSizeProperty = new Property<AppBarBase, number>({ name: 'subtitleFontSize', valueConverter: fontSizeConverter, valueChanged: changed });
+export const subtitleFontWeightProperty = new Property<AppBarBase, AppBarFontWeight>({ name: 'subtitleFontWeight', valueChanged: changed });
 export const subtitleProperty = new Property<AppBarBase, string>({ name: 'subtitle', valueChanged: changed });
 export const formattedTitleProperty = new Property<AppBarBase, FormattedString | object>({ name: 'formattedTitle', valueChanged: changed });
 export const translucentProperty = new Property<AppBarBase, boolean>({ name: 'translucent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: changed });
@@ -232,6 +246,13 @@ export class AppBarBase extends ActionBar {
     scrollBehavior: AppBarScrollBehavior;
     titleAlignment: AppBarTitleAlignment;
     subtitle: string;
+    transitionDuration: number;
+    titleFontFamily: string;
+    titleFontSize: number;
+    titleFontWeight: AppBarFontWeight;
+    subtitleFontFamily: string;
+    subtitleFontSize: number;
+    subtitleFontWeight: AppBarFontWeight;
     /** the title with spans (needs `@nativescript-community/text` for the full support) */
     /** spans, or a native rich text (`createNativeAttributedString`) used as is */
     formattedTitle: FormattedString | object;
@@ -259,6 +280,13 @@ export class AppBarBase extends ActionBar {
 sizeProperty.register(AppBarBase);
 scrollBehaviorProperty.register(AppBarBase);
 subtitleProperty.register(AppBarBase);
+transitionDurationProperty.register(AppBarBase);
+titleFontFamilyProperty.register(AppBarBase);
+titleFontSizeProperty.register(AppBarBase);
+titleFontWeightProperty.register(AppBarBase);
+subtitleFontFamilyProperty.register(AppBarBase);
+subtitleFontSizeProperty.register(AppBarBase);
+subtitleFontWeightProperty.register(AppBarBase);
 titleAlignmentProperty.register(AppBarBase);
 formattedTitleProperty.register(AppBarBase);
 translucentProperty.register(AppBarBase);

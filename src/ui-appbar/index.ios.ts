@@ -1,10 +1,12 @@
 import { Color, GridLayout, ItemSpec, Page, Utils, View } from '@nativescript/core';
 import { colorProperty } from '@nativescript/core/ui/styling/style-properties';
+import { Font } from '@nativescript/core/ui/styling/font';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu';
 import {
     AppBarBase,
     AppBarBottomItem,
+    AppBarFontWeight,
     AppBarBottomView,
     AppBarItem,
     AppBarScrollBehavior,
@@ -16,6 +18,11 @@ import {
     notifyBottomItemTap
 } from './index-common';
 export { AppBarBottomItem, AppBarBottomView, AppBarItem, AppBarScrollBehavior, AppBarSearchField, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppPageSearchContent };
+
+/** the font of a title: the system font where the family is not set, the default size where the size is not set */
+function createFont(family: string, size: number, weight: AppBarFontWeight, defaultSize: number) {
+    return new Font(family, size, undefined, weight as any).getUIFont(UIFont.systemFontOfSize(defaultSize));
+}
 
 function findScrollView(view: View): UIScrollView {
     const native = view?.nativeViewProtected;
@@ -160,17 +167,54 @@ export class AppBar extends AppBarBase {
     private _searchController: UISearchController;
     private _searchDelegate: SearchDelegate;
 
+    /** what is drawn by the bar: when it changes while the bar is shown, the change cross dissolves */
+    private _appearanceKey: string;
+    private getAppearanceKey() {
+        return JSON.stringify([
+            String(this.color),
+            this.title,
+            this.subtitle,
+            this.titleFontFamily,
+            this.titleFontSize,
+            this.titleFontWeight,
+            this.subtitleFontFamily,
+            this.subtitleFontSize,
+            this.subtitleFontWeight
+        ]);
+    }
+    private applyWithTransition(apply: () => void, force = false) {
+        const navigationBar = (this as any).navBar as UINavigationBar;
+        const key = this.getAppearanceKey();
+        const changed = force || (this._appearanceKey !== undefined && this._appearanceKey !== key);
+        this._appearanceKey = key;
+        if (changed && this.transitionDuration > 0 && navigationBar?.window) {
+            UIView.transitionWithViewDurationOptionsAnimationsCompletion(
+                navigationBar,
+                this.transitionDuration / 1000,
+                UIViewAnimationOptions.TransitionCrossDissolve | UIViewAnimationOptions.AllowUserInteraction,
+                apply,
+                null
+            );
+        } else {
+            apply();
+        }
+    }
+
     update() {
-        super.update();
-        this.applyAppBar();
+        this.applyWithTransition(() => {
+            super.update();
+            this.applyAppBar();
+        });
     }
 
     // @ts-ignore
     [colorProperty.setNative](color: Color) {
-        // @ts-ignore
-        super[colorProperty.setNative](color);
-        // the title colors of the page are in its own appearance, not only in the one of the navigation bar
-        this.applyAppBar();
+        this.applyWithTransition(() => {
+            // @ts-ignore
+            super[colorProperty.setNative](color);
+            // the title colors of the page are in its own appearance, not only in the one of the navigation bar
+            this.applyAppBar();
+        }, true);
     }
 
     focusSearch() {
@@ -255,6 +299,19 @@ export class AppBar extends AppBarBase {
                 appearance.titleTextAttributes = attributes as any;
             }
         }
+        // the font props of the title: the inline and the large title (the size of the large one defaults to the system one)
+        if (this.titleFontFamily || this.titleFontSize || this.titleFontWeight) {
+            const inline = createFont(this.titleFontFamily, this.titleFontSize, this.titleFontWeight, 17);
+            const large = createFont(this.titleFontFamily, this.titleFontSize, this.titleFontWeight, 34);
+            for (const appearance of [standard, edge]) {
+                const attributes = NSMutableDictionary.dictionaryWithDictionary((appearance.titleTextAttributes ?? NSDictionary.new()) as any);
+                attributes.setObjectForKey(inline, NSFontAttributeName);
+                appearance.titleTextAttributes = attributes as any;
+                const largeAttributes = NSMutableDictionary.dictionaryWithDictionary((appearance.largeTitleTextAttributes ?? NSDictionary.new()) as any);
+                largeAttributes.setObjectForKey(large, NSFontAttributeName);
+                appearance.largeTitleTextAttributes = largeAttributes as any;
+            }
+        }
         // the color of the bar for the title: the one of the navigation bar is only updated after this, the title would follow one change late
         if (this.color) {
             const titleColor = (this.color instanceof Color ? this.color : new Color(this.color as any)).ios;
@@ -269,8 +326,8 @@ export class AppBar extends AppBarBase {
             const attributes = appearance.titleTextAttributes;
             if (attributes) {
                 const color = attributes.objectForKey(NSForegroundColorAttributeName);
-                // the subtitle has the color of the title but not its font: the css font of the bar is the one of the title
-                const subtitleAttributes: Record<string, unknown> = { [NSFontAttributeName]: UIFont.systemFontOfSize(17) };
+                // the subtitle has the color of the title but not its font: the css font of the bar is the one of the title, the font props are its own
+                const subtitleAttributes: Record<string, unknown> = { [NSFontAttributeName]: createFont(this.subtitleFontFamily, this.subtitleFontSize, this.subtitleFontWeight, 17) };
                 if (color) {
                     subtitleAttributes[NSForegroundColorAttributeName] = color;
                 }
