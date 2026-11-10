@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/nativescript-community/ui-native-components/compare/v1.5.2...v1.6.0) (2026-11-10)
+
+### Features
+
+* **ui-appbar:** add transitionDuration and the font props of the title and the subtitle ([af12f0e](https://github.com/nativescript-community/ui-native-components/commit/af12f0eb05e41cda766dc66b56c3d5cb2e99067f))
+
+### Bug Fixes
+
+* **ui-appbar:** do not copy the css font of the bar to the subtitle on iOS ([f84abed](https://github.com/nativescript-community/ui-native-components/commit/f84abed1aea6116d4fa2beb20ca18c2ffb36b317))
+* **ui-appbar:** do not pull the content of a pushed page before iOS 26 ([0f5454e](https://github.com/nativescript-community/ui-native-components/commit/0f5454efeef7abac0d926f5f620bbdc4db4e011d))
+* **ui-appbar:** hide the empty bottom toolbar and float its buttons before iOS 26 ([d6fee6c](https://github.com/nativescript-community/ui-native-components/commit/d6fee6c705272c5ae9fe373f721a45d9cd71163b))
+* **ui-appbar:** keep the large title of a pushed page with a subtitle on iOS ([ca21b23](https://github.com/nativescript-community/ui-native-components/commit/ca21b23663dbc54d7d85ae0a0529f9b2043f3b85))
+* **ui-appbar:** show the bottom buttons as capsules before iOS 26 ([b31fa7c](https://github.com/nativescript-community/ui-native-components/commit/b31fa7cbd4b528d8297f3818f835477372ffa766))
+* **ui-appbar:** update the title colors of the page when the color changes on iOS ([d8b2066](https://github.com/nativescript-community/ui-native-components/commit/d8b2066694e7b9e2a4f4b3ae1bf192d60611f4ae))
+
 ## [1.5.2](https://github.com/nativescript-community/ui-native-components/compare/v1.5.1...v1.5.2) (2026-11-06)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/nativescript-community/ui-material-components/compare/v1.5.2...v1.6.0) (2026-11-10)
+
+### Features
+
+* **ui-appbar:** add transitionDuration and the font props of the title and the subtitle ([af12f0e](https://github.com/nativescript-community/ui-material-components/commit/af12f0eb05e41cda766dc66b56c3d5cb2e99067f))
+
 ## [1.5.2](https://github.com/nativescript-community/ui-material-components/compare/v1.5.1...v1.5.2) (2026-11-06)
 
 **Note:** Version bump only for package @nativescript-community/ui-appbar

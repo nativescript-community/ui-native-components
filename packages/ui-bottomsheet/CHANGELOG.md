@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/nativescript-community/ui-native-components/compare/v1.5.2...v1.6.0) (2026-11-10)
+
+**Note:** Version bump only for package @nativescript-community/ui-bottomsheet
+
 ## [1.5.2](https://github.com/nativescript-community/ui-native-components/compare/v1.5.1...v1.5.2) (2026-11-06)
 
 **Note:** Version bump only for package @nativescript-community/ui-bottomsheet
