@@ -622,7 +622,8 @@ export class AppBar extends AppBarBase {
      * Only for a bar with a subtitle: without it the first inset is the right one.
      */
     private keepLargeTitle(target: View, scrollView: UIScrollView, viewController: UIViewController) {
-        if (this.size === 'small' || !this.subtitle || target['_appBarLargeTitleKept']) {
+        // before iOS 26 the bar has no subtitle: its first inset is the right one, pulling the content would only move it down until the end of the push
+        if (this.size === 'small' || !this.subtitle || !viewController.navigationItem.respondsToSelector('setSubtitle:') || target['_appBarLargeTitleKept']) {
             return;
         }
         // pushed from a large bar with a subtitle: the first inset is the one of that bar, not too small
