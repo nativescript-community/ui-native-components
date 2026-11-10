@@ -7,8 +7,8 @@
 
 import { ActionBar, Color, ActionItem, ContentView, FormattedString, GridLayout, Page, View } from '@nativescript/core';
 import { MenuItem } from '@nativescript-community/ui-menu';
-import { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment } from './index-common';
-export { AppBarBottomBarStyle, AppBarBottomItem, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment };
+import { AppBarBottomBarStyle, AppBarBottomItem, AppBarFontWeight, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment } from './index-common';
+export { AppBarBottomBarStyle, AppBarBottomItem, AppBarFontWeight, AppBarScrollBehavior, AppBarSearchMode, AppBarSearchPlacement, AppBarSize, AppBarTitleAlignment };
 
 /**
  * An ActionBar with scroll behaviors. Use it as the `actionBar` of an `AppPage` (Android needs the AppPage: it hosts the AppBarLayout).
@@ -20,6 +20,16 @@ export class AppBar extends ActionBar {
     scrollBehavior: AppBarScrollBehavior;
     /** iOS 26 and Android */
     subtitle: string;
+    /** duration in ms of the cross dissolve (iOS) / fade (Android) of the title, the subtitle and the buttons when their text, color or font change while the bar is shown. 0 (default): immediate */
+    transitionDuration: number;
+    /** the font of the title (inline and large / expanded): wins over the css font of the bar */
+    titleFontFamily: string;
+    titleFontSize: number;
+    titleFontWeight: AppBarFontWeight;
+    /** the font of the subtitle */
+    subtitleFontFamily: string;
+    subtitleFontSize: number;
+    subtitleFontWeight: AppBarFontWeight;
     /** the title with spans */
     /** spans, or a native rich text (`createNativeAttributedString`) used as is */
     formattedTitle: FormattedString | object;

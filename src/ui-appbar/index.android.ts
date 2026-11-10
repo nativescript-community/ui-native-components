@@ -1,9 +1,11 @@
 import { ActionBar, Application, Color, ContentView, EventData, FormattedString, ImageSource, Page, TextField, Utils, View, colorProperty } from '@nativescript/core';
+import { Font } from '@nativescript/core/ui/styling/font';
 import { createNativeFormattedText } from '@nativescript-community/ui-core/formatted-text';
 import { getNativeIcon, showMenu } from '@nativescript-community/ui-menu';
 import {
     AppBarBase,
     AppBarBottomItem,
+    AppBarFontWeight,
     AppBarBottomView,
     AppBarItem,
     AppBarScrollBehavior,
@@ -120,6 +122,11 @@ function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.
  * Android: a Material Toolbar. In an `AppPage` it lives in an `AppBarLayout`: `size` medium / large use a M3 `CollapsingToolbarLayout`,
  * `scrollBehavior` the scroll flags / lift on scroll of the AppBarLayout.
  */
+/** the typeface of a title font prop, null when none is set */
+function createTypeface(family: string, size: number, weight: AppBarFontWeight) {
+    return family || weight ? new Font(family, size, undefined, weight as any).getAndroidTypeface() : null;
+}
+
 export class AppBar extends AppBarBase {
     // a Material 3 toolbar: tinted navigation icon, centered title...
     createNativeView() {
@@ -244,22 +251,56 @@ export class AppBar extends AppBarBase {
         }
     }
 
-    // the color of the bar changes with the theme: the icons (also of the search bar) follow it
-    [colorProperty.setNative](value) {
-        // @ts-ignore
-        super[colorProperty.setNative](value);
-        if (this.nativeViewProtected) {
-            this.applyTints();
-            this.update();
+    /** what is drawn by the bar: when it changes while the bar is shown, the new one fades in */
+    private _appearanceKey: string;
+    private getAppearanceKey() {
+        return JSON.stringify([
+            String(this.color),
+            this.title,
+            this.subtitle,
+            this.titleFontFamily,
+            this.titleFontSize,
+            this.titleFontWeight,
+            this.subtitleFontFamily,
+            this.subtitleFontSize,
+            this.subtitleFontWeight
+        ]);
+    }
+    private applyWithTransition(apply: () => void, force = false) {
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        const key = this.getAppearanceKey();
+        const changed = force || (this._appearanceKey !== undefined && this._appearanceKey !== key);
+        this._appearanceKey = key;
+        if (changed && this.transitionDuration > 0 && toolbar?.isAttachedToWindow()) {
+            toolbar.animate().cancel();
+            apply();
+            toolbar.setAlpha(0);
+            toolbar.animate().alpha(1).setDuration(this.transitionDuration).start();
+        } else {
+            apply();
         }
     }
 
+    // the color of the bar changes with the theme: the icons (also of the search bar) follow it
+    [colorProperty.setNative](value) {
+        this.applyWithTransition(() => {
+            // @ts-ignore
+            super[colorProperty.setNative](value);
+            if (this.nativeViewProtected) {
+                this.applyTints();
+                this.update();
+            }
+        }, true);
+    }
+
     update() {
-        super.update();
-        const page = this.page;
-        if (page instanceof AppPage) {
-            page.syncAppBar();
-        }
+        this.applyWithTransition(() => {
+            super.update();
+            const page = this.page;
+            if (page instanceof AppPage) {
+                page.syncAppBar();
+            }
+        });
     }
 
     /** the toolbar is hidden while the SearchBar hosts the actions: the menu opens under the SearchBar */
@@ -384,6 +425,7 @@ export class AppBar extends AppBarBase {
         if (this.titleView || (!this.formattedTitle && !this.subtitle && !collapsing)) {
             // @ts-ignore
             super._updateTitleAndTitleView();
+            this.applyTitleFonts();
             return;
         }
         const title: any = this.formattedTitle ? createNativeFormattedText(this.formattedTitle) : this.title;
@@ -398,6 +440,57 @@ export class AppBar extends AppBarBase {
         } else {
             toolbar.setTitle(title ?? null);
             toolbar.setSubtitle(this.subtitle ?? null);
+        }
+        this.applyTitleFonts();
+    }
+
+    /** the font props: the title and the subtitle of the toolbar, or the ones of the CollapsingToolbarLayout (collapsed and expanded) */
+    private applyTitleFonts() {
+        const hasTitleFont = this.titleFontFamily || this.titleFontSize || this.titleFontWeight;
+        const hasSubtitleFont = this.subtitleFontFamily || this.subtitleFontSize || this.subtitleFontWeight;
+        if (!hasTitleFont && !hasSubtitleFont) {
+            return;
+        }
+        const titleTypeface = createTypeface(this.titleFontFamily, this.titleFontSize, this.titleFontWeight);
+        const subtitleTypeface = createTypeface(this.subtitleFontFamily, this.subtitleFontSize, this.subtitleFontWeight);
+        const page = this.page;
+        const collapsing: any = page instanceof AppPage ? page.collapsingLayout : null;
+        if (collapsing) {
+            if (titleTypeface) {
+                collapsing.setCollapsedTitleTypeface(titleTypeface);
+                collapsing.setExpandedTitleTypeface(titleTypeface);
+            }
+            if (this.titleFontSize) {
+                collapsing.setCollapsedTitleTextSize(Utils.layout.toDevicePixels(this.titleFontSize));
+                collapsing.setExpandedTitleTextSize(Utils.layout.toDevicePixels(this.titleFontSize));
+            }
+            if (subtitleTypeface) {
+                collapsing.setCollapsedSubtitleTypeface?.(subtitleTypeface);
+                collapsing.setExpandedSubtitleTypeface?.(subtitleTypeface);
+            }
+            if (this.subtitleFontSize) {
+                collapsing.setCollapsedSubtitleTextSize?.(Utils.layout.toDevicePixels(this.subtitleFontSize));
+                collapsing.setExpandedSubtitleTextSize?.(Utils.layout.toDevicePixels(this.subtitleFontSize));
+            }
+            return;
+        }
+        // the title and the subtitle are the text views the toolbar created: the first one is the title
+        const toolbar = this.nativeViewProtected as androidx.appcompat.widget.Toolbar;
+        const subtitle = this.subtitle ? String(this.subtitle) : null;
+        for (let index = 0; index < toolbar.getChildCount(); index++) {
+            const child = toolbar.getChildAt(index);
+            if (!(child instanceof android.widget.TextView)) {
+                continue;
+            }
+            const isSubtitle = !!subtitle && child.getText()?.toString() === subtitle;
+            const typeface = isSubtitle ? subtitleTypeface : titleTypeface;
+            const size = isSubtitle ? this.subtitleFontSize : this.titleFontSize;
+            if (typeface) {
+                child.setTypeface(typeface);
+            }
+            if (size) {
+                child.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, size);
+            }
         }
     }
 }
