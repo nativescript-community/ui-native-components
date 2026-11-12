@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/nativescript-community/ui-native-components/compare/v1.6.0...v1.6.1) (2026-11-12)
+
+**Note:** Version bump only for package @nativescript-community/ui-switch
+
 ## [1.6.0](https://github.com/nativescript-community/ui-native-components/compare/v1.5.2...v1.6.0) (2026-11-10)
 
 **Note:** Version bump only for package @nativescript-community/ui-switch
