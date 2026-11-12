@@ -6,8 +6,8 @@ import { createNativeMenu, getNativeIcon } from '@nativescript-community/ui-menu
 import {
     AppBarBase,
     AppBarBottomItem,
-    AppBarFontWeight,
     AppBarBottomView,
+    AppBarFontWeight,
     AppBarItem,
     AppBarScrollBehavior,
     AppBarSearchField,
@@ -620,6 +620,7 @@ export class AppBar extends AppBarBase {
             }
             frozen = true;
             scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
+            //@ts-expect-error missing typing
             scrollView.contentInset = UIEdgeInsetsMake(saved.top, 0, saved.bottom, 0);
             scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, -saved.top);
         });
@@ -629,6 +630,7 @@ export class AppBar extends AppBarBase {
             }
             frozen = false;
             saved = null;
+            //@ts-expect-error missing typing
             scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
             scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Automatic;
             scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top);

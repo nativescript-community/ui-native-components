@@ -101,6 +101,9 @@ Register the svelte elements once (`registerElement` of svelte-native): `import 
 | `size` | `small` (default), `medium`, `large`: title that collapses with the scroll |
 | `scrollBehavior` (Android notes: the surface of the bar is the AppBarLayout, the toolbar is flat and transparent; the icons follow the css `color`, the surface the css `background-color`, else the theme colors; `lift` changes the surface color and the status bar area follows) | `none`, `lift` (elevation / separator only when content scrolls under the bar), `hide` (the whole bar, also a large one, leaves the screen when scrolling down and comes back when scrolling up) |
 | `subtitle`, `formattedTitle` | subtitle, title with spans |
+| `transitionDuration` | duration in ms of the cross dissolve (iOS) / fade (Android) of the title, the subtitle and the buttons when their text, color or font change while the bar is shown. 0 (default): the change is immediate |
+| `titleFontFamily`, `titleFontSize`, `titleFontWeight` | the font of the title, inline and large / expanded (the css font of the bar is the fallback on iOS) |
+| `subtitleFontFamily`, `subtitleFontSize`, `subtitleFontWeight` | the font of the subtitle |
 | `translucent` | the content scrolls under the bar, which is see through: iOS a blur tinted with the color of the bar, Android the color of the bar at 85%. Set `scrollTarget`; the scrolling view must be the content of the page (iOS) |
 | `searchable`, `searchHint` | search: iOS `UISearchController` under the title, Android a collapsible `SearchView` action. Events `searchChange`, `searchSubmit`, `searchCancel` (`text`) |
 | `searchMode` | Android: `collapsible` (default, a search icon in the bar) `bar` (Material 3 `SearchBar` under the title which opens a full screen `SearchView`; its suggestions / results go in `<appPageSearchContent>`, a child of the page) or `inline` (Material 3 `SearchBar` that morphs into an editable field in place: filter your content from `searchChange`, no full screen view; without a `title` the bar hosts the navigation icon and the actions, `closeSearch()` closes it) |
@@ -115,7 +118,7 @@ On Android the bar draws under the status bar (edge to edge) and the page handle
 
 ## Items
 
-`<appBarItem>` is the core `ActionItem` with `menu` (items of `@nativescript-community/ui-menu`: iOS native menu of the bar button, Android popup menu) and `prominent` (iOS 26 tinted glass).
+`<appBarItem>` is the core `ActionItem` with `menu` (items of `@nativescript-community/ui-menu`: iOS native menu of the bar button, Android popup menu) `prominent` (iOS 26 tinted glass, filled with the tint) and `isEnabled` (`false` greys the action out and ignores the taps, can change at runtime).
 
 ```svelte
 <appBar title="Inbox">
@@ -156,7 +159,7 @@ On iOS 26 the system puts it in a Liquid Glass capsule, use a plain / text varia
 
 ## Bottom items
 
-`bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, color, onTap }`, event `bottomItemTap`; `color` tints the button (icon and text) on both platforms, e.g. the error color for a delete action; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
+`bottomBarStyle` (Android: `floating`, the default, a Material 3 Expressive floating toolbar over the content, or `bottomAppBar`; iOS ignores it) and `bottomItems` (`{ text, icon, spacer, menu, color, prominent, enabled, onTap }`, event `bottomItemTap`; `color` tints the button (icon and text) on both platforms, e.g. the error color for a delete action; `prominent` is the iOS 26 tinted glass button; `enabled: false` greys the button out and ignores the taps; `menu` makes the button open a menu: iOS native, Android popup above the bar): iOS the bottom toolbar of the navigation controller (Liquid Glass buttons on iOS 26, `spacer` is a flexible space), Android a Material `BottomAppBar` (with `scrollBehavior="hide"` it hides on scroll; the actions are at the start, `spacer` is ignored).
 The last items of the `scrollTarget` stay above the Android bar. The icons of the Android bars take the color of the bar (`color` css, else the theme `colorOnSurface`) and follow a dark / light switch.
 
 ```svelte
@@ -169,6 +172,8 @@ The last items of the `scrollTarget` stay above the Android bar. The icons of th
 ## Custom views (Android)
 
 `<appBarSearchField>` (`searchField`) replaces the built-in text field of the `inline` search by any NativeScript `TextField` (core, or `@nativescript-community/ui-textfield`). The bar puts it between the back and the clear buttons and keeps `searchChange`, `searchSubmit`, the clear button and the keyboard working with it.
+Android: `bottomBarBackgroundColor` (the container) and `bottomBarColor` (the default color of the items, an item `color` wins) fit the bottom bar to a dark screen in a light theme; default is the theme.
+
 `<appBarBottomView>` (`bottomView`) puts any view in the `floating` bottom toolbar instead of the `bottomItems` buttons (`bottomItems` stay the default; the `bottomAppBar` style ignores `bottomView`). Both are ignored on iOS.
 
 ```svelte

@@ -100,6 +100,7 @@ const remove = setContextMenu(label, { items, onSelect: (item) => {} });
 ## API
 
 Menu items: `id`, `title`, `subtitle`, `icon` (resource, file, `sys://`, an ImageSource or a FormattedString), `checked`, `destructive`, `disabled`, `items` (submenu), `separator`, `onSelect`.
+`trailingAction` (`{ icon, title, onSelect }`) adds a secondary action to an item. Android: an icon button at the end of the row (`title` is its content description); tapping it closes the menu and calls its `onSelect`, not the one of the item, and `showMenu` resolves with `undefined`. iOS: a `UIMenu` can not host a trailing control, so the action becomes a separate entry placed right after the item, with the same icon and `title`.
 `showMenu` resolves with the selected item, or `undefined` when dismissed. `placement`: `horizontal` `start`/`center`/`end`, `vertical` `auto`/`above`/`below`.
 
 
