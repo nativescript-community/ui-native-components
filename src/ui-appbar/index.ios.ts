@@ -321,19 +321,24 @@ export class AppBar extends AppBarBase {
                 appearance.titleTextAttributes = attributes as any;
             }
         }
-        // iOS 26: the subtitle and the large title have their own text attributes: same as the title
+        // iOS 26: the subtitle and the large title have their own text attributes
         for (const appearance of [standard, edge]) {
             const attributes = appearance.titleTextAttributes;
             if (attributes) {
                 const color = attributes.objectForKey(NSForegroundColorAttributeName);
-                // the subtitle has the color of the title but not its font: the css font of the bar is the one of the title, the font props are its own
-                const subtitleAttributes: Record<string, unknown> = { [NSFontAttributeName]: createFont(this.subtitleFontFamily, this.subtitleFontSize, this.subtitleFontWeight, 17) };
+                // the subtitle and the large subtitle keep the system font (size, weight) with the color of the title, unless the font props are set
+                const subtitleAttributes: Record<string, unknown> = {};
+                if (this.subtitleFontFamily || this.subtitleFontSize || this.subtitleFontWeight) {
+                    subtitleAttributes[NSFontAttributeName] = createFont(this.subtitleFontFamily, this.subtitleFontSize, this.subtitleFontWeight, 17);
+                }
                 if (color) {
                     subtitleAttributes[NSForegroundColorAttributeName] = color;
                 }
-                for (const key of ['subtitleTextAttributes', 'largeSubtitleTextAttributes']) {
-                    if (key in (appearance as any)) {
-                        (appearance as any)[key] = subtitleAttributes;
+                if (Object.keys(subtitleAttributes).length) {
+                    for (const key of ['subtitleTextAttributes', 'largeSubtitleTextAttributes']) {
+                        if (key in (appearance as any)) {
+                            (appearance as any)[key] = subtitleAttributes;
+                        }
                     }
                 }
                 // the large title has the color of the title
@@ -594,6 +599,42 @@ export class AppBar extends AppBarBase {
         (this.page.ios as UIViewController).definesPresentationContext = true;
     }
 
+    /**
+     * Coming back to a page after a page without bar was over it, UIKit lays the bar out from the inset it sees: with an automatic inset it shrinks while the page appears,
+     * and the large title collapses. While the page comes back the inset is a fixed one, the one the page had when it was left; the automatic inset is back once it is shown.
+     */
+    private freezeInsetOnReturn(target: View, scrollView: UIScrollView) {
+        const page = this.page;
+        if (target['_appBarInsetFrozen'] || !page) {
+            return;
+        }
+        target['_appBarInsetFrozen'] = true;
+        let saved: { top: number; bottom: number } = null;
+        let frozen = false;
+        page.on('navigatingFrom', () => {
+            saved = { top: scrollView.adjustedContentInset.top, bottom: scrollView.adjustedContentInset.bottom };
+        });
+        page.on('navigatingTo', () => {
+            if (!saved) {
+                return;
+            }
+            frozen = true;
+            scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
+            scrollView.contentInset = UIEdgeInsetsMake(saved.top, 0, saved.bottom, 0);
+            scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, -saved.top);
+        });
+        page.on('navigatedTo', () => {
+            if (!frozen) {
+                return;
+            }
+            frozen = false;
+            saved = null;
+            scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+            scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Automatic;
+            scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top);
+        });
+    }
+
     private _inlineTitleTarget: View;
     private _inlineTitleListener: () => void;
     private _inlineTitleShown = false;
@@ -764,6 +805,9 @@ export class AppBar extends AppBarBase {
             (viewController as any).setContentScrollViewForEdge(scrollView, NSDirectionalRectEdge.Bottom);
             this.observeInlineTitle(target);
             this.pinScrollTarget(target, scrollView, viewController);
+            if (this.size !== 'small') {
+                this.freezeInsetOnReturn(target, scrollView);
+            }
             if (viewController.navigationController?.viewControllers.indexOfObject(viewController) > 0) {
                 this.keepLargeTitle(target, scrollView, viewController);
             }
