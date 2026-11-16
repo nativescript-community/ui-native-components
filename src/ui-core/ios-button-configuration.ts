@@ -117,8 +117,13 @@ function buildConfiguration(state: ButtonConfigurationState) {
     configuration.showsActivityIndicator = !!state.busy;
     const font = state.font;
     if (font) {
-        // the configuration applies its own font over the attributed title: it can only be changed through the transformer
+        // the configuration applies its own font over the attributed title: it can only be changed through the transformer.
+        // A run with its own font (an icon span) keeps it: only the default text style font is replaced.
         configuration.titleTextAttributesTransformer = (attributes: NSDictionary<string, any>) => {
+            const runFont = attributes.objectForKey(NSFontAttributeName) as UIFont;
+            if (runFont && !runFont.fontDescriptor.objectForKey('NSCTFontUIUsageAttribute')) {
+                return attributes;
+            }
             const result = NSMutableDictionary.dictionaryWithDictionary(attributes);
             result.setObjectForKey(font, NSFontAttributeName);
             return result;
