@@ -284,7 +284,13 @@ export function overrideViewBase() {
             if (!this.rippleDrawable) {
                 this.rippleDrawable = createRippleDrawable(this.getRippleColor(), topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
                 if (isPostMarshmallow) {
-                    view.setForeground(this.rippleDrawable);
+                    // the core shares the foreground with the border it draws over the children
+                    if (typeof (this as any)._updateForeground === 'function') {
+                        (view as any)._rippleForeground = this.rippleDrawable;
+                        (this as any)._updateForeground();
+                    } else {
+                        view.setForeground(this.rippleDrawable);
+                    }
                 }
             }
         }
