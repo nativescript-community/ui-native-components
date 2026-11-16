@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.2](https://github.com/nativescript-community/ui-native-components/compare/v1.6.1...v1.6.2) (2026-11-16)
+
+### Bug Fixes
+
+* **ui-core:** keep the font of an attributed title run on ios button configurations ([a9e5bb6](https://github.com/nativescript-community/ui-native-components/commit/a9e5bb6ee5097cee815d143ace5481d77c495192))
+* **ui-core:** keep the ripple together with the border foreground on android ([e3ab7f7](https://github.com/nativescript-community/ui-native-components/commit/e3ab7f702f11625440645a54a1b8076602659be2))
+
 ## [1.6.1](https://github.com/nativescript-community/ui-native-components/compare/v1.6.0...v1.6.1) (2026-11-12)
 
 ### Bug Fixes
