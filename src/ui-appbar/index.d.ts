@@ -77,6 +77,10 @@ export class AppBarItem extends ActionItem {
     menu: MenuItem[];
     /** iOS 26: tinted Liquid Glass button */
     prominent: boolean;
+    /** iOS 26: `false` removes the Liquid Glass capsule behind the item (a logo, a view with its own background)
+     * @default true
+     */
+    glass: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot (iOS 26 and Android) */
     badge: string | number | boolean;
     /** `false` greys the action out and ignores the taps. Can change at runtime

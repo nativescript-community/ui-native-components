@@ -241,6 +241,10 @@ export class AppBar extends AppBarBase {
             barButtonItem.enabled = item.isEnabled !== false;
             applyBadge(barButtonItem, item.badge);
         }
+        if (item instanceof AppBarItem && item.glass === false && barButtonItem && 'hidesSharedBackground' in barButtonItem) {
+            // iOS 26
+            (barButtonItem as any).hidesSharedBackground = true;
+        }
         if (item instanceof AppBarItem && item.prominent && barButtonItem && 'style' in barButtonItem) {
             // UIBarButtonItemStylePlain = 0, Done / prominent = 2
             barButtonItem.style = 2 as UIBarButtonItemStyle;

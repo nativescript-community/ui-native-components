@@ -123,6 +123,15 @@ function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.
  * `scrollBehavior` the scroll flags / lift on scroll of the AppBarLayout.
  */
 /** the typeface of a title font prop, null when none is set */
+/** the CollapsingToolbarLayout adds a match parent dummy view to its toolbar to draw its own title: left there it takes all the room of the title */
+function removeCollapsingDummy(toolbar: androidx.appcompat.widget.Toolbar) {
+    for (let index = toolbar.getChildCount() - 1; index >= 0; index--) {
+        if (toolbar.getChildAt(index).getClass().getName() === 'android.view.View') {
+            toolbar.removeViewAt(index);
+        }
+    }
+}
+
 function createTypeface(family: string, size: number, weight: AppBarFontWeight) {
     return family || weight ? new Font(family, size, undefined, weight as any).getAndroidTypeface() : null;
 }
@@ -749,8 +758,10 @@ export class AppPage extends Page {
 
         // 1. the structure
         if (size === 'small') {
+            const hadCollapsing = !!this._collapsing;
             if (this._collapsing) {
                 (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
+                removeCollapsingDummy(toolbar);
                 appBarLayout.removeView(this._collapsing);
                 this._collapsing = null;
                 this._collapsingSize = null;
@@ -759,8 +770,13 @@ export class AppPage extends Page {
                 (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
                 appBarLayout.addView(toolbar, new AppBarLayoutParams(MATCH_PARENT, WRAP_CONTENT));
             }
+            if (hadCollapsing) {
+                // the title was drawn by the collapsing layout: the toolbar takes it back
+                bar.update();
+            }
         } else if (this._collapsingSize !== size || !this._collapsing) {
             (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
+            removeCollapsingDummy(toolbar);
             if (this._collapsing) {
                 appBarLayout.removeView(this._collapsing);
             }
