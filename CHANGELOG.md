@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.4](https://github.com/nativescript-community/ui-native-components/compare/v1.6.3...v1.6.4) (2026-11-18)
+
+### Bug Fixes
+
+* **ui-appbar:** glass item option on iOS 26, remove the collapsing dummy view on Android ([2133996](https://github.com/nativescript-community/ui-native-components/commit/2133996d1b35f315081a7a3a69d920212703edc3))
+
 ## [1.6.3](https://github.com/nativescript-community/ui-native-components/compare/v1.6.2...v1.6.3) (2026-11-16)
 
 **Note:** Version bump only for package @nativescript-community/ui-native-components
