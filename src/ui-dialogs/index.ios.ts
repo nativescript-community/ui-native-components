@@ -57,7 +57,11 @@ class UIViewAutoSize extends UIView {
             return;
         }
         const size = this.frame.size;
-        View.layoutChild(null, view, 0, 0, Utils.layout.toDevicePixels(size.width), Utils.layout.toDevicePixels(size.height));
+        const width = Utils.layout.toDevicePixels(size.width);
+        const height = Utils.layout.toDevicePixels(size.height);
+        // a layout needs a measure first: the content may have been invalidated since the last one
+        View.measureChild(null, view, Utils.layout.makeMeasureSpec(width, Utils.layout.EXACTLY), Utils.layout.makeMeasureSpec(height, Utils.layout.EXACTLY));
+        View.layoutChild(null, view, 0, 0, width, height);
     }
 }
 
@@ -84,6 +88,25 @@ class ContentViewController extends UIViewController {
     }
     viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews();
+        this.updatePreferredContentSize();
+    }
+    // UIKit puts the alert at the origin of its container when a modal presented over it is closed: present it again
+    viewDidAppear(animated: boolean) {
+        super.viewDidAppear(animated);
+        const alertController = this.parentViewController;
+        const presenter = alertController?.presentingViewController;
+        const frame = alertController?.view.frame;
+        if (presenter && frame.origin.x === 0 && frame.origin.y === 0 && frame.size.width < presenter.view.bounds.size.width) {
+            presenter.dismissViewControllerAnimatedCompletion(false, () =>
+                presenter.presentViewControllerAnimatedCompletion(alertController, false, () => {
+                    // the content was laid out for the previous position
+                    this._container?._view?.requestLayout();
+                    this._container?.setNeedsLayout();
+                })
+            );
+        }
+    }
+    updatePreferredContentSize() {
         const container = this._container;
         if (container) {
             const height = container.contentHeightForWidth(this.view.bounds.size.width || ALERT_WIDTH);
@@ -99,6 +122,7 @@ interface AlertController extends UIAlertController {
     clear?: Function;
     _resolveFunction?: Function;
     _contentController?: ContentViewController;
+    _onClear?: Function;
 }
 
 function createAlertController(options: DialogOptions & MDCAlertControlerOptions, resolve?: Function, style = UIAlertControllerStyle.Alert) {
@@ -106,6 +130,9 @@ function createAlertController(options: DialogOptions & MDCAlertControlerOptions
     alertController['isAlertController'] = true;
 
     const clear = (alertController.clear = function clear() {
+        const onClear = alertController._onClear;
+        alertController._onClear = null;
+        onClear?.();
         const index = showingDialogs.indexOf(alertController);
         if (index !== -1) {
             showingDialogs.splice(index, 1);
@@ -232,29 +259,48 @@ export class AlertDialog {
     constructor(private options: any) {}
 
     show(onClosed?) {
+        if (this.waitingFor) {
+            // hide() was waiting for an alert on top: the dialog stays
+            this.waitingFor._onClear = null;
+            this.waitingFor = null;
+            this.hiding = false;
+        }
         if (!this.alertController) {
             this.alertController = createAlertController(this.options, onClosed);
             this.presentingController = showUIAlertController(this.alertController, this.options);
         }
     }
     hiding = false;
+    waitingFor: AlertController;
     async hide(result?) {
-        if (this.presentingController && !this.hiding) {
-            this.hiding = true;
-            return new Promise<void>((resolve) => {
-                this.alertController.dismissViewControllerAnimatedCompletion(true, () => {
-                    if (this.alertController._resolveFunction) {
-                        this.alertController._resolveFunction(result);
-                        this.alertController._resolveFunction = null;
+        const alertController = this.alertController;
+        if (!this.presentingController || this.hiding) {
+            return;
+        }
+        this.hiding = true;
+        const dismiss = () =>
+            new Promise<void>((resolve) => {
+                alertController.dismissViewControllerAnimatedCompletion(true, () => {
+                    if (alertController._resolveFunction) {
+                        alertController._resolveFunction(result);
+                        alertController._resolveFunction = null;
                     }
-                    resolve?.();
-                    this.alertController.clear();
+                    resolve();
+                    alertController.clear();
                     this.presentingController = null;
                     this.alertController = null;
+                    this.waitingFor = null;
                     this.hiding = false;
                 });
             });
+        const onTop = alertController.presentedViewController;
+        if (onTop && !onTop.beingDismissed && onTop['isAlertController']) {
+            // dismissing a controller dismisses what is presented over it: wait for the alert on top to be closed
+            this.waitingFor = onTop as AlertController;
+            this.waitingFor._onClear = dismiss;
+            return;
         }
+        return dismiss();
     }
 }
 
