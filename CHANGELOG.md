@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.5](https://github.com/nativescript-community/ui-native-components/compare/v1.6.4...v1.6.5) (2026-11-18)
+
+### Bug Fixes
+
+* **ui-appbar:** follow the collapse of a lifting bar with the color of the status bar area on android ([e04da1c](https://github.com/nativescript-community/ui-native-components/commit/e04da1cb595b10f0ba2102bb8d1ee0ca26611bb0))
+* **ui-dialogs:** keep an alert laid out and in place on ios when another alert is over it or a modal closes ([d607fca](https://github.com/nativescript-community/ui-native-components/commit/d607fcab2680ccea8261dea2d0bf552eb592624b))
+* **ui-dialogs:** keep the alert out of sight and unghosted when it is shown again at the origin on ios ([b9e4dd5](https://github.com/nativescript-community/ui-native-components/commit/b9e4dd5a4b020eb2007e7f8e0066c9eb1e85fa76))
+
 ## [1.6.4](https://github.com/nativescript-community/ui-native-components/compare/v1.6.3...v1.6.4) (2026-11-18)
 
 ### Bug Fixes
