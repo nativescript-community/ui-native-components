@@ -90,21 +90,43 @@ class ContentViewController extends UIViewController {
         super.viewDidLayoutSubviews();
         this.updatePreferredContentSize();
     }
-    // UIKit puts the alert at the origin of its container when a modal presented over it is closed: present it again
+    // iOS 27 (not checked on older versions): a full screen modal presented over the alert and then closed makes UIKit
+    // show the alert again at the origin of its container, and nothing lays it out again: present it again.
+    // It is hidden meanwhile, it would flash at the top left while the modal is closing.
+    viewWillAppear(animated: boolean) {
+        super.viewWillAppear(animated);
+        const alertController = this.parentViewController as AlertController;
+        if (alertController?._appeared && !alertController._representing) {
+            alertController.view.alpha = 0;
+        }
+    }
     viewDidAppear(animated: boolean) {
         super.viewDidAppear(animated);
-        const alertController = this.parentViewController;
+        const alertController = this.parentViewController as AlertController;
         const presenter = alertController?.presentingViewController;
-        const frame = alertController?.view.frame;
-        if (presenter && frame.origin.x === 0 && frame.origin.y === 0 && frame.size.width < presenter.view.bounds.size.width) {
-            presenter.dismissViewControllerAnimatedCompletion(false, () =>
-                presenter.presentViewControllerAnimatedCompletion(alertController, false, () => {
-                    // the content was laid out for the previous position
-                    this._container?._view?.requestLayout();
-                    this._container?.setNeedsLayout();
-                })
-            );
+        if (!presenter || alertController._representing) {
+            return;
         }
+        alertController._appeared = true;
+        const frame = alertController.view.frame;
+        if (frame.origin.x !== 0 || frame.origin.y !== 0 || frame.size.width >= presenter.view.bounds.size.width) {
+            alertController.view.alpha = 1;
+            return;
+        }
+        alertController._representing = true;
+        presenter.dismissViewControllerAnimatedCompletion(false, () =>
+            presenter.presentViewControllerAnimatedCompletion(alertController, false, () => {
+                alertController._representing = false;
+                alertController.view.alpha = 1;
+                // the content was laid out for the previous position (safe area insets)
+                this._container?._view?.requestLayout();
+                this._container?.setNeedsLayout();
+                // a dismiss requested meanwhile (hide()) was held back: presenting again right after it would show a closed alert
+                const afterRepresent = alertController._afterRepresent;
+                alertController._afterRepresent = null;
+                afterRepresent?.();
+            })
+        );
     }
     updatePreferredContentSize() {
         const container = this._container;
@@ -123,6 +145,17 @@ interface AlertController extends UIAlertController {
     _resolveFunction?: Function;
     _contentController?: ContentViewController;
     _onClear?: Function;
+    _appeared?: boolean;
+    _representing?: boolean;
+    _afterRepresent?: Function;
+}
+
+function dismissAlertController(alertController: AlertController, animated: boolean, completion: () => void) {
+    if (alertController._representing) {
+        alertController._afterRepresent = () => alertController.dismissViewControllerAnimatedCompletion(animated, completion);
+        return;
+    }
+    alertController.dismissViewControllerAnimatedCompletion(animated, completion);
 }
 
 function createAlertController(options: DialogOptions & MDCAlertControlerOptions, resolve?: Function, style = UIAlertControllerStyle.Alert) {
@@ -173,7 +206,7 @@ function createAlertController(options: DialogOptions & MDCAlertControlerOptions
                 alertController._resolveFunction(originalArgs);
                 alertController._resolveFunction = null;
             }
-            alertController.dismissViewControllerAnimatedCompletion(true, () => {
+            dismissAlertController(alertController, true, () => {
                 clear();
             });
         };
@@ -280,7 +313,7 @@ export class AlertDialog {
         this.hiding = true;
         const dismiss = () =>
             new Promise<void>((resolve) => {
-                alertController.dismissViewControllerAnimatedCompletion(true, () => {
+                dismissAlertController(alertController, true, () => {
                     if (alertController._resolveFunction) {
                         alertController._resolveFunction(result);
                         alertController._resolveFunction = null;
