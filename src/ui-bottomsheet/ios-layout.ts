@@ -41,7 +41,7 @@ function initLayoutGuide(controller: UIViewController) {
         layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
         layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
         layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
-    ] as any);
+    ]);
 
     return layoutGuide;
 }
@@ -432,4 +432,3 @@ export class MDLayoutViewController extends UIViewController {
         }
     }
 }
-
