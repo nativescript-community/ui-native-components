@@ -34,6 +34,7 @@ import CardsSurfaces from './CardsSurfaces.svelte';
 import Controls from './Controls.svelte';
 import DateTimePickers from './DateTimePickers.svelte';
 import Dialogs from './Dialogs.svelte';
+import DialogsStacked from './DialogsStacked.svelte';
 import FloatingActionButtons from './FloatingActionButtons.svelte';
 import SegmentedBar from './SegmentedBar.svelte';
 import Menus from './Menus.svelte';
@@ -96,6 +97,7 @@ export const demos = [
     { name: 'Pull to refresh', path: 'RefreshLayout', component: RefreshLayout },
     { name: 'Search bar', path: 'SearchBars', component: SearchBars },
     { name: 'Dialogs', path: 'Dialogs', component: Dialogs },
+    { name: 'Dialogs stacked with modals', path: 'DialogsStacked', component: DialogsStacked },
     { name: 'Bottom sheet', path: 'BottomSheet', component: BottomSheet },
     { name: 'Tabs', path: 'Tabs', component: Tabs },
     { name: 'Bottom navigation', path: 'BottomNavigation', component: BottomNavigation },
