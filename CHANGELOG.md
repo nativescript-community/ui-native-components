@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.7](https://github.com/nativescript-community/ui-native-components/compare/v1.6.6...v1.6.7) (2026-11-22)
+
+**Note:** Version bump only for package @nativescript-community/ui-native-components
+
+## [1.6.6](https://github.com/nativescript-community/ui-native-components/compare/v1.6.5...v1.6.6) (2026-11-22)
+
+### Bug Fixes
+
+* **ui-dialogs:** keep ios alerts in place and closable under modals ([15c3d60](https://github.com/nativescript-community/ui-native-components/commit/15c3d6056e4199c601b083ccad1c63dd2c0d7319))
+
+## [1.6.5](https://github.com/nativescript-community/ui-native-components/compare/v1.6.4...v1.6.5) (2026-11-18)
+
+### Bug Fixes
+
+* **ui-appbar:** follow the collapse of a lifting bar with the color of the status bar area on android ([e04da1c](https://github.com/nativescript-community/ui-native-components/commit/e04da1cb595b10f0ba2102bb8d1ee0ca26611bb0))
+* **ui-dialogs:** keep an alert laid out and in place on ios when another alert is over it or a modal closes ([d607fca](https://github.com/nativescript-community/ui-native-components/commit/d607fcab2680ccea8261dea2d0bf552eb592624b))
+* **ui-dialogs:** keep the alert out of sight and unghosted when it is shown again at the origin on ios ([b9e4dd5](https://github.com/nativescript-community/ui-native-components/commit/b9e4dd5a4b020eb2007e7f8e0066c9eb1e85fa76))
+
+## [1.6.4](https://github.com/nativescript-community/ui-native-components/compare/v1.6.3...v1.6.4) (2026-11-18)
+
+### Bug Fixes
+
+* **ui-appbar:** glass item option on iOS 26, remove the collapsing dummy view on Android ([2133996](https://github.com/nativescript-community/ui-native-components/commit/2133996d1b35f315081a7a3a69d920212703edc3))
+
+## [1.6.3](https://github.com/nativescript-community/ui-native-components/compare/v1.6.2...v1.6.3) (2026-11-16)
+
+**Note:** Version bump only for package @nativescript-community/ui-native-components
+
+## [1.6.2](https://github.com/nativescript-community/ui-native-components/compare/v1.6.1...v1.6.2) (2026-11-16)
+
+### Bug Fixes
+
+* **ui-core:** keep the font of an attributed title run on ios button configurations ([a9e5bb6](https://github.com/nativescript-community/ui-native-components/commit/a9e5bb6ee5097cee815d143ace5481d77c495192))
+* **ui-core:** keep the ripple together with the border foreground on android ([e3ab7f7](https://github.com/nativescript-community/ui-native-components/commit/e3ab7f702f11625440645a54a1b8076602659be2))
+
+## [1.6.1](https://github.com/nativescript-community/ui-native-components/compare/v1.6.0...v1.6.1) (2026-11-12)
+
+### Bug Fixes
+
+* **ios:** keep the large title when a page comes back and use the system subtitle look ([7f998f2](https://github.com/nativescript-community/ui-native-components/commit/7f998f25dff049078411ac6769b0c059f02b26ab))
+
 ## [1.6.0](https://github.com/nativescript-community/ui-native-components/compare/v1.5.2...v1.6.0) (2026-11-10)
 
 ### Features

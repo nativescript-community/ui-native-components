@@ -123,6 +123,15 @@ function attachBadges(toolbar: androidx.appcompat.widget.Toolbar, previous: com.
  * `scrollBehavior` the scroll flags / lift on scroll of the AppBarLayout.
  */
 /** the typeface of a title font prop, null when none is set */
+/** the CollapsingToolbarLayout adds a match parent dummy view to its toolbar to draw its own title: left there it takes all the room of the title */
+function removeCollapsingDummy(toolbar: androidx.appcompat.widget.Toolbar) {
+    for (let index = toolbar.getChildCount() - 1; index >= 0; index--) {
+        if (toolbar.getChildAt(index).getClass().getName() === 'android.view.View') {
+            toolbar.removeViewAt(index);
+        }
+    }
+}
+
 function createTypeface(family: string, size: number, weight: AppBarFontWeight) {
     return family || weight ? new Font(family, size, undefined, weight as any).getAndroidTypeface() : null;
 }
@@ -749,8 +758,10 @@ export class AppPage extends Page {
 
         // 1. the structure
         if (size === 'small') {
+            const hadCollapsing = !!this._collapsing;
             if (this._collapsing) {
                 (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
+                removeCollapsingDummy(toolbar);
                 appBarLayout.removeView(this._collapsing);
                 this._collapsing = null;
                 this._collapsingSize = null;
@@ -759,8 +770,13 @@ export class AppPage extends Page {
                 (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
                 appBarLayout.addView(toolbar, new AppBarLayoutParams(MATCH_PARENT, WRAP_CONTENT));
             }
+            if (hadCollapsing) {
+                // the title was drawn by the collapsing layout: the toolbar takes it back
+                bar.update();
+            }
         } else if (this._collapsingSize !== size || !this._collapsing) {
             (toolbar.getParent() as android.view.ViewGroup)?.removeView(toolbar);
+            removeCollapsingDummy(toolbar);
             if (this._collapsing) {
                 appBarLayout.removeView(this._collapsing);
             }
@@ -834,6 +850,22 @@ export class AppPage extends Page {
             // the scrim drawn once the bar is collapsed
             this._collapsing.setContentScrimColor(behavior === 'lift' ? liftedColor : barColor);
             this._collapsing.setStatusBarScrimColor(behavior === 'lift' ? liftedColor : barColor);
+        }
+        this._collapseColors = this._collapsing && behavior === 'lift' ? { bar: barColor, lifted: liftedColor } : null;
+        if (!this._collapsePreDrawListener) {
+            // a collapsing bar is never "lifted" for the AppBarLayout: its scrim takes the lifted color once collapsed, the status bar area must follow
+            this._collapsePreDrawListener = new android.view.ViewTreeObserver.OnPreDrawListener({
+                onPreDraw: () => {
+                    const colors = this._collapseColors;
+                    const range = appBarLayout.getTotalScrollRange();
+                    if (colors && range > 0) {
+                        const progress = Math.min(1, Math.max(0, (Math.abs(appBarLayout.getTop()) / range - 0.7) / 0.3));
+                        this.setStatusScrimColor(androidx.core.graphics.ColorUtils.blendARGB(colors.bar, colors.lifted, progress));
+                    }
+                    return true;
+                }
+            });
+            appBarLayout.getViewTreeObserver().addOnPreDrawListener(this._collapsePreDrawListener);
         }
         toolbar.setTitleTextColor(onBarColor);
         toolbar.setSubtitleTextColor(onBarColor);
@@ -978,6 +1010,8 @@ export class AppPage extends Page {
     }
 
     private _statusScrim: android.view.View;
+    private _collapseColors: { bar: number; lifted: number };
+    private _collapsePreDrawListener: android.view.ViewTreeObserver.OnPreDrawListener;
     private _searchBarSetup = false;
     /** the SearchBar when it hosts the navigation icon and the actions of the bar (the toolbar is hidden) */
     get hostingSearchBar() {

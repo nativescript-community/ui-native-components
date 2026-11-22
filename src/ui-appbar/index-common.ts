@@ -47,18 +47,21 @@ function itemChanged(target: AppBarItem) {
 export const badgeProperty = new Property<AppBarItem, string | number | boolean>({ name: 'badge', valueChanged: itemChanged });
 export const menuProperty = new Property<AppBarItem, MenuItem[]>({ name: 'menu', valueChanged: itemChanged });
 export const prominentProperty = new Property<AppBarItem, boolean>({ name: 'prominent', defaultValue: false, valueConverter: (v: any) => v === true || v === 'true' || v === '', valueChanged: itemChanged });
+export const glassProperty = new Property<AppBarItem, boolean>({ name: 'glass', defaultValue: true, valueConverter: (v: any) => v !== false && v !== 'false', valueChanged: itemChanged });
 export const isEnabledProperty = new Property<AppBarItem, boolean>({ name: 'isEnabled', defaultValue: true, valueConverter: (v: any) => v !== false && v !== 'false', valueChanged: itemChanged });
 
 /**
  * An action of the bar. In addition to the core `ActionItem` (text, icon, `actionView`, `android.position`...):
  * - `menu`: items of a menu shown when the action is tapped (iOS: native menu of the bar button, Android: popup menu)
  * - `prominent`: iOS 26 tinted Liquid Glass button
+ * - `glass`: `false` removes the Liquid Glass capsule the system draws behind the item on iOS 26 (a logo, a view which has its own background)
  * - `isEnabled`: `false` greys the action out and ignores the taps
  */
 export class AppBarItem extends ActionItem {
     isEnabled: boolean;
     menu: MenuItem[];
     prominent: boolean;
+    glass: boolean;
     /** a badge on the action: a number, a text, or `true` for a dot. iOS 26 and Android */
     badge: string | number | boolean;
 
@@ -87,6 +90,7 @@ export class AppBarItem extends ActionItem {
 menuProperty.register(AppBarItem);
 badgeProperty.register(AppBarItem);
 prominentProperty.register(AppBarItem);
+glassProperty.register(AppBarItem);
 isEnabledProperty.register(AppBarItem);
 
 export interface AppBarSearchEventData extends EventData {
