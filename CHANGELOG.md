@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.8](https://github.com/nativescript-community/ui-native-components/compare/v1.6.7...v1.6.8) (2026-11-22)
+
+### Bug Fixes
+
+* **release:** keep working tree clean for lerna-lite >= 5.7 ([bd9d170](https://github.com/nativescript-community/ui-native-components/commit/bd9d1706c6ca5605c069fd33cf91361f45e72f4b))
+
 ## [1.6.7](https://github.com/nativescript-community/ui-native-components/compare/v1.6.6...v1.6.7) (2026-11-22)
 
 **Note:** Version bump only for package @nativescript-community/ui-native-components
