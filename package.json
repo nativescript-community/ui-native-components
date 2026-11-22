@@ -52,7 +52,7 @@
         "pnpm": ">=7.0.0",
         "node": "^14.20.0 || ^16.13.0 || >=18.10.0"
     },
-    "packageManager": "yarn@4.10.2",
+    "packageManager": "yarn@4.19.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/nativescript-community/ui-native-components.git"
