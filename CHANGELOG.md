@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.6](https://github.com/nativescript-community/ui-native-components/compare/v1.6.5...v1.6.6) (2026-11-22)
+
+### Bug Fixes
+
+* **ui-dialogs:** keep ios alerts in place and closable under modals ([15c3d60](https://github.com/nativescript-community/ui-native-components/commit/15c3d6056e4199c601b083ccad1c63dd2c0d7319))
+
 ## [1.6.5](https://github.com/nativescript-community/ui-native-components/compare/v1.6.4...v1.6.5) (2026-11-18)
 
 ### Bug Fixes

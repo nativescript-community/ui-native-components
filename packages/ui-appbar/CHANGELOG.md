@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.6](https://github.com/nativescript-community/ui-material-components/compare/v1.6.5...v1.6.6) (2026-11-22)
+
+**Note:** Version bump only for package @nativescript-community/ui-appbar
+
 ## [1.6.5](https://github.com/nativescript-community/ui-material-components/compare/v1.6.4...v1.6.5) (2026-11-18)
 
 **Note:** Version bump only for package @nativescript-community/ui-appbar
