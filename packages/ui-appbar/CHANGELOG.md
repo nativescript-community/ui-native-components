@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.0](https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-appbar/compare/v1.6.8...v1.7.0) (2026-11-26)
+
+### Features
+
+* **svelte:** add a Svelte 5 binding for ui-appbar in svelte5/ ([3b95b29](https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-appbar/commit/3b95b29a10cd703b0e7b88ee141fcf3b99884dce))
+* **svelte:** build the svelte5/ bindings against svelte-native 5 ([2c655cc](https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-appbar/commit/2c655cce569e9d9980ec6d9ed125071ae9c58998)), references [#36](https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-appbar/issues/36)
+
 ## [1.6.8](https://github.com/nativescript-community/ui-material-components/tree/master/packages/ui-appbar/compare/v1.6.7...v1.6.8) (2026-11-22)
 
 **Note:** Version bump only for package @nativescript-community/ui-appbar
