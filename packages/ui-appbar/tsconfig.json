@@ -25,6 +25,8 @@
         "../../src/references.d.ts"
     ],
     "exclude": [
+        "../../src/ui-appbar/svelte5/**/*",
         "../../src/ui-appbar/angular/**"
-    ]
+    ],
+    "references": [{ "path": "./tsconfig.svelte5.json" }]
 }

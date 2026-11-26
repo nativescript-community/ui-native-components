@@ -1,0 +1,19 @@
+{
+    "extends": "../../tools/tsconfig.svelte5.json",
+    "compilerOptions": {
+        "rootDir": "../../src/ui-appbar",
+        "outDir": "./",
+        // `paths` replaces the inherited ones: keep the svelte ones of tools/tsconfig.svelte5.json
+        "paths": {
+            "svelte": ["./node_modules/svelte5"],
+            "svelte/*": ["./node_modules/svelte5/*"],
+            "@nativescript-community/svelte-native": ["./node_modules/svelte-native5"],
+            "@nativescript-community/svelte-native/*": ["./node_modules/svelte-native5/*"],
+            "@nativescript-community/ui-core": ["packages/ui-core/index"],
+            "@nativescript-community/ui-core/*": ["packages/ui-core/*"],
+            "@nativescript-community/ui-menu": ["packages/ui-menu/index"],
+            "@nativescript-community/ui-menu/*": ["packages/ui-menu/*"]
+        }
+    },
+    "include": ["../../src/ui-appbar/svelte5/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"]
+}

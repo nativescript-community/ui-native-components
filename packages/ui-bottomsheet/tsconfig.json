@@ -19,6 +19,8 @@
         "../../src/references.d.ts"
     ],
     "exclude": [
+        "../../src/ui-bottomsheet/svelte5/**/*",
         "../../src/ui-bottomsheet/angular/**"
-    ]
+    ],
+    "references": [{ "path": "./tsconfig.svelte5.json" }]
 }
