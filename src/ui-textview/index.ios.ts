@@ -12,4 +12,7 @@ export class TextView extends TextViewBase {
     public clearFocus() {
         this.nativeViewProtected?.resignFirstResponder();
     }
+    public blur() {
+        this.clearFocus();
+    }
 }

@@ -27,6 +27,7 @@ import {
     placeholderColorProperty,
     textAlignmentProperty
 } from '@nativescript/core';
+import { editableProperty } from '@nativescript/core/ui/editable-text-base';
 import { TextViewBase } from './index-common';
 
 import { accessibilityIdentifierProperty } from '@nativescript/core/accessibility/accessibility-properties';
@@ -172,6 +173,68 @@ export class TextView extends TextViewBase {
         if (this.nativeTextViewProtected) {
             this.nativeTextViewProtected.fullClearFocus();
         }
+    }
+    public blur() {
+        this.clearFocus();
+        this.dismissSoftInput();
+    }
+
+    // core turns focus, click and long click off with `editable`: read-only text could not be selected. `selectable` only exists in the Akylas fork of core
+    [editableProperty.setNative](value: boolean) {
+        super[editableProperty.setNative](value);
+        const editText = this.editText;
+        const interactive = value || (this as { selectable?: boolean }).selectable !== false;
+        editText.setFocusable(interactive);
+        editText.setFocusableInTouchMode(interactive);
+        editText.setLongClickable(interactive);
+        editText.setClickable(interactive);
+        editText.setShowSoftInputOnFocus(value);
+    }
+
+    private _isScrollEnabled = true;
+    get isScrollEnabled() {
+        return this._isScrollEnabled;
+    }
+    set isScrollEnabled(value: boolean) {
+        this._isScrollEnabled = value;
+        const editText = this.editText;
+        if (!value && editText) {
+            // ends what the finger already started: scroll, long press, selection
+            const time = android.os.SystemClock.uptimeMillis();
+            const event = android.view.MotionEvent.obtain(time, time, android.view.MotionEvent.ACTION_CANCEL, 0, 0, 0);
+            editText.onTouchEvent(event);
+            event.recycle();
+        }
+    }
+
+    private editTextTouchListenerIsSet = false;
+    // The touches go to the EditText, the layout around it never sees them: the touch listener of the view is on the EditText
+    public setOnTouchListener() {
+        const editText = this.editText;
+        if (this.editTextTouchListenerIsSet || !editText || !this.hasGestureObservers()) {
+            return;
+        }
+        const owner = new WeakRef(this);
+        editText.setOnTouchListener(
+            new android.view.View.OnTouchListener({
+                onTouch: (_view, event) => {
+                    const view = owner.get();
+                    if (!view) {
+                        return false;
+                    }
+                    (view as unknown as { handleGestureTouch(event: android.view.MotionEvent): void }).handleGestureTouch(event);
+                    return !view.isScrollEnabled;
+                }
+            })
+        );
+        this.editTextTouchListenerIsSet = true;
+    }
+    public disposeNativeView() {
+        if (this.editTextTouchListenerIsSet) {
+            this.editTextTouchListenerIsSet = false;
+            this.editText?.setOnTouchListener(null);
+        }
+        super.disposeNativeView();
     }
     public setSelection(start: number, stop?: number) {
         if (stop !== undefined) {

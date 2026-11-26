@@ -31,5 +31,12 @@ The Android components use **Material 3**: see the [repository README](https://g
 
 Same properties as `ui-textfield` (variant, helper, error, counter... on Android only).
 
+Also:
+
+- `blur()`: removes the focus and hides the keyboard.
+- `isScrollEnabled` (Android): when `false` the text view ignores the touches (no scroll, no selection), for a parent that takes the touch (a sheet dragged from the text).
+- `touch` events and gestures work on the text itself on Android.
+- Read-only text (`editable="false"`) stays selectable. With the Akylas fork of `@nativescript/core`, `selectable="false"` turns it off.
+
 {{ load:../../tools/readme/demos-and-development.md }}
 {{ load:../../tools/readme/questions.md }}

@@ -24,7 +24,17 @@ export class TextView extends EditableTextBase {
     variant: string;
     error: string;
 
+    /**
+     * Android: when false, the text view ignores the touches: no scroll, no selection. Used by a parent which takes the touch (a sheet dragged from the text).
+     * @platform android
+     * @default true
+     */
+    isScrollEnabled: boolean;
+
     focus();
+    /**
+     * Removes the focus from the text and hides the keyboard.
+     */
     blur();
     requestFocus();
     clearFocus();
