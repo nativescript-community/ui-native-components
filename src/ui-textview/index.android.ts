@@ -208,7 +208,7 @@ export class TextView extends TextViewBase {
     }
 
     private editTextTouchListenerIsSet = false;
-    // The touches go to the EditText, the layout around it never sees them: the touch listener of the view is on the EditText
+    // Overrides the hook core calls in `onLoaded` and when a touch observer is added. The touches go to the EditText, the layout around it never sees them: the listener is set on the EditText
     public setOnTouchListener() {
         const editText = this.editText;
         if (this.editTextTouchListenerIsSet || !editText || !this.hasGestureObservers()) {
